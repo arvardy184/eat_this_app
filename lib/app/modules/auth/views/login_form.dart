@@ -1,52 +1,42 @@
 import 'package:eat_this_app/app/components/CustomButton.dart';
 import 'package:eat_this_app/app/components/CustomTextField.dart';
 import 'package:eat_this_app/app/components/SocialLoginButton.dart';
-import 'package:eat_this_app/app/modules/auth/views/login_form.dart';
-import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
-import 'package:eat_this_app/app/modules/home/views/home_page.dart';
-import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class LoginForm extends StatelessWidget {
+  const LoginForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Log In'),
+        centerTitle: true,
+        elevation: 0,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Center(
-              child: Container(
-                height: Get.height * 0.5,
-                width: Get.width * 0.5,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/logo.png'),
-                  ),
-                ),
-              ),
-            ),
+            const Text("Email",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const CustomTextField(hint: "Text your email"),
+            const SizedBox(height: 16),
+            const Text("Password",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const CustomTextField(hint: "Text your password", isPassword: true),
+            const SizedBox(height: 20),
             CustomButton(
               text: 'Log In',
               isPrimary: true,
-              onPressed: () {
-                Get.to(() => LoginForm());
-              },
+              onPressed: () {},
             ),
-            SizedBox(height: 20),
-            CustomButton(
-              text: 'Sign Up',
-              isPrimary: false,
-              onPressed: () {
-                Get.to(() => SignupForm());
-              },
-            ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(

@@ -1,41 +1,37 @@
 import 'package:eat_this_app/app/components/CustomButton.dart';
 import 'package:eat_this_app/app/components/CustomTextField.dart';
 import 'package:eat_this_app/app/components/SocialLoginButton.dart';
-import 'package:eat_this_app/app/modules/auth/views/login_form.dart';
-import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
 import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class SignupForm extends StatelessWidget {
+  const SignupForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sign Up'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Center(
-              child: Container(
-                height: Get.height * 0.5,
-                width: Get.width * 0.5,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/logo.png'),
-                  ),
-                ),
-              ),
-            ),
             CustomButton(
               text: 'Log In',
               isPrimary: true,
               onPressed: () {
-                Get.to(() => LoginForm());
+                // Handle login
+                print("Logging in...");
+                // Navigate to home page
+                // Get.to(() => HomePage());
               },
             ),
             SizedBox(height: 20),
@@ -43,7 +39,10 @@ class LoginPage extends StatelessWidget {
               text: 'Sign Up',
               isPrimary: false,
               onPressed: () {
-                Get.to(() => SignupForm());
+                // Handle login
+                print("Logging in...");
+                // Navigate to home page
+                // Get.to(() => HomePage());
               },
             ),
             SizedBox(height: 20),

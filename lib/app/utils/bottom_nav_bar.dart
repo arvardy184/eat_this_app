@@ -8,55 +8,53 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../modules/scan/views/scan_view.dart';
 
-
-
 class PersistentBottomNavBar extends StatelessWidget {
-  const PersistentBottomNavBar({Key? key}) : super(key: key);
+  const PersistentBottomNavBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    PersistentTabController _controller;
-    _controller = PersistentTabController(initialIndex: 0);
+    PersistentTabController controller;
+    controller = PersistentTabController(initialIndex: 0);
 
-    List<Widget> _buildScreens() {
+    List<Widget> buildScreens() {
       return [
         HomePage(),
-        ProductPage(),
-        ScanPage(),
-        PharmacyPage(),
-        ChatPage(),
+        const ProductPage(),
+        const ScanPage(),
+        const PharmacyPage(),
+        const ChatPage(),
       ];
     }
 
-    List<PersistentBottomNavBarItem> _navBarsItems() {
+    List<PersistentBottomNavBarItem> navBarsItems() {
       return [
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.home),
+          icon: const Icon(Icons.home),
           title: ("Home"),
           activeColorPrimary: Colors.blue,
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.search),
+          icon: const Icon(Icons.search),
           title: ("Product"),
           activeColorPrimary: Colors.blue,
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.qr_code_scanner, color: Colors.white),
+          icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
           title: ("Scan"),
           activeColorPrimary: Colors.blue,
           inactiveColorPrimary: Colors.grey,
           activeColorSecondary: Colors.white,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.local_pharmacy),
+          icon: const Icon(Icons.local_pharmacy),
           title: ("Pharmacy"),
           activeColorPrimary: Colors.blue,
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
-          icon: Icon(Icons.chat),
+          icon: const Icon(Icons.chat),
           title: ("Chat"),
           activeColorPrimary: Colors.blue,
           inactiveColorPrimary: Colors.grey,
@@ -66,10 +64,10 @@ class PersistentBottomNavBar extends StatelessWidget {
 
     return PersistentTabView(
       context,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-     
+      controller: controller,
+      screens: buildScreens(),
+      items: navBarsItems(),
+
       backgroundColor: Colors.white,
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
@@ -89,7 +87,8 @@ class PersistentBottomNavBar extends StatelessWidget {
       //   curve: Curves.ease,
       //   duration: Duration(milliseconds: 200),
       // ),
-      navBarStyle: NavBarStyle.style15, // Choose the nav bar style with this property
+      navBarStyle:
+          NavBarStyle.style15, // Choose the nav bar style with this property
     );
   }
 }

@@ -6,7 +6,7 @@ class AppTheme {
   static final light = ThemeData.light().copyWith(
     primaryColor: Colors.blue,
     scaffoldBackgroundColor: Colors.white,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: Colors.blue,
       elevation: 0,
     ),
@@ -16,14 +16,13 @@ class AppTheme {
   static final dark = ThemeData.dark().copyWith(
     primaryColor: Colors.blueGrey,
     scaffoldBackgroundColor: Colors.grey[900],
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: Colors.blueGrey,
       elevation: 0,
     ),
     // Add more customizations here
   );
 }
-
 
 class CIETTheme {
   static const Color primary_color = Color(0xFF390061);

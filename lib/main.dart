@@ -1,4 +1,3 @@
-import 'package:eat_this_app/app/modules/auth/views/login_page.dart';
 import 'package:eat_this_app/app/modules/splash_page.dart';
 import 'package:eat_this_app/app/routes/app_pages.dart';
 import 'package:eat_this_app/app/themes/app_theme.dart';
@@ -16,6 +15,8 @@ void main() async {
 }
 
 class CIETApp extends StatelessWidget {
+  const CIETApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -23,11 +24,9 @@ class CIETApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
       locale: Get.deviceLocale,
-      fallbackLocale: Locale('en', 'US'),
+      fallbackLocale: const Locale('en', 'US'),
       theme: setupTheme(),
       home: SplashPage(),
-      
-    
     );
   }
 

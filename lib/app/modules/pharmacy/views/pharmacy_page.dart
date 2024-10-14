@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class PharmacyPage extends StatelessWidget {
@@ -8,12 +7,12 @@ class PharmacyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pharmacy"),
+        title: const Text("Pharmacy"),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-      body: Center(
+      body: const Center(
         child: Text("Pharmacy"),
       ),
     );

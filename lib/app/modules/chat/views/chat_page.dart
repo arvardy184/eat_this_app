@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatelessWidget {
@@ -8,12 +7,12 @@ class ChatPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chat"),
+        title: const Text("Chat"),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-      body: Center(
+      body: const Center(
         child: Text("Chat"),
       ),
     );

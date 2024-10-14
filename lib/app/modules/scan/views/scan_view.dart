@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class ScanPage extends StatelessWidget {
   const ScanPage({super.key});
@@ -8,24 +7,21 @@ class ScanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Scan"),
+        title: const Text("Scan"),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
-        
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: (){
-
-              },
-              child: Text("Scan Product"),
-              // onPressed: () =>  
+              onPressed: () {},
+              child: const Text("Scan Product"),
+              // onPressed: () =>
             ),
-          
+
             // }),
           ],
         ),
