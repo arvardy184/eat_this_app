@@ -17,15 +17,35 @@ class SignupForm extends StatelessWidget {
         title: const Text('Sign Up'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const Text(
+              'Email',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const CustomTextField(hint: "Text your email"),
+            const SizedBox(height: 16),
+            const Text(
+              'Password',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const CustomTextField(hint: "Text your password", isPassword: true),
+            const SizedBox(height: 12),
+            const Text(
+              'Confirm Password',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const CustomTextField(hint: "Text your password", isPassword: true),
+            const SizedBox(height: 62),
             CustomButton(
-              text: 'Log In',
+              text: 'Sign Up',
               isPrimary: true,
               onPressed: () {
                 // Handle login
@@ -34,18 +54,7 @@ class SignupForm extends StatelessWidget {
                 // Get.to(() => HomePage());
               },
             ),
-            SizedBox(height: 20),
-            CustomButton(
-              text: 'Sign Up',
-              isPrimary: false,
-              onPressed: () {
-                // Handle login
-                print("Logging in...");
-                // Navigate to home page
-                // Get.to(() => HomePage());
-              },
-            ),
-            SizedBox(height: 20),
+            SizedBox(height: 28),
             Row(
               children: [
                 Expanded(
@@ -65,7 +74,7 @@ class SignupForm extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 28),
             SocialLoginButton(
               text: 'Continue with Google',
               icon: 'assets/images/google_icon.png',
@@ -74,7 +83,7 @@ class SignupForm extends StatelessWidget {
                 print("Logging in with Google...");
               },
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             SocialLoginButton(
               text: 'Continue with Facebook',
               icon: 'assets/images/facebook_icon.png',
