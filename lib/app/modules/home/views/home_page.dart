@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -56,9 +55,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// lib/widgets/custom_app_bar.dart
-// import 'package:flutter/material.dart';
-
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String username;
 
@@ -78,25 +74,28 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Hi, $username',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hi, $username',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const Text(
-                'Welcome back!',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+                const Text(
+                  'Welcome back!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const CircleAvatar(
             backgroundImage: AssetImage('assets/profile_image.png'),
@@ -110,9 +109,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(100);
 }
-
-// lib/widgets/last_scanned_card.dart
-// import 'package:flutter/material.dart';
 
 class LastScannedCard extends StatelessWidget {
   final String productName;
@@ -139,14 +135,11 @@ class LastScannedCard extends StatelessWidget {
           children: [
             Image.asset('assets/images/citato_image.png',
                 errorBuilder: (context, error, stackTrace) {
-              // Fallback in case the image is not found
               return Container(
                 width: 60,
                 height: 60,
-                color: Colors.grey, // Grey background if image not found
-                child: const Icon(Icons.broken_image,
-                    color:
-                        Colors.white), // Optional: an icon for visual feedback
+                color: Colors.grey,
+                child: const Icon(Icons.broken_image, color: Colors.white),
               );
             }, width: 60, height: 60),
             const SizedBox(width: 16),
@@ -158,18 +151,19 @@ class LastScannedCard extends StatelessWidget {
                     productName,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  Text(productType),
+                  Text(productType, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       const Icon(Icons.calendar_today, size: 16),
                       const SizedBox(width: 4),
-                      Text(date),
+                      Expanded(child: Text(date, overflow: TextOverflow.ellipsis)),
                       const SizedBox(width: 16),
                       const Icon(Icons.access_time, size: 16),
                       const SizedBox(width: 4),
-                      Text(time),
+                      Expanded(child: Text(time, overflow: TextOverflow.ellipsis)),
                     ],
                   ),
                 ],
@@ -182,9 +176,6 @@ class LastScannedCard extends StatelessWidget {
     );
   }
 }
-
-// lib/widgets/recommendation_section.dart
-// import 'package:flutter/material.dart';
 
 class RecommendationSection extends StatelessWidget {
   const RecommendationSection({super.key});
@@ -210,8 +201,7 @@ class RecommendationItem extends StatelessWidget {
   final String name;
   final String image;
 
-  const RecommendationItem(
-      {super.key, required this.name, required this.image});
+  const RecommendationItem({super.key, required this.name, required this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -222,25 +212,20 @@ class RecommendationItem extends StatelessWidget {
         children: [
           Image.asset(image, width: 60, height: 60,
               errorBuilder: (context, error, stackTrace) {
-            // Fallback in case the image is not found
             return Container(
               width: 60,
               height: 60,
-              color: Colors.grey, // Grey background if image not found
-              child: const Icon(Icons.broken_image,
-                  color: Colors.white), // Optional: an icon for visual feedback
+              color: Colors.grey,
+              child: const Icon(Icons.broken_image, color: Colors.white),
             );
           }),
           const SizedBox(height: 4),
-          Text(name, textAlign: TextAlign.center),
+          Text(name, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
         ],
       ),
     );
   }
 }
-
-// lib/widgets/pharmacy_section.dart
-// import 'package:flutter/material.dart';
 
 class PharmacySection extends StatelessWidget {
   const PharmacySection({super.key});
@@ -309,8 +294,7 @@ class PharmacyItem extends StatelessWidget {
                 const CircleAvatar(
                   backgroundColor: Colors.grey,
                   radius: 30,
-                  child: Icon(Icons.broken_image,
-                      color: Colors.white), // Optional icon
+                  child: Icon(Icons.broken_image, color: Colors.white),
                 );
               },
               radius: 30,
@@ -321,33 +305,45 @@ class PharmacyItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(location),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis),
+                  Text(location, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.location_on,
-                          size: 16, color: Colors.grey),
+                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
-                      Text(distance,
-                          style: const TextStyle(color: Colors.grey)),
-                      if (rating.isNotEmpty) ...[
-                        const SizedBox(width: 16),
-                        const Icon(Icons.star, size: 16, color: Colors.yellow),
-                        const SizedBox(width: 4),
-                        Text('$rating ($reviews Reviews)',
-                            style: const TextStyle(color: Colors.grey)),
-                      ],
-                      if (openTime.isNotEmpty) ...[
-                        const SizedBox(width: 16),
-                        const Icon(Icons.access_time,
-                            size: 16, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text('Open at $openTime',
-                            style: const TextStyle(color: Colors.grey)),
-                      ],
+                      Expanded(
+                        child: Text(distance,
+                            style: const TextStyle(color: Colors.grey),
+                            overflow: TextOverflow.ellipsis),
+                      ),
                     ],
                   ),
+                  if (rating.isNotEmpty)
+                    Row(
+                      children: [
+                        const Icon(Icons.star, size: 16, color: Colors.yellow),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text('$rating ($reviews Reviews)',
+                              style: const TextStyle(color: Colors.grey),
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                      ],
+                    ),
+                  if (openTime.isNotEmpty)
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text('Open at $openTime',
+                              style: const TextStyle(color: Colors.grey),
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -357,6 +353,3 @@ class PharmacyItem extends StatelessWidget {
     );
   }
 }
-
-// lib/widgets/bottom_navigation.dart
-// import 'package:flutter/material.dart';

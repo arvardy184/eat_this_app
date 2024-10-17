@@ -3,6 +3,8 @@ import 'package:eat_this_app/app/components/CustomTextField.dart';
 import 'package:eat_this_app/app/components/SocialLoginButton.dart';
 import 'package:eat_this_app/app/modules/auth/views/forgetPassword_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
+import 'package:eat_this_app/app/modules/home/views/home_page.dart';
+import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -68,7 +70,9 @@ class _LoginFormState extends State<LoginForm> {
             CustomButton(
               text: 'Log In',
               isPrimary: true,
-              onPressed: () {},
+              onPressed: () {
+                 Get.to(() => const PersistentBottomNavBar());
+              },
             ),
             const SizedBox(height: 28),
             Row(
