@@ -1,9 +1,9 @@
 import 'package:eat_this_app/app/components/CustomButton.dart';
 import 'package:eat_this_app/app/components/CustomTextField.dart';
 import 'package:eat_this_app/app/components/SocialLoginButton.dart';
+import 'package:eat_this_app/app/hooks/use_auth.dart';
 import 'package:eat_this_app/app/modules/auth/views/forgetPassword_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
-import 'package:eat_this_app/app/modules/home/views/home_page.dart';
 import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,6 +17,12 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   bool rememberMe = false;
+  bool _isLoading = false;
+
+  final UseAuth _auth = UseAuth();
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +40,16 @@ class _LoginFormState extends State<LoginForm> {
             const Text("Email",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const CustomTextField(hint: "Text your email"),
+            CustomTextField(
+                controller: _emailController, hint: "Text your email"),
             const SizedBox(height: 16),
             const Text("Password",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const CustomTextField(hint: "Text your password", isPassword: true),
+            CustomTextField(
+                controller: _passwordController,
+                hint: "Text your password",
+                isPassword: true),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -70,9 +80,8 @@ class _LoginFormState extends State<LoginForm> {
             CustomButton(
               text: 'Log In',
               isPrimary: true,
-              onPressed: () {
-                 Get.to(() => const PersistentBottomNavBar());
-              },
+              isLoading: _isLoading,
+              onPressed: _handleLogin,
             ),
             const SizedBox(height: 28),
             Row(
@@ -131,5 +140,22 @@ class _LoginFormState extends State<LoginForm> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      await _auth.login(_emailController.text, _passwordController.text);
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+
+    super.dispose();
   }
 }

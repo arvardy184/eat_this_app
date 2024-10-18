@@ -1,9 +1,7 @@
 import 'package:eat_this_app/app/components/CustomButton.dart';
 import 'package:eat_this_app/app/components/CustomTextField.dart';
-import 'package:eat_this_app/app/components/SocialLoginButton.dart';
-import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
+import 'package:eat_this_app/app/hooks/use_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class ForgotPasswordForm extends StatefulWidget {
   const ForgotPasswordForm({Key? key}) : super(key: key);
@@ -14,6 +12,10 @@ class ForgotPasswordForm extends StatefulWidget {
 
 class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
   bool rememberMe = false;
+
+  final UseAuth _auth = UseAuth();
+
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,8 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
             const Text("Email",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const CustomTextField(hint: "Text your email"),
+            CustomTextField(
+                controller: _emailController, hint: "Text your email"),
             const SizedBox(height: 35),
             CustomButton(
               text: 'Confirm',

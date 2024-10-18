@@ -1,10 +1,7 @@
 import 'package:eat_this_app/app/components/CustomButton.dart';
-import 'package:eat_this_app/app/components/CustomTextField.dart';
 import 'package:eat_this_app/app/components/SocialLoginButton.dart';
 import 'package:eat_this_app/app/modules/auth/views/login_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
-import 'package:eat_this_app/app/modules/home/views/home_page.dart';
-import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
