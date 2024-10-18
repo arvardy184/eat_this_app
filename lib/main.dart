@@ -18,7 +18,12 @@ class CIETApp extends StatelessWidget {
   const CIETApp({super.key});
 
   @override
+
   Widget build(BuildContext context) {
+     SystemChrome.setSystemUIOverlayStyle( SystemUiOverlayStyle(
+      statusBarColor: Colors.blue,
+      
+     ));
     return GetMaterialApp(
       getPages: AppPages.routes,
       debugShowCheckedModeBanner: false,
