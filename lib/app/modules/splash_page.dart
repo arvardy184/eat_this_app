@@ -1,3 +1,4 @@
+import 'package:eat_this_app/app/hooks/use_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -10,13 +11,24 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  final UseAuth _auth = UseAuth();
+
   @override
-  void initState() {
+  void initState()  {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      Get.toNamed('/login');
+  pref();
+  }
+
+  void pref() async {
+      Future.delayed(const Duration(seconds: 3), () async {
+    if(await _auth.isLoggedIn()){
+      Get.offAllNamed('/home');
+    } else {
+      Get.offAllNamed('/login');
+    }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {

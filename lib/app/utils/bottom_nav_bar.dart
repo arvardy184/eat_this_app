@@ -2,7 +2,6 @@
 import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
 import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_page.dart';
-import 'package:eat_this_app/app/modules/product_details/views/product_page.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';

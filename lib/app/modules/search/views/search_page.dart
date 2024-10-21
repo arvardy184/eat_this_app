@@ -5,6 +5,13 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(" ini search page");
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Search"),
+      ),
+      body: Center(
+        child: Text("Search"),
+      )
+    );
   }
 }

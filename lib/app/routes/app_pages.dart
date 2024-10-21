@@ -7,6 +7,7 @@ import 'package:eat_this_app/app/modules/auth/views/login_page.dart';
 import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
 import 'package:eat_this_app/app/modules/auth/views/forgetPassword_form.dart';
+import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:get/get.dart';
 
 class AppPages {
@@ -15,7 +16,7 @@ class AppPages {
   static final routes = [
     GetPage(
       name: '/home',
-      page: () => HomePage(),
+      page: () => PersistentBottomNavBar(),
       // binding: HomeBinding(),
     ),
     GetPage(name: '/login', page: () => const LoginPage()),

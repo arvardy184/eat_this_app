@@ -20,7 +20,7 @@ class CIETApp extends StatelessWidget {
   @override
 
   Widget build(BuildContext context) {
-     SystemChrome.setSystemUIOverlayStyle( SystemUiOverlayStyle(
+     SystemChrome.setSystemUIOverlayStyle( const SystemUiOverlayStyle(
       statusBarColor: Colors.blue,
       
      ));
@@ -31,7 +31,7 @@ class CIETApp extends StatelessWidget {
       locale: Get.deviceLocale,
       fallbackLocale: const Locale('en', 'US'),
       theme: setupTheme(),
-      home: SplashPage(),
+      home: const SplashPage(),
     );
   }
 
