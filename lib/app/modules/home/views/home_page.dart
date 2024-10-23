@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -97,9 +98,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
-          const CircleAvatar(
-            backgroundImage: AssetImage('assets/profile_image.png'),
-            radius: 25,
+          GestureDetector(
+            onTap: () {
+              Get.toNamed('/profile');
+            },
+            child: const CircleAvatar(
+              backgroundImage: AssetImage('assets/images/farhan.png'),
+              radius: 25,
+            ),
           ),
         ],
       ),
@@ -133,7 +139,7 @@ class LastScannedCard extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            Image.asset('assets/images/citato_image.png',
+            Image.asset('assets/images/farhan.png',
                 errorBuilder: (context, error, stackTrace) {
               return Container(
                 width: 60,
@@ -187,10 +193,10 @@ class RecommendationSection extends StatelessWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: const [
-          RecommendationItem(name: 'Citato', image: 'assets/citato.png'),
-          RecommendationItem(name: 'Biskuat', image: 'assets/biskuat.png'),
-          RecommendationItem(name: 'Monde', image: 'assets/monde.png'),
-          RecommendationItem(name: 'Nextar', image: 'assets/nextar.png'),
+          RecommendationItem(name: 'Citato', image: 'assets/images/farhan.png'),
+          RecommendationItem(name: 'Biskuat', image: 'assets/images/farhan.png'),
+          RecommendationItem(name: 'Monde', image: 'assets/images/farhan.png'),
+          RecommendationItem(name: 'Nextar', image: 'assets/images/farhan.png'),
         ],
       ),
     );
@@ -241,7 +247,7 @@ class PharmacySection extends StatelessWidget {
           rating: '4.8',
           reviews: '120',
           openTime: '07:00',
-          image: 'assets/pharmacy_1.png',
+          image: 'assets/images/farhan.png',
         ),
         SizedBox(height: 12),
         PharmacyItem(
@@ -251,7 +257,7 @@ class PharmacySection extends StatelessWidget {
           rating: '',
           reviews: '',
           openTime: '',
-          image: 'assets/pharmacy_2.png',
+          image: 'assets/images/farhan.png',
         ),
       ],
     );

@@ -6,57 +6,54 @@ class UseAuth {
   final ApiService _apiService = ApiService();
 
   Future<void> login(String email, String password) async {
-    try {
-      final response = await _apiService.login(email, password);
-      if (response.statusCode == 200) {
-        // Handle successful login
-         await _saveSession(response.data['token']);
-        Get.offAllNamed('/home'); // Navigate to home page
-      } else {
-        // Handle login failure
-        Get.snackbar('Login Failed', 'Please check your credentials');
-      }
-    } catch (e) {
-      // Handle errors
-      Get.snackbar('Error', 'An error occurred during login');
+  try {
+    final response = await _apiService.login(email, password);
+    print("Response: $response");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Login successful");
+      Get.offAllNamed('/home');  // Navigate to the home page
+    } else {
+      print("Login failed with status: ${response.statusCode}");
+      Get.snackbar('Login Failed', 'Please check your credentials');
     }
+  } catch (e) {
+    print("Error during login: $e");
+    Get.snackbar('Error', 'An error occurred during login');
   }
+}
+
+
 
   Future<void> signup(String name, String email, String password) async {
     try {
       final response = await _apiService.signup(name, email, password);
-      if (response.statusCode == 201) {
-        // Handle successful signup
-        Get.snackbar('Signup Successful', 'Please login with your new account');
-        Get.offAllNamed('/login'); // Navigate to login page
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Get.offAllNamed('/home');
       } else {
-        // Handle signup failure
-        Get.snackbar('Signup Failed', 'Please try again');
+        Get.snackbar('Signup Failed', 'Please check your credentials');
       }
     } catch (e) {
-      // Handle errors
       Get.snackbar('Error', 'An error occurred during signup');
     }
   }
- Future<void> _saveSession(String token) async {
+
+  Future<void> handleUnauthorized() async {
+    try {
+      await _apiService.refreshToken();
+    } catch (e) {
+      await logout();
+    }
+  }
+
+  Future<void> logout() async {
+    await _apiService.logout();
+  }
+
+  Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('auth_token', token);
+    final token = prefs.getString('auth_token');
+    final refreshToken = prefs.getString('refresh_token');
+    return token != null && refreshToken != null;
   }
-
-   Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
-  }
-
-Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    Get.offAllNamed('/login');
-  }
-
-   Future<bool> isLoggedIn() async {
-    final token = await getToken();
-    return token != null && token.isNotEmpty;
-  }
-
 }

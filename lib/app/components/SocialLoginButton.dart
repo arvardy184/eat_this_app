@@ -21,7 +21,7 @@ class SocialLoginButton extends StatelessWidget {
         minimumSize: Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: Colors.grey),
+          side: const BorderSide(color: Colors.grey),
         ),
       ),
       onPressed: onPressed,
