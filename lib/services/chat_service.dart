@@ -7,8 +7,9 @@ class ChatService {
   final Dio dio = Dio();
 
   Future<ConsultantModel> getConsultants({String? name}) async {
-     SharedPreferences preferences = await SharedPreferences.getInstance();
+    SharedPreferences preferences = await SharedPreferences.getInstance();
     String? token = preferences.getString('auth_token');
+      print("Using token: $token");
     try{
       final response = await dio.get(
         "${ApiConstants.baseUrl}user/consultants",
@@ -20,9 +21,10 @@ class ChatService {
           },
         )
       );
-
+      print("Response: ${response.data}");
       return ConsultantModel.fromJson(response.data);
     } catch(e){
+      print("Error: $e");
       throw Exception(e);
     }
   }
