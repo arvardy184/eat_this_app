@@ -8,35 +8,50 @@ import 'package:get/get.dart';
 class ScanPage extends StatelessWidget {
   final ScanController controller = Get.put(ScanController());
 
+  ScanPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Scan Product')),
+      appBar: AppBar(
+        title: const Text('Scan Product'),
+        elevation: 0,
+      ),
       body: Column(
         children: [
           Expanded(
             flex: 2,
             child: Obx(
               () => controller.isScanning.value
-                  ? SizedBox(
-                      height: 300,
-                      width: double.infinity,
-                      child:
-                          ScannerWidget(onDetect: controller.handleDetection),
+                  ? Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.black,
+                      ),
+                      child: SizedBox(
+                        height: 300,
+                        width: double.infinity,
+                        child: ScannerWidget(onDetect: controller.handleDetection),
+                      ),
                     )
                   : ProductDetailWidget(
-                      productData: controller.productData.value ?? ProductModel(),),
+                      productData: controller.productData.value ?? ProductModel(),
+                    ),
             ),
           ),
-          Expanded(
-            flex: 1,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: controller.toggleScanning,
-                child: Obx(() => Text(controller.isScanning.value
-                    ? 'Stop Scanning'
-                    : 'Scan Again')),
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: controller.toggleScanning,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
+              child: Obx(() => Text(
+                controller.isScanning.value ? 'Stop Scanning' : 'Scan Again',
+                style: const TextStyle(fontSize: 16),
+              )),
             ),
           ),
         ],
