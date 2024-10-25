@@ -1,9 +1,11 @@
 // lib/widgets/persistent_bottom_nav_bar.dart
 import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
+import 'package:eat_this_app/app/modules/chat/views/chat_page2.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
 import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_page.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../modules/scan/views/scan_view.dart';
@@ -22,7 +24,7 @@ class PersistentBottomNavBar extends StatelessWidget {
         const SearchPage(),
          ScanPage(),
         const PharmacyPage(),
-        const ChatPage(),
+        
       ];
     }
 

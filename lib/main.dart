@@ -10,7 +10,7 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
-    runApp(CIETApp());
+    runApp(const CIETApp());
   });
 }
 
@@ -18,7 +18,6 @@ class CIETApp extends StatelessWidget {
   const CIETApp({super.key});
 
   @override
-
   Widget build(BuildContext context) {
      SystemChrome.setSystemUIOverlayStyle( const SystemUiOverlayStyle(
       statusBarColor: Colors.blue,

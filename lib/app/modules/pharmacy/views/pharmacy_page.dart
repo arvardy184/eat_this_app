@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class PharmacyPage extends StatelessWidget {
@@ -12,7 +13,7 @@ class PharmacyPage extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-      body: const Center(
+      body: Center(
         child: Text("Pharmacy"),
       ),
     );

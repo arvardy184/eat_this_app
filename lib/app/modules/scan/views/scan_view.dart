@@ -1,7 +1,7 @@
 import 'package:eat_this_app/app/data/models/product_model.dart';
 import 'package:eat_this_app/app/modules/scan/controllers/scan_controller.dart';
-import 'package:eat_this_app/widgets/product_detail_widget.dart';
-import 'package:eat_this_app/widgets/scanner_widget.dart';
+import 'package:eat_this_app/widgets/product/product_detail_widget.dart';
+import 'package:eat_this_app/widgets/product/scanner_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
