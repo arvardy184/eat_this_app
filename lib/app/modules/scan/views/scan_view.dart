@@ -25,7 +25,7 @@ class ScanPage extends StatelessWidget {
                           ScannerWidget(onDetect: controller.handleDetection),
                     )
                   : ProductDetailWidget(
-                      product: controller.productData.value ?? Product()),
+                      productData: controller.productData.value ?? ProductModel(),),
             ),
           ),
           Expanded(

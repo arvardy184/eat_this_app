@@ -6,12 +6,11 @@ class ProductModel {
 
   ProductModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    product =
-        json['product'] != null ? new Product.fromJson(json['product']) : null;
+    product = json['product'] != null ? Product.fromJson(json['product']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = this.status;
     if (this.product != null) {
       data['product'] = this.product!.toJson();
@@ -50,7 +49,6 @@ class Product {
   });
 
   Product.fromJson(Map<String, dynamic> json) {
-     print("Product.fromJson called with: $json");
     id = json['id'];
     description = json['description'];
     imageUrl = json['image_url'];
@@ -75,9 +73,8 @@ class Product {
     nutrients = json['nutrients'] != null ? Nutrients.fromJson(json['nutrients']) : null;
   }
 
- Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    print("Product.toJson called"); // Tambahkan log ini
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = this.id;
     data['description'] = this.description;
     data['image_url'] = this.imageUrl;
@@ -96,7 +93,6 @@ class Product {
     if (this.nutrients != null) {
       data['nutrients'] = this.nutrients!.toJson();
     }
-    print("Product.toJson result: $data"); // Tambahkan log ini
     return data;
   }
 }
@@ -115,7 +111,7 @@ class Allergens {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = this.name;
     data['product_keyword'] = this.productKeyword;
     data['content'] = this.content;
@@ -133,7 +129,7 @@ class Categories {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['value'] = this.value;
     return data;
   }
@@ -143,8 +139,8 @@ class Nutrients {
   int? id;
   int? serving;
   String? unit;
-  String? energy;
-  String? fat;
+  int? energy; // Updated to int
+  double? fat; // Updated to double
   double? saturatedFat;
   double? carbohydrate;
   double? sugar;
@@ -154,39 +150,40 @@ class Nutrients {
   String? alcohol;
   String? productId;
 
-  Nutrients(
-      {this.id,
-      this.serving,
-      this.unit,
-      this.energy,
-      this.fat,
-      this.saturatedFat,
-      this.carbohydrate,
-      this.sugar,
-      this.fiber,
-      this.protein,
-      this.salt,
-      this.alcohol,
-      this.productId});
+  Nutrients({
+    this.id,
+    this.serving,
+    this.unit,
+    this.energy,
+    this.fat,
+    this.saturatedFat,
+    this.carbohydrate,
+    this.sugar,
+    this.fiber,
+    this.protein,
+    this.salt,
+    this.alcohol,
+    this.productId,
+  });
 
   Nutrients.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     serving = json['serving'];
     unit = json['unit'];
     energy = json['energy'];
-    fat = json['fat'];
-    saturatedFat = json['saturated_fat'];
-    carbohydrate = json['carbohydrate'];
-    sugar = json['sugar'];
-    fiber = json['fiber'];
-    protein = json['protein'];
-    salt = json['salt'];
+    fat = json['fat'] != null ? double.tryParse(json['fat'].toString()) : null;
+    saturatedFat = json['saturated_fat']?.toDouble();
+    carbohydrate = json['carbohydrate']?.toDouble();
+    sugar = json['sugar']?.toDouble();
+    fiber = json['fiber']?.toDouble();
+    protein = json['protein']?.toDouble();
+    salt = json['salt']?.toDouble();
     alcohol = json['alcohol'];
     productId = json['product_id'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = this.id;
     data['serving'] = this.serving;
     data['unit'] = this.unit;
