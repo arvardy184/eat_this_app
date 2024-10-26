@@ -31,92 +31,94 @@ class _SignupFormState extends State<SignupForm> {
         centerTitle: true,
         elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Name',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            CustomTextField(
-                controller: _nameController, hint: "Text your Username"),
-            const SizedBox(height: 16),
-            const Text(
-              'Email',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            CustomTextField(
-                controller: _emailController, hint: "Text your email"),
-            const SizedBox(height: 16),
-            const Text(
-              'Password',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            CustomTextField(
-                controller: _passwordController,
-                hint: "Text your password",
-                isPassword: true),
-            const SizedBox(height: 12),
-            const Text(
-              'Confirm Password',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            CustomTextField(
-                controller: _confirmPasswordController,
-                hint: "Text your password",
-                isPassword: true),
-            const SizedBox(height: 62),
-            CustomButton(
-              text: 'Sign Up',
-              isPrimary: true,
-              isLoading: _isLoading,
-              onPressed: _handleSignup,
-            ),
-            SizedBox(height: 28),
-            Row(
-              children: [
-                Expanded(
-                  child: Divider(
-                    thickness: 1,
-                    color: Colors.grey[400],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Name',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              CustomTextField(
+                  controller: _nameController, hint: "Text your Username"),
+              const SizedBox(height: 16),
+              const Text(
+                'Email',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              CustomTextField(
+                  controller: _emailController, hint: "Text your email"),
+              const SizedBox(height: 16),
+              const Text(
+                'Password',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              CustomTextField(
+                  controller: _passwordController,
+                  hint: "Text your password",
+                  isPassword: true),
+              const SizedBox(height: 12),
+              const Text(
+                'Confirm Password',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              CustomTextField(
+                  controller: _confirmPasswordController,
+                  hint: "Text your password",
+                  isPassword: true),
+              const SizedBox(height: 62),
+              CustomButton(
+                text: 'Sign Up',
+                isPrimary: true,
+                isLoading: _isLoading,
+                onPressed: _handleSignup,
+              ),
+              SizedBox(height: 28),
+              Row(
+                children: [
+                  Expanded(
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.grey[400],
+                    ),
                   ),
-                ),
-                SizedBox(width: 10),
-                Text('Or'),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Divider(
-                    thickness: 1,
-                    color: Colors.grey[400],
+                  SizedBox(width: 10),
+                  Text('Or'),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Divider(
+                      thickness: 1,
+                      color: Colors.grey[400],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 28),
-            SocialLoginButton(
-              text: 'Continue with Google',
-              icon: 'assets/images/google_icon.png',
-              onPressed: () {
-                // Handle Google login
-                print("Logging in with Google...");
-              },
-            ),
-            SizedBox(height: 20),
-            SocialLoginButton(
-              text: 'Continue with Facebook',
-              icon: 'assets/images/facebook_icon.png',
-              onPressed: () {
-                // Handle Facebook login
-                print("Logging in with Facebook...");
-              },
-            ),
-          ],
+                ],
+              ),
+              SizedBox(height: 28),
+              SocialLoginButton(
+                text: 'Continue with Google',
+                icon: 'assets/images/google_icon.png',
+                onPressed: () {
+                  // Handle Google login
+                  print("Logging in with Google...");
+                },
+              ),
+              SizedBox(height: 20),
+              SocialLoginButton(
+                text: 'Continue with Facebook',
+                icon: 'assets/images/facebook_icon.png',
+                onPressed: () {
+                  // Handle Facebook login
+                  print("Logging in with Facebook...");
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

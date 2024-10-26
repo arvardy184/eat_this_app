@@ -1,4 +1,5 @@
 import 'package:eat_this_app/app/hooks/use_auth.dart';
+import 'package:eat_this_app/app/modules/profile/views/personal_information_page.dart';
 import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,7 +8,7 @@ import '../controllers/profile_controller.dart';
 class ProfilePage extends GetView<ProfileController> {
   const ProfilePage({Key? key}) : super(key: key);
 
-  UseAuth get _auth => Get.put( UseAuth() );
+  UseAuth get _auth => Get.put(UseAuth());
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +33,35 @@ class ProfilePage extends GetView<ProfileController> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Profile Picture and Name
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: user.profilePicture != null
-                    ? NetworkImage(user.profilePicture!)
-                    : AssetImage('assets/images/default_avatar.png')
-                        as ImageProvider,
+              GestureDetector(
+                onTap: () => _showImagePickerBottomSheet(context),
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: user.profilePicture != null
+                          ? NetworkImage(user.profilePicture!)
+                          : const AssetImage('assets/images/default_avatar.png')
+                              as ImageProvider,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: CIETTheme.secondary_color,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 10),
               Text(
@@ -47,7 +71,7 @@ class ProfilePage extends GetView<ProfileController> {
               const SizedBox(height: 5),
 
               // Premium Badge
-              if (user.packageId != null)
+              if (user.package?.id != null)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -68,8 +92,7 @@ class ProfilePage extends GetView<ProfileController> {
               // Allergies Section
               if (user.allergens != null && user.allergens!.isNotEmpty)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric( vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   color: Colors.blue.shade50,
                   child: Column(
                     children: [
@@ -100,7 +123,7 @@ class ProfilePage extends GetView<ProfileController> {
               ListTile(
                 leading: const Icon(Icons.person),
                 title: const Text("Personal information"),
-                onTap: () {},
+                onTap: () => Get.to(() => PersonalInformationPage()),
               ),
               ListTile(
                 leading: const Icon(Icons.language),
@@ -132,7 +155,7 @@ class ProfilePage extends GetView<ProfileController> {
                 title:
                     const Text("Log Out", style: TextStyle(color: Colors.red)),
                 onTap: () {
-                _auth.logout();
+                  _auth.logout();
                 },
               ),
             ],
@@ -155,6 +178,36 @@ class ProfilePage extends GetView<ProfileController> {
         style:
             const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
+    );
+  }
+
+  void _showImagePickerBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Choose from Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.updateProfileImage();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Take a Photo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // You can add camera functionality here if needed
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

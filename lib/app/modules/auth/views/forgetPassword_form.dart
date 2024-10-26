@@ -25,27 +25,29 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
         centerTitle: true,
         elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-                "Enter the email associated with your account and we’ll send an email with code to reset your password",
-                style: TextStyle(fontSize: 12, color: Colors.grey)),
-            const SizedBox(height: 23),
-            const Text("Email",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            CustomTextField(
-                controller: _emailController, hint: "Text your email"),
-            const SizedBox(height: 35),
-            CustomButton(
-              text: 'Confirm',
-              isPrimary: true,
-              onPressed: () {},
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                  "Enter the email associated with your account and we’ll send an email with code to reset your password",
+                  style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const SizedBox(height: 23),
+              const Text("Email",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              CustomTextField(
+                  controller: _emailController, hint: "Text your email"),
+              const SizedBox(height: 35),
+              CustomButton(
+                text: 'Confirm',
+                isPrimary: true,
+                onPressed: () {},
+              ),
+            ],
+          ),
         ),
       ),
     );

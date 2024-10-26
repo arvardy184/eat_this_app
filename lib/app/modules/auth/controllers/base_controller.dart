@@ -24,7 +24,8 @@ abstract class BaseController extends GetxController {
               showError('Resource not found');
               break;
             default:
-              showError(error.response?.data['message'] ?? 'Something went wrong');
+              showError(
+                  error.response?.data['message'] ?? 'Something went wrong');
           }
           break;
         default:
