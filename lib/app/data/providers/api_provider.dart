@@ -35,7 +35,7 @@ class ApiService {
 
       print("Response status code: ${response.statusCode}");
       print("Response data: ${response.data}");
-
+    
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data; // No need to decode
         await _saveTokens(
@@ -44,7 +44,7 @@ class ApiService {
               '', // In case you don't have refresh_token
         );
         await _saveTypes(type: data['user']['type']);
-        saveUserData(data['user']);
+       await saveUserData(data['user']);
         return response;
       } else {
         print("Login failed with status code: ${response.statusCode}");
@@ -153,6 +153,8 @@ class ApiService {
     await prefs.remove('auth_token');
     await prefs.remove('refresh_token');
     await prefs.remove('type');
+    await prefs.remove('conversation_key');
+
     _accessToken = null;
     _refreshToken = null;
     Get.offAllNamed('/login');
