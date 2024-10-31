@@ -1,62 +1,67 @@
-class LoginResponse {
+class User2Model {
   String? status;
-  User? user;
-  String? token;
+  List<Users>? users;
 
-  LoginResponse({this.status, this.user, this.token});
+  User2Model({this.status, this.users});
 
-  LoginResponse.fromJson(Map<String, dynamic> json) {
+  User2Model.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
-    token = json['token'];
+    if (json['users'] != null) {
+      users = <Users>[];
+      json['users'].forEach((v) {
+        users!.add(new Users.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['status'] = this.status;
-    if (this.user != null) {
-      data['user'] = this.user!.toJson();
+    if (this.users != null) {
+      data['users'] = this.users!.map((v) => v.toJson()).toList();
     }
-    data['token'] = this.token;
     return data;
   }
 }
 
-class User {
+class Users {
   String? id;
   String? name;
   String? email;
   String? emailVerifiedAt;
   String? profilePicture;
+  String? birthDate;
   String? type;
   String? conversationKey;
   String? createdAt;
   String? updatedAt;
-  int? packageId;
+  int? status;
 
-  User(
+  Users(
       {this.id,
       this.name,
       this.email,
       this.emailVerifiedAt,
       this.profilePicture,
+      this.birthDate,
       this.type,
       this.conversationKey,
       this.createdAt,
       this.updatedAt,
-      this.packageId});
+      this.status});
 
-  User.fromJson(Map<String, dynamic> json) {
+  Users.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     email = json['email'];
     emailVerifiedAt = json['email_verified_at'];
     profilePicture = json['profile_picture'];
+    birthDate = json['birth_date'];
     type = json['type'];
     conversationKey = json['conversation_key'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    packageId = json['package_id'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -66,11 +71,12 @@ class User {
     data['email'] = this.email;
     data['email_verified_at'] = this.emailVerifiedAt;
     data['profile_picture'] = this.profilePicture;
+    data['birth_date'] = this.birthDate;
     data['type'] = this.type;
     data['conversation_key'] = this.conversationKey;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
-    data['package_id'] = this.packageId;
+    data['status'] = this.status;
     return data;
   }
 }

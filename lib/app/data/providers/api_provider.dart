@@ -11,6 +11,7 @@ class ApiService {
   final Dio _dio = Dio();
   static String? _accessToken;
   static String? _refreshToken;
+  static String? _type;
 
   ApiService() {
     _dio.options.baseUrl = ApiConstants.baseUrl;
@@ -42,6 +43,8 @@ class ApiService {
           refreshToken: data['refresh_token'] ??
               '', // In case you don't have refresh_token
         );
+        await _saveTypes(type: data['user']['type']);
+        saveUserData(data['user']);
         return response;
       } else {
         print("Login failed with status code: ${response.statusCode}");
@@ -98,6 +101,38 @@ class ApiService {
     }
   }
 
+  Future<void> saveUserData(Map<String, dynamic> userData) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', userData['token']);
+    await prefs.setString('type', userData['type']);
+    await prefs.setString('conversation_key', userData['conversation_key']);
+    await prefs.setString('user_id', userData['id']);
+    await prefs.setString('user_name', userData['name']);
+
+
+  }
+
+  Future<void> _saveTypes({required String type}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('type', type);
+
+    _type = type;
+    print("Cek type: ${_type}");
+  }
+
+  Future<String?> getType() async {
+    final prefs = await SharedPreferences.getInstance();
+    final type = prefs.getString('type');
+    return type;
+  }
+
+  Future<String?> getCurrentUserKey() async{
+    final prefs = await SharedPreferences.getInstance();
+    final conversationKey = prefs.getString('conversation_key');
+    print("cek conversation key ${conversationKey}");
+    return conversationKey;
+  }
+
   Future<void> _saveTokens({
     required String accessToken,
     String? refreshToken,
@@ -117,6 +152,7 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
     await prefs.remove('refresh_token');
+    await prefs.remove('type');
     _accessToken = null;
     _refreshToken = null;
     Get.offAllNamed('/login');

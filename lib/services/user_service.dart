@@ -151,5 +151,6 @@ class UserService {
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
+    await prefs.remove('type');
   }
 }

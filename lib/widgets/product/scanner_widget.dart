@@ -4,7 +4,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 class ScannerWidget extends StatefulWidget {
   final Function(String) onDetect;
 
-  ScannerWidget({required this.onDetect});
+  ScannerWidget({super.key, required this.onDetect});
 
   @override
   _ScannerWidgetState createState() => _ScannerWidgetState();

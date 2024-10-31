@@ -8,7 +8,10 @@ import 'package:eat_this_app/app/modules/auth/views/login_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/login_page.dart';
 import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
 import 'package:eat_this_app/app/modules/chat/bindings/chat_binding.dart';
+import 'package:eat_this_app/app/modules/chat/views/acquiantances_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
+import 'package:eat_this_app/app/modules/chat/views/consultant_req_page.dart';
+import 'package:eat_this_app/app/modules/chat/views/list_consultant.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
 import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_page.dart';
 import 'package:eat_this_app/app/modules/profile/bindings/profile_binding.dart';
@@ -16,7 +19,6 @@ import 'package:eat_this_app/app/modules/profile/views/profile_page.dart';
 import 'package:eat_this_app/app/modules/scan/views/scan_view.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
 import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
-import 'package:eat_this_app/app/utils/nav_bindings.dart';
 import 'package:get/get.dart';
 
 class AppPages {
@@ -43,8 +45,13 @@ class AppPages {
     GetPage(name: '/signupForm', page: () => const SignupForm()),
     GetPage(name: '/forgotPassword', page: () => const ForgotPasswordForm()),
     GetPage(name: '/profile', page: () => const ProfilePage(),binding: ProfileBinding()),
+
+    //chat and consult
     GetPage(name: '/chat', page: () => ChatPage(), binding: ChatBinding()),
-    
+    GetPage(name: '/add-consultant', page: () => ListConsultantPage(), binding: ChatBinding()),
+    GetPage(name: '/chat/room', page: () => ChatPage(), binding: ChatBinding()),
+    GetPage(name: '/consultant/requests', page: () => ConsultantRequestsPage(), binding: ChatBinding()),
+    GetPage(name: '/consultant/acquaitances', page: () => AcquaintancesPage(), binding: ChatBinding()),
     // tambah rute baru disini
   ];
 }
