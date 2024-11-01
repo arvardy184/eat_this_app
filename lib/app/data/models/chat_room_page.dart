@@ -1,4 +1,5 @@
 import 'package:eat_this_app/app/data/models/chat_model.dart';
+import 'package:eat_this_app/app/data/models/message_model.dart';
 import 'package:eat_this_app/app/modules/chat/controllers/chat_controller.dart';
 import 'package:eat_this_app/app/utils/chat_channel_utils.dart';
 import 'package:eat_this_app/services/chat_service.dart';
@@ -19,7 +20,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   WebSocketChannel? channel;
-  List<Message> messages = [];
+  final ChatService _chatService = Get.put(ChatService());
+  List<MessageData> messages = [];
   bool isConnected = false;
   bool isConnecting = false;
   late final String channelName;
@@ -29,14 +31,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   final String host = 'ciet.site';
 
   // Get from arguments
-  late final dynamic recipient;
+  final dynamic recipient = Get.arguments;
   late final String currentUserKey;
   late final String recipientKey;
 
   @override
   void initState() {
     super.initState();
-    recipient = Get.arguments;
+    //recipient = Get.arguments;
+    print(" Recipient: $recipient");
     // Get current user key from shared preferences or service
     initChatRoom();
   }
@@ -45,6 +48,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     final chatController = Get.find<ChatController>();
 
     currentUserKey = chatController.currentUserKey.value;
+    print("init chat room : $currentUserKey");
     if(currentUserKey.isEmpty){
       Get.snackbar('Error', 'Failed to load messages');
       Get.back();
@@ -52,27 +56,37 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     }
 
 
-    recipient = Get.arguments;
+   // recipient = Get.arguments;
     recipientKey = recipient.conversationKey;
-
+    print("init chat room : $recipientKey");
+       _chatService.getMessage(recipientKey);
     channelName = ChatChannelUtil.createChannelName(currentUserKey, recipientKey);
 
     await _loadMessages();
     connectToWebSocket();
   }
 
-  Future<void> _loadMessages() async {
-    try {
-      final response = await Get.find<ChatService>().getMessage(recipientKey);
-      final List<dynamic> messageData = response.data['messages'];
-      setState(() {
-        messages = messageData.map((m) => Message.fromJson(m)).toList();
-      });
-      _scrollToBottom();
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to load messages');
-    }
+ Future<void> _loadMessages() async {
+  try {
+    final response = await _chatService.getMessage(recipientKey);
+    
+    // Access the 'messages' map and then get 'data', which is the list of messages
+    final List<dynamic> messageDataList = response.data['messages']['data'];
+    print("Message data: $messageDataList");
+
+    setState(() {
+      // Convert each item in the list to a MessageData object
+      messages = messageDataList.map((message) => MessageData.fromJson(message)).toList();
+      print("Messages: $messages");
+    });
+
+    _scrollToBottom();
+  } catch (e) {
+    print('Error loading messages: $e');
+    Get.snackbar('Error', 'Failed to load messages: $e');
   }
+}
+
 
   Future<void> connectToWebSocket() async {
     if (isConnecting) return;
@@ -121,7 +135,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         if (data is String) {
           data = jsonDecode(data);
         }
-        final newMessage = Message.fromJson(data);
+        final newMessage = MessageData.fromJson(data);
         setState(() {
           messages.add(newMessage);
         });
@@ -146,14 +160,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       isConnected = false;
       isConnecting = false;
     });
-    Future.delayed(const Duration(seconds: 5), connectToWebSocket);
+    Future.delayed(const Duration(seconds: 1), connectToWebSocket);
   }
 
   Future<void> sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
-
+  
     try {
-      await Get.find<ChatService>().sendMessage(
+      await _chatService.sendMessage(
         _messageController.text.trim(),
         recipientKey,
       );
@@ -222,10 +236,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               itemBuilder: (context, index) {
                 final message = messages[index];
                 final isCurrentUser = message.senderKey == currentUserKey;
-                
+                print("isCurrentUser: $isCurrentUser");
+                print("messageapa: $message");
                 return ChatBubble(
                   message: message.message,
-                  timestamp: message.timestamp,
+                  timestamp: message.updatedAt,
                   isCurrentUser: isCurrentUser,
                 );
               },

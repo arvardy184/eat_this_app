@@ -207,9 +207,9 @@ class ChatPage extends GetView<ChatController> {
               return RefreshIndicator(
                 onRefresh: controller.fetchAddedConsultants,
                 child: ListView.builder(
-                  itemCount: controller.consultants.length,
+                  itemCount: controller.addedConsultants.length,
                   itemBuilder: (context, index) {
-                    final consultant = controller.consultants[index];
+                    final consultant = controller.addedConsultants[index];
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundImage: consultant.profilePicture != null

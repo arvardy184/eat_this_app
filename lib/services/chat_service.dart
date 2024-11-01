@@ -21,6 +21,8 @@ class ChatService {
     return type;
   }
 
+
+
   Future<ConsultantModel> getConsultants({String? name}) async {
     final token = await getToken();
     if (token == null) throw Exception("Token not found");
@@ -75,6 +77,7 @@ class ChatService {
                   'Content-Type': 'application/json',
                 },
               ));
+              print("req user id $consultantId");
       print("Response add consultant: ${response.data}");
       return ConsultantData.fromJson(response.data);
     } catch (e) {
@@ -156,7 +159,7 @@ class ChatService {
               'Content-Type': 'application/json',
             },
           ));
-      print("Response: ${response.data}");
+      print("Response chat : ${response.data}");
       return response;
     } catch (e) {
       print("Error di sendMessage: $e");
@@ -175,12 +178,12 @@ class ChatService {
               'Content-Type': 'application/json',
             },
           ));
-      print("Response: ${response.data}");
+      print("Response chat get: ${response.data}");
       return response;
     } catch (e) {
       print("Error di getMessage: $e");
       throw Exception(e);
     }
-      
+    
 }
 }

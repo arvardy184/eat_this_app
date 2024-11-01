@@ -75,14 +75,10 @@ class ListConsultantPage extends GetView<ChatController> {
                             ElevatedButton(
                               onPressed: () async {
                                 // Call the function to add the consultant
+                                print("berapa id: ${consultant.id}");
                                 await controller.addConsultant(consultant.id!);
                                 Get.back();
-                                Get.snackbar(
-                                  'Success',
-                                  '${consultant.name} has been added successfully',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: CIETTheme.primary_color
-                                );
+                               
                               },
                               child: const Text('Add Consultant'),
                             ),

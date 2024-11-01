@@ -37,20 +37,21 @@ class ApiService {
       print("Response data: ${response.data}");
     
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data; // No need to decode
+        final data = response.data; 
         await _saveTokens(
-          accessToken: data['token'], // Token field in response
+          accessToken: data['token'] ?? '', 
           refreshToken: data['refresh_token'] ??
-              '', // In case you don't have refresh_token
+              '',
         );
-        await _saveTypes(type: data['user']['type']);
-       await saveUserData(data['user']);
+        await _saveTypes(type: data['user']['type'] ?? '');
+       await saveUserData(data['user'] ?? {});
         return response;
       } else {
         print("Login failed with status code: ${response.statusCode}");
         return response;
       }
     } catch (e) {
+      
       print("Login error: $e");
       throw e;
     }
@@ -101,16 +102,14 @@ class ApiService {
     }
   }
 
-  Future<void> saveUserData(Map<String, dynamic> userData) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('auth_token', userData['token']);
-    await prefs.setString('type', userData['type']);
-    await prefs.setString('conversation_key', userData['conversation_key']);
-    await prefs.setString('user_id', userData['id']);
-    await prefs.setString('user_name', userData['name']);
+ Future<void> saveUserData(Map<String, dynamic> userData) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('user_id', userData['id'] ?? '');
+  await prefs.setString('user_name', userData['name'] ?? '');
+  await prefs.setString('conversation_key', userData['conversation_key'] ?? '');
+  await prefs.setString('type', userData['type'] ?? '');
+}
 
-
-  }
 
   Future<void> _saveTypes({required String type}) async {
     final prefs = await SharedPreferences.getInstance();

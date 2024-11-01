@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 
 class ChatController extends BaseController {
   final ChatService _chatService = ChatService();
-    final ApiService _authService = Get.find<ApiService>();
+    final ApiService _authService = Get.put(ApiService());
   final RxList consultants = [].obs;
   final RxList<ConsultantData> addedConsultants = RxList<ConsultantData>();
   final RxList<Users> users = RxList<Users>();  // Changed to RxList
@@ -34,6 +34,7 @@ class ChatController extends BaseController {
       // Get conversation_key
       final key = await _authService.getCurrentUserKey();
       if (key != null) {
+        print('User key found: $key');
         currentUserKey.value = key;
       } else {
         throw Exception('User key not found');
@@ -105,9 +106,11 @@ class ChatController extends BaseController {
     try {
       isLoading.value = true;
       final result = await _chatService.getAddedConsultants();
+      print("hasil result added: $result");
       if (result.consultants != null) {
         addedConsultants.value = result.consultants!;
-        if (consultants.isEmpty) {
+        print("hasil 2 result addes : $addedConsultants");
+        if (addedConsultants.isEmpty) {
           showError('No added consultants found');
         }
       } else {
@@ -121,6 +124,7 @@ class ChatController extends BaseController {
   }
 
   // Add consultant
+
   Future<void> addConsultant(String consultantId) async {
     try {
       isLoading.value = true;

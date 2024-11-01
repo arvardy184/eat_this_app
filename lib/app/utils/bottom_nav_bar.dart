@@ -15,7 +15,8 @@ class PersistentBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PersistentTabController controller = PersistentTabController(initialIndex: 0);
+    PersistentTabController controller =
+        PersistentTabController(initialIndex: 0);
 
     List<Widget> buildScreens() {
       return [
@@ -94,7 +95,7 @@ class PersistentBottomNavBar extends StatelessWidget {
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
       stateManagement: true,
-hideNavigationBarWhenKeyboardAppears: true,
+      hideNavigationBarWhenKeyboardAppears: true,
       decoration: NavBarDecoration(
         borderRadius: BorderRadius.circular(10.0),
         colorBehindNavBar: Colors.white,
