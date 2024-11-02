@@ -15,7 +15,8 @@ import 'package:eat_this_app/app/modules/chat/views/chat_page2.dart';
 import 'package:eat_this_app/app/modules/chat/views/consultant_req_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/list_consultant.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
-import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_page.dart';
+import 'package:eat_this_app/app/modules/pharmacy/views/bindings/pharmacy_binding.dart';
+import 'package:eat_this_app/app/modules/pharmacy/views/views/pharmacy_page.dart';
 import 'package:eat_this_app/app/modules/profile/bindings/profile_binding.dart';
 import 'package:eat_this_app/app/modules/profile/views/profile_page.dart';
 import 'package:eat_this_app/app/modules/scan/views/scan_view.dart';
@@ -27,35 +28,49 @@ class AppPages {
   static const INITIAL = Routes.HOME;
 
   static final routes = [
-    GetPage(
-      name: '/home',
-      page: () =>  PersistentBottomNavBar(),
-      bindings: [
-        ProfileBinding(),
-        ChatBinding(),
-      ],
-      middlewares: [AuthMiddleware()]
-      // binding: NavBindings()
-      // binding: HomeBinding(),
-    ),
+    GetPage(name: '/home', page: () => PersistentBottomNavBar(), bindings: [
+      ProfileBinding(),
+      ChatBinding(),
+    ], middlewares: [
+      AuthMiddleware()
+    ]
+        // binding: NavBindings()
+        // binding: HomeBinding(),
+        ),
     GetPage(name: '/beranda', page: () => const HomePage()),
     GetPage(name: '/search', page: () => const SearchPage()),
     GetPage(name: '/login', page: () => const LoginPage()),
-    GetPage(name: '/scan', page: () =>  ScanPage()),
-    GetPage(name: '/pharmacy', page: () => const PharmacyPage()),
+    GetPage(name: '/scan', page: () => ScanPage()),
     GetPage(name: '/loginForm', page: () => const LoginForm()),
     GetPage(name: '/signupForm', page: () => const SignupForm()),
     GetPage(name: '/forgotPassword', page: () => const ForgotPasswordForm()),
-    GetPage(name: '/profile', page: () => const ProfilePage(),binding: ProfileBinding()),
+    GetPage(
+        name: '/profile',
+        page: () => const ProfilePage(),
+        binding: ProfileBinding()),
+    GetPage(
+        name: '/pharmacy',
+        page: () => PharmacyPage(),
+        bindings: [PharmacyBinding()]),
 
     //chat and consult
     GetPage(name: '/chat', page: () => ChatPage(), binding: ChatBinding()),
-    GetPage(name: '/add-consultant', page: () => ListConsultantPage(), binding: ChatBinding()),
+    GetPage(
+        name: '/add-consultant',
+        page: () => ListConsultantPage(),
+        binding: ChatBinding()),
     // GetPage(name: '/chat/room', page: () => ChatPage(), binding: ChatBinding()),
-    GetPage(name: '/consultant/requests', page: () => ConsultantRequestsPage(), binding: ChatBinding()),
-    GetPage(name: '/consultant/acquaitances', page: () => AcquaintancesPage(), binding: ChatBinding()),
+    GetPage(
+        name: '/consultant/requests',
+        page: () => ConsultantRequestsPage(),
+        binding: ChatBinding()),
+    GetPage(
+        name: '/consultant/acquaitances',
+        page: () => AcquaintancesPage(),
+        binding: ChatBinding()),
     // tambah rute baru disini
-    GetPage(name: '/chat/room', page: () => ChatRoomPage(), binding: ChatBinding()),
+    GetPage(
+        name: '/chat/room', page: () => ChatRoomPage(), binding: ChatBinding()),
   ];
 }
 

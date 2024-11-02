@@ -2,7 +2,8 @@
 import 'package:eat_this_app/app/modules/chat/controllers/chat_controller.dart';
 import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
-import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_page.dart';
+import 'package:eat_this_app/app/modules/pharmacy/views/controllers/pharmacy_controller.dart';
+import 'package:eat_this_app/app/modules/pharmacy/views/views/pharmacy_page.dart';
 import 'package:eat_this_app/app/modules/scan/controllers/scan_controller.dart';
 import 'package:eat_this_app/app/modules/scan/views/scan_view.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
@@ -38,7 +39,7 @@ class PersistentBottomNavBar extends StatelessWidget {
         PharmacyPage(),
         // GetBuilder<PharmacyController>(
         //   init: PharmacyController(),
-        //   builder: (controller) => const PharmacyPage(),
+        //   builder: (controller) => PharmacyPage(),
         // ),
         GetBuilder<ChatController>(
           init: ChatController(),
