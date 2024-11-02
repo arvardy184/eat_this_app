@@ -1,3 +1,4 @@
+
 import 'package:eat_this_app/app/data/models/chat_model.dart';
 import 'package:eat_this_app/app/data/models/message_model.dart';
 import 'package:eat_this_app/app/modules/chat/controllers/chat_controller.dart';
@@ -15,7 +16,6 @@ class ChatRoomPage extends StatefulWidget {
   @override
   State<ChatRoomPage> createState() => _ChatRoomPageState();
 }
-
 class _ChatRoomPageState extends State<ChatRoomPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -25,6 +25,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   bool isConnected = false;
   bool isConnecting = false;
   late final String channelName;
+  bool _disposed = false; // Add this flag to track disposal state
 
   // Reverb config
   final String appKey = 'u0x3cvdmybn0zpspqmo9';
@@ -38,97 +39,141 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   void initState() {
     super.initState();
-    //recipient = Get.arguments;
     print(" Recipient: $recipient");
-    // Get current user key from shared preferences or service
     initChatRoom();
   }
 
-  Future<void> initChatRoom() async{
+  Future<void> initChatRoom() async {
+    if (_disposed) return;
+
     final chatController = Get.find<ChatController>();
 
     currentUserKey = chatController.currentUserKey.value;
     print("init chat room : $currentUserKey");
-    if(currentUserKey.isEmpty){
-      Get.snackbar('Error', 'Failed to load messages');
-      Get.back();
+    if (currentUserKey.isEmpty) {
+      if (!_disposed) {
+        Get.snackbar('Error', 'Failed to load messages');
+        Get.back();
+      }
       return;
     }
 
-
-   // recipient = Get.arguments;
     recipientKey = recipient.conversationKey;
     print("init chat room : $recipientKey");
-       _chatService.getMessage(recipientKey);
     channelName = ChatChannelUtil.createChannelName(currentUserKey, recipientKey);
-
+    print("Channel name: $channelName");
     await _loadMessages();
-    connectToWebSocket();
+    if (!_disposed) {
+      connectToWebSocket();
+    }
   }
 
- Future<void> _loadMessages() async {
-  try {
-    final response = await _chatService.getMessage(recipientKey);
-    
-    // Access the 'messages' map and then get 'data', which is the list of messages
-    final List<dynamic> messageDataList = response.data['messages']['data'];
-    print("Message data: $messageDataList");
+  Future<void> _loadMessages() async {
+    if (_disposed) return;
 
-    setState(() {
-      // Convert each item in the list to a MessageData object
-      messages = messageDataList.map((message) => MessageData.fromJson(message)).toList();
-      print("Messages: $messages");
-    });
+    try {
+      final response = await _chatService.getMessage(recipientKey);
+      final List<dynamic> messageDataList = response.data['messages']['data'];
+      print("Message data: $messageDataList");
 
-    _scrollToBottom();
-  } catch (e) {
-    print('Error loading messages: $e');
-    Get.snackbar('Error', 'Failed to load messages: $e');
+      if (!_disposed) {
+        setState(() {
+          messages = messageDataList.map((message) => MessageData.fromJson(message)).toList();
+          print("Messages: $messages");
+        });
+        _scrollToBottom();
+      }
+    } catch (e) {
+      print('Error loading messages: $e');
+      if (!_disposed) {
+        Get.snackbar('Error', 'Failed to load messages: $e');
+      }
+    }
   }
-}
-
 
   Future<void> connectToWebSocket() async {
-    if (isConnecting) return;
+    if (_disposed || isConnecting) return;
 
+    if (!mounted) return; // Additional mounted check before setState
     setState(() {
       isConnecting = true;
     });
 
     try {
       final wsUrl = 'wss://$host/app/$appKey';
+        print("Connecting to WebSocket: $wsUrl"); // Debug WebSocket connection
       channel = WebSocketChannel.connect(
         Uri.parse(wsUrl),
         protocols: ['wss'],
       );
 
       channel?.stream.listen(
-        (message) => handleWebSocketMessage(message),
-        onError: handleWebSocketError,
-        onDone: handleWebSocketDone,
+        (message) {
+           print("WebSocket message received: $message");
+          if (!_disposed) {
+            handleWebSocketMessage(message);
+          }
+        },
+        onError: (error) {
+           print("WebSocket error: $error"); 
+          if (!_disposed) {
+            handleWebSocketError(error);
+          }
+        },
+        onDone: () {
+          print("WebSocket connection closed");
+          if (!_disposed) {
+            handleWebSocketDone();
+          }
+        },
+        cancelOnError: true,
       );
 
-      // Subscribe to private channel
       final subscribeMessage = {
         'event': 'pusher:subscribe',
         'data': {
           'channel': channelName,
-          'auth': null // For public channels
+       //   'auth': null
         }
       };
 
       channel?.sink.add(jsonEncode(subscribeMessage));
+      
+      if (!mounted) return; // Check mounted before setState
       setState(() {
         isConnected = true;
         isConnecting = false;
       });
     } catch (e) {
-      handleWebSocketError(e);
+      if (!_disposed) {
+        handleWebSocketError(e);
+      }
     }
   }
 
+  
+
+Future<void> sendMessage() async {
+  if (_messageController.text.trim().isEmpty) return;
+
+  try {
+    await _chatService.sendMessage(
+      _messageController.text.trim(),
+      recipientKey,
+    );
+    _messageController.clear();
+  } catch (e) {
+    print("Error in sendMessage: $e");
+    Get.snackbar('Error', 'Failed to send message: ${e.toString()}');
+  }
+}
+
+
   void handleWebSocketMessage(dynamic message) {
+    if (_disposed) return;
+
     try {
+      print("Processing WebSocket message: $message"); 
       final decodedMessage = jsonDecode(message);
       if (decodedMessage['event'] == 'chat-message') {
         var data = decodedMessage['data'];
@@ -136,6 +181,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           data = jsonDecode(data);
         }
         final newMessage = MessageData.fromJson(data);
+        
+        if (!mounted) return; // Check mounted before setState
         setState(() {
           messages.add(newMessage);
         });
@@ -147,37 +194,53 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void handleWebSocketError(dynamic error) {
+    if (_disposed) return;
+
+    if (!mounted) return; // Check mounted before setState
     setState(() {
       isConnected = false;
       isConnecting = false;
     });
-    Get.snackbar('Error', 'Connection error occurred');
-    Future.delayed(const Duration(seconds: 5), connectToWebSocket);
-  }
-
-  void handleWebSocketDone() {
-    setState(() {
-      isConnected = false;
-      isConnecting = false;
-    });
-    Future.delayed(const Duration(seconds: 1), connectToWebSocket);
-  }
-
-  Future<void> sendMessage() async {
-    if (_messageController.text.trim().isEmpty) return;
-  
-    try {
-      await _chatService.sendMessage(
-        _messageController.text.trim(),
-        recipientKey,
-      );
-      _messageController.clear();
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to send message');
+    
+    if (!_disposed) {
+      Get.snackbar('Error', 'Connection error occurred');
+      // Use a canceled variable to prevent reconnection after disposal
+      Future.delayed(const Duration(seconds: 5), () {
+        if (!_disposed) {
+          connectToWebSocket();
+        }
+      });
     }
   }
 
-  void _scrollToBottom() {
+  void handleWebSocketDone() {
+    if (_disposed) return;
+
+    if (!mounted) return; // Check mounted before setState
+    setState(() {
+      isConnected = false;
+      isConnecting = false;
+    });
+    
+    if (!_disposed) {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (!_disposed) {
+          connectToWebSocket();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true; // Set disposal flag
+    channel?.sink.close();
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+    void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
@@ -185,14 +248,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         curve: Curves.easeOut,
       );
     }
-  }
-
-  @override
-  void dispose() {
-    channel?.sink.close();
-    _messageController.dispose();
-    _scrollController.dispose();
-    super.dispose();
   }
 
   @override
@@ -234,6 +289,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               padding: const EdgeInsets.all(8),
               itemCount: messages.length,
               itemBuilder: (context, index) {
+                index = messages.length - index - 1;
                 final message = messages[index];
                 final isCurrentUser = message.senderKey == currentUserKey;
                 print("isCurrentUser: $isCurrentUser");

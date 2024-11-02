@@ -216,10 +216,10 @@ class ChatPage extends GetView<ChatController> {
                             ? NetworkImage(consultant.profilePicture!)
                             : null,
                         child: consultant.profilePicture == null
-                            ? Text(consultant.name![0])
+                            ? Text(consultant.name?[0] ?? '')
                             : null,
                       ),
-                      title: Text(consultant.name!),
+                      title: Text(consultant.name??'Unknown'),
                       subtitle: Text(consultant.specialization ?? 'General Consultant'),
                       trailing: const Icon(Icons.chat_bubble_outline),
                       onTap: () => Get.toNamed('/chat/room', arguments: consultant),

@@ -108,6 +108,7 @@ class ChatController extends BaseController {
       final result = await _chatService.getAddedConsultants();
       print("hasil result added: $result");
       if (result.consultants != null) {
+        print("hasil 1 result addes : ${result.consultants}");
         addedConsultants.value = result.consultants!;
         print("hasil 2 result addes : $addedConsultants");
         if (addedConsultants.isEmpty) {
