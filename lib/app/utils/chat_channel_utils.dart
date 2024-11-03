@@ -1,11 +1,14 @@
 class ChatChannelUtil {
   static String createChannelName(String key1, String key2) {
-    final sortedKeys = [key1, key2]..sort((a, b) => a.compareTo(b));
-    final channelName = 'chat.${sortedKeys[0]}.${sortedKeys[1]}';
-    print("Creating channel name:");
+    // Sort berdasarkan string comparison seperti di backend
+    final firstId = key1.compareTo(key2) < 0 ? key1 : key2;
+    final secondId = key1.compareTo(key2) < 0 ? key2 : key1;
+    
+    print("Channel Creation Debug:");
     print("Input keys: $key1, $key2");
-    print("Sorted keys: ${sortedKeys[0]}, ${sortedKeys[1]}");
-    print("Final channel name: $channelName");
-    return channelName;
+    print("First ID: $firstId");
+    print("Second ID: $secondId");
+    
+    return 'chat.$firstId.$secondId';
   }
 }

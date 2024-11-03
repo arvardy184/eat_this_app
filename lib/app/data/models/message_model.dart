@@ -1,3 +1,5 @@
+import 'package:eat_this_app/app/data/models/chat_user_model.dart';
+
 class MessageResponse {
   final String status;
   final Messages messages;
@@ -68,8 +70,8 @@ class MessageData {
   final String message;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final User sender;
-  final User recipient;
+  final ChatUser sender;
+  final ChatUser recipient;
 
   MessageData({
     required this.senderKey,
@@ -88,9 +90,21 @@ class MessageData {
       message: json['message'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      sender: User.fromJson(json['sender']),
-      recipient: User.fromJson(json['recipient']),
+      sender: ChatUser.fromJson(json['sender']),
+      recipient: ChatUser.fromJson(json['recipient']),
     );
+  }
+
+   Map<String, dynamic> toJson() {
+    return {
+      'sender_key': senderKey,
+      'recipient_key': recipientKey,
+      'message': message,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'sender': sender.toJson(),
+      'recipient': recipient.toJson(),
+    };
   }
 }
 
