@@ -9,6 +9,7 @@ import 'package:eat_this_app/services/pharmacy_service.dart';
 class PharmacyController extends GetxController {
   final PharmacyService pharmacyService = PharmacyService();
   RxList<Pharmacy> pharmacies = <Pharmacy>[].obs;
+  final Rx<Position?> currentPosition = Rx<Position?>(null);
   RxBool isLoading = false.obs;
   RxString errorMessage = ''.obs;
 
@@ -23,27 +24,26 @@ class PharmacyController extends GetxController {
     errorMessage.value = '';
 
     try {
-      // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw Exception('Location services are disabled');
       }
 
-      // Request location permission
       var status = await Permission.location.request();
       if (status.isDenied || status.isPermanentlyDenied) {
         throw Exception('Location permission denied');
       }
 
-      // Get current position
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
         timeLimit: const Duration(seconds: 5),
       );
 
+      // Store the current position
+      currentPosition.value = position;
+
       print('Position obtained: ${position.latitude}, ${position.longitude}');
 
-      // Get nearby pharmacies
       pharmacies.value = await pharmacyService.getNearbyPharmacies(
         position.latitude,
         position.longitude,
