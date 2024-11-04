@@ -87,35 +87,57 @@ class PharmacyPage extends StatelessWidget {
                         child: const Icon(
                           Icons.my_location,
                           color: Colors.blue,
-                          size: 30,
+                          size: 20,
                         ),
                       ),
                       // Pharmacy markers
                       ...controller.pharmacies.map((pharmacy) {
                         return Marker(
                           point: LatLng(pharmacy.latitude, pharmacy.longitude),
+                          alignment: Alignment.topCenter,
                           child: GestureDetector(
                             onTap: () {
                               Get.to(() =>
                                   PharmacyDetailPage(pharmacyId: pharmacy.id));
                             },
-                            child: Column(
+                            child: Stack(
+                              clipBehavior: Clip.none,
                               children: [
-                                const Icon(
-                                  Icons.local_pharmacy,
-                                  color: Colors.red,
-                                  size: 30,
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(4),
+                              const Positioned(
+                                  top: 0,
+                                  child: Icon(
+                                    Icons.local_pharmacy,
+                                    color: Colors.red,
+                                    size: 30,
                                   ),
-                                  child: Text(
-                                    pharmacy.name,
-                                    style: const TextStyle(fontSize: 10),
-                                    overflow: TextOverflow.ellipsis,
+                                ),
+                                Positioned(
+                                  top: 32,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          spreadRadius: 1,
+                                          blurRadius: 2,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      pharmacy.name,
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
                                   ),
                                 ),
                               ],
