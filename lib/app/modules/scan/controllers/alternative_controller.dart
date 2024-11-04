@@ -52,11 +52,3 @@ class AlternativeProductController extends GetxController {
   }
 }
 
-// bindings/alternative_product_binding.dart
-class AlternativeProductBinding extends Bindings {
-  @override
-  void dependencies() {
-    Get.lazyPut(() => AlternativeProductController());
-    Get.lazyPut(() => ProductService());
-  }
-}
