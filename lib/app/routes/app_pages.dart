@@ -18,10 +18,13 @@ import 'package:eat_this_app/app/modules/pharmacy/views/bindings/pharmacy_bindin
 import 'package:eat_this_app/app/modules/pharmacy/views/views/pharmacy_page.dart';
 import 'package:eat_this_app/app/modules/profile/bindings/profile_binding.dart';
 import 'package:eat_this_app/app/modules/profile/views/profile_page.dart';
+import 'package:eat_this_app/app/modules/scan/controllers/alternative_controller.dart';
 import 'package:eat_this_app/app/modules/scan/views/scan_view.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
 import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:get/get.dart';
+
+import '../modules/scan/views/alternative_product_page.dart';
 
 class AppPages {
   static const INITIAL = Routes.HOME;
@@ -70,6 +73,12 @@ class AppPages {
     // tambah rute baru disini
     GetPage(
         name: '/chat/room', page: () => ChatRoomPage(), binding: ChatBinding()),
+        // routes/app_pages.dart
+GetPage(
+  name: '/product/alternative',
+  page: () => AlternativeProductPage(),
+  binding: AlternativeProductBinding(),
+),
   ];
 }
 

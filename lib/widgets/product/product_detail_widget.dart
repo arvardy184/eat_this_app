@@ -1,10 +1,23 @@
+import 'package:eat_this_app/app/data/models/alternative_model.dart';
 import 'package:eat_this_app/app/data/models/product_model.dart';
+import 'package:eat_this_app/app/modules/scan/views/alternative_product_page.dart';
+import 'package:eat_this_app/services/product_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ProductDetailWidget extends StatelessWidget {
   final ProductModel productData;
+   final Function(List<String>) onRefreshAlternatives;
+  final List<Products>? alternativeProducts;
+  final bool isLoadingAlternatives;
 
-  ProductDetailWidget({required this.productData});
+   const ProductDetailWidget({
+    required this.productData,
+    required this.onRefreshAlternatives,
+    this.alternativeProducts,
+    this.isLoadingAlternatives = false,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -76,14 +89,14 @@ class ProductDetailWidget extends StatelessWidget {
                 SizedBox(height: 8),
 
                 // Product Description
-                if (product?.description != null)
+                if (product?.keywords != null)
                   Card(
                     elevation: 0,
                     color: Colors.blue[50],
                     child: Padding(
                       padding: EdgeInsets.all(12),
                       child: Text(
-                        product?.description ?? '',
+                        product?.keywords ?? '',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
@@ -177,13 +190,14 @@ class ProductDetailWidget extends StatelessWidget {
                 Card(
                   elevation: 0,
                   color: Colors.grey[50],
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.all(12),
                     child: Column(
                       children: [
                        //gatau masukin apa
                         Divider(),
-                       
+                       SizedBox(height: 24),
+                        _buildAlternativeProducts(context),
                       ],
                     ),
                   ),
@@ -221,7 +235,7 @@ class ProductDetailWidget extends StatelessWidget {
   }
 
   // ... rest of your methods remain the same
-}
+
 
   Widget _buildInfoRow(String label, String? value) {
     return Padding(
@@ -289,3 +303,165 @@ class ProductDetailWidget extends StatelessWidget {
       ),
     );
   }
+
+
+Widget _buildAlternativeProducts(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Alternative Products',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[900],
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.refresh, color: Colors.blue),
+              onPressed: isLoadingAlternatives 
+                ? null 
+                : () => onRefreshAlternatives(
+                    productData.product?.keywords?.split(',') ?? []
+                  ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+        
+        if (isLoadingAlternatives)
+          Center(child: CircularProgressIndicator())
+        else if (alternativeProducts == null || alternativeProducts!.isEmpty)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Icon(Icons.search_off, size: 48, color: Colors.grey),
+                  SizedBox(height: 8),
+                  Text(
+                    'No alternative products found',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          SizedBox(
+            height: 280,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: alternativeProducts!.length,
+              itemBuilder: (context, index) {
+                final alternative = alternativeProducts![index];
+                return _buildAlternativeCard(context, alternative);
+              },
+            ),
+          ),
+      ],
+    );
+  }
+Widget _buildAlternativeCard(BuildContext context, Products product) {
+    return Card(
+      margin: EdgeInsets.only(right: 16, bottom: 4, top: 4),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Container(
+        width: 200,
+        padding: EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product Image
+            Expanded(
+              flex: 3,
+              child: Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    product.imageUrl ?? '',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 8),
+            
+            // Product Name
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name ?? 'Unknown Product',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  
+                  // Allergens
+                  if (product.allergens != null && product.allergens!.isNotEmpty)
+                    Expanded(
+                      child: Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: product.allergens!.take(3).map((allergen) => Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: Colors.red[200]!),
+                          ),
+                          child: Text(
+                            allergen,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.red[900],
+                            ),
+                          ),
+                        )).toList(),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            
+            // View Details Button
+            // TextButton(
+            //   onPressed: () {
+            //     // Navigate to product details
+            //     Get.toNamed('/product/details', arguments: product.id);
+            //   },
+            //   child: Text('View Details'),
+            //   style: TextButton.styleFrom(
+            //     minimumSize: Size(double.infinity, 36),
+            //   ),
+            // ),
+            TextButton(
+  onPressed: () {
+    Get.toNamed('/product/alternative', arguments: product.id);
+  },
+  child: Text('View Details'),
+  style: TextButton.styleFrom(
+    minimumSize: Size(double.infinity, 36),
+  ),
+),
+         
+          ],
+        ),
+      ),
+    );
+  }
+}
