@@ -1,35 +1,158 @@
 import 'dart:async';
-import 'package:eat_this_app/app/data/models/consultant_model.dart' hide ConsultantData;
+import 'dart:convert';
+import 'package:eat_this_app/app/data/models/chat_user_model.dart';
 import 'package:eat_this_app/app/data/models/consultant2_model.dart';
+import 'package:eat_this_app/app/data/models/message_model.dart';
 import 'package:eat_this_app/app/data/models/user2_model.dart';
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
+import 'package:eat_this_app/app/utils/chat_channel_utils.dart';
 import 'package:eat_this_app/services/chat_service.dart';
 import 'package:get/get.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatController extends BaseController {
   final ChatService _chatService = ChatService();
-    final ApiService _authService = Get.put(ApiService());
+
+  final ApiService _authService = Get.put(ApiService());
   final RxList consultants = [].obs;
+  final messages = <MessageData>[].obs;
   final RxList<ConsultantData> addedConsultants = RxList<ConsultantData>();
-  final RxList<Users> users = RxList<Users>();  // Changed to RxList
-   final RxList<Users> acquaintances = RxList<Users>();  // For accepted users
-  final RxList<Users> requests = RxList<Users>();      // For pending requests
+  final RxList<Users> users = RxList<Users>(); 
+  final RxList<Users> acquaintances = RxList<Users>(); // For accepted users
+  final RxList<Users> requests = RxList<Users>(); // For pending requests
   final searchQuery = ''.obs;
   final isConsultant = false.obs;
   final typeUser = ''.obs;
   final isInitialized = false.obs;
-    final currentUserKey = ''.obs;
+   final currentUserKey = ''.obs;
+
+  final isConnected = false.obs;
+  final isConnecting = false.obs;
+  bool isSubscribed = false;
+
+  WebSocketChannel? channel;
+  late final String channelName;
+  final recipient = Get.arguments;
+
+  //  late final String currentUserKey;
+  late final String recipientKey;
   
+
+  Future<void> init(String currentUserKey, String recipientKey) async {
+    this.currentUserKey.value = currentUserKey;
+    this.recipientKey = recipientKey;
+    await _loadInitialData();
+  }
+
+  Future<void> loadMessages() async{
+    try{
+      final messagesList = await _chatService.getMessage(channelName);
+      // messages.value = messagesList.reversed.toList();
+       messages.assignAll(messagesList.reversed);
+         print("Loaded ${messages.length} messages");
+    } catch(e){
+      handleError(e);
+    }
+  }
+
+//  Future<void> connectWebSocket() async {
+//     if (isConnecting.value) return;
+    
+//     try {
+//       isConnecting.value = true;
+//       final token = await _chatService.getToken();
+      
+//       if (token == null) {
+//         throw Exception('No auth token available');
+//       }
+
+//       channel = await _chatService.connectWebSocket(
+//         channelName,
+//         token,
+//         handleWebSocketMessage,
+//         handleWebSocketError,
+//         handleWebSocketDone,
+//       );
+//     } catch (e) {
+//       print("Error connecting to WebSocket: $e");
+//       handleWebSocketError(e);
+//     }
+//   }
+
+
+Future<void> sendMessage(String text) async {
+
+  if(text.isEmpty) return;
+
+    try {
+      final optimisticMessage = MessageData(
+        message: text,
+        senderKey: currentUserKey.value,
+        recipientKey: recipient.conversationKey,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        sender: ChatUser(conversationKey: currentUserKey.value),
+        recipient: ChatUser(conversationKey: recipient.conversationKey),
+      );
+      
+      messages.insert(0, optimisticMessage);
+
+      final success = await _chatService.sendMessage(text, recipient.conversationKey);
+      if (!success) {
+        messages.remove(optimisticMessage);
+        Get.snackbar('Error', 'Failed to send message');
+      }
+    } catch (e) {
+     handleError(e);
+    }
+  }
+
+  
+
+
   @override
   void onInit() {
     super.onInit();
+    print("chat controller init");
     checkConsultantStatus();
-   initializeController();
-   _initializeUserData();
+    initializeController();
+    _initializeUserData();
+    // _initChatRoom();
   }
 
-   Future<void> _initializeUserData() async {
+  //  Future<void> _initChatRoom() async {
+  //   try {
+  //     isLoading(true);
+  //     // Get current user key
+  //     final key = await _authService.getCurrentUserKey();
+  //     if (key != null) {
+  //       print('User key found: $key');
+  //       currentUserKey.value = key;
+  //     } else {
+  //       throw Exception('User key not found');
+  //     }
+     
+      
+  //     // Set channel name
+  //     channelName = ChatChannelUtil.createChannelName(
+  //       currentUserKey.value,
+  //       recipient.conversationKey,
+  //     );
+
+  //  print("Initializing chat room with channel: $channelName");
+  //     // Load messages
+  //     await loadMessages();
+      
+  //     // Connect WebSocket
+  //     await connectWebSocket();
+  //   } catch (e) {
+  //     print("Error initializing chat room: $e");
+  //     Get.snackbar('Error', 'Failed to initialize chat');
+  //   }
+  // }
+
+  Future<void> _initializeUserData() async {
     try {
       // Get conversation_key
       final key = await _authService.getCurrentUserKey();
@@ -39,7 +162,7 @@ class ChatController extends BaseController {
       } else {
         throw Exception('User key not found');
       }
-      
+
       await checkConsultantStatus();
       await _loadInitialData();
     } catch (e) {
@@ -47,7 +170,7 @@ class ChatController extends BaseController {
     }
   }
 
-   Future<void> initializeController() async {
+  Future<void> initializeController() async {
     try {
       isLoading.value = true;
       await checkConsultantStatus();
@@ -56,11 +179,11 @@ class ChatController extends BaseController {
       handleError(e);
     } finally {
       isLoading.value = false;
-      isInitialized.value = true;  
+      isInitialized.value = true;
     }
   }
 
- Future<void> _loadInitialData() async {
+  Future<void> _loadInitialData() async {
     if (isConsultant.value) {
       await fetchAcquaintances();
       await fetchRequests();
@@ -81,8 +204,7 @@ class ChatController extends BaseController {
     }
   }
 
-  // Fetch all consultants with optional search
-  Future<void> fetchConsultants({String? query}) async {
+ Future<void> fetchConsultants({String? query}) async {
     try {
       isLoading.value = true;
       final result = await _chatService.getConsultants(name: query);
@@ -167,12 +289,10 @@ class ChatController extends BaseController {
       isLoading.value = true;
       final result = await _chatService.getAquaintances();
       if (result.users != null) {
-         acquaintances.assignAll(
-          result.users!.where((user) => user.status == 1).toList()
-        );
+        acquaintances.assignAll(
+            result.users!.where((user) => user.status == 1).toList());
         requests.assignAll(
-          result.users!.where((user) => user.status == 0).toList()
-        );
+            result.users!.where((user) => user.status == 0).toList());
         if (users.isEmpty) {
           showError('No acquaintances found');
         }
@@ -191,8 +311,10 @@ class ChatController extends BaseController {
     try {
       isLoading.value = true;
       final result = await _chatService.reqAnswer(userId, status);
-      if (result.users == true) {  // Check for successful response
-        showSuccess(result.status ?? (status == 1 ? 'Request accepted' : 'Request declined'));
+      if (result.users == true) {
+        // Check for successful response
+        showSuccess(result.status ??
+            (status == 1 ? 'Request accepted' : 'Request declined'));
         // Refresh lists after successful update
         await fetchAcquaintances();
         await fetchRequests();
@@ -214,8 +336,15 @@ class ChatController extends BaseController {
 
   @override
   void onClose() {
-    consultants.clear();
-    users.clear();
+    // consultants.clear();
+    // acquaintances.clear();
+    // requests.clear();
+    // addedConsultants.clear();
+    messages.clear();
+    searchQuery.value = '';
+    isLoading.value = false;
+    _chatService.disconnect();
+    // users.clear();
     super.onClose();
   }
 }

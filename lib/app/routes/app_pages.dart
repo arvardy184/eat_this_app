@@ -2,7 +2,6 @@
 
 // part 'app_routes.dart';
 
-import 'package:eat_this_app/app/data/models/chat_room_page.dart';
 import 'package:eat_this_app/app/middleware/auth_middleware.dart';
 import 'package:eat_this_app/app/modules/auth/views/forgetPassword_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/login_form.dart';
@@ -11,7 +10,7 @@ import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
 import 'package:eat_this_app/app/modules/chat/bindings/chat_binding.dart';
 import 'package:eat_this_app/app/modules/chat/views/acquiantances_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
-import 'package:eat_this_app/app/modules/chat/views/chat_page2.dart';
+import 'package:eat_this_app/app/modules/chat/views/chat_room_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/consultant_req_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/list_consultant.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';

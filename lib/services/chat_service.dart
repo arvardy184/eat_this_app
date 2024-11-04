@@ -1,15 +1,107 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/answer_model.dart';
 import 'package:eat_this_app/app/data/models/consultant2_model.dart';
 import 'package:eat_this_app/app/data/models/consultant_model.dart' hide ConsultantData;
+import 'package:eat_this_app/app/data/models/message_model.dart';
 import 'package:eat_this_app/app/data/models/user2_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatService {
   final Dio dio = Dio();
+  WebSocketChannel? channel;
 
+  final String appKey = 'u0x3cvdmybn0zpspqmo9';
+  final String host = 'ciet.site';
+  final int port = 443;
+  final String cluster = 'us2';
+  
+  bool isConnected = false;
+  bool isConnecting = false;
+  bool isSubscribed = false;
+  
+  Future<WebSocketChannel?> connectWebSocket(String channelName, String token, Function(dynamic) onMessage, Function(dynamic) onError, Function() onDone) async{
+    if(isConnecting) return null;
+    isConnecting = true;
+
+    try{
+      final wsUrl = "wss://$host:$port/app/$appKey";
+      print("Connect to WebSocket: $wsUrl");
+
+      final webSocket = await WebSocket.connect(
+        wsUrl,
+        protocols: ['ws', 'wss'],
+        headers: {
+          'Authorization': 'Bearer $token',
+          'cluster': cluster,
+          'useTLS': 'true',
+          'version': '7.0',
+          'client': 'dart',
+        }
+      );
+
+      channel = IOWebSocketChannel(webSocket);
+
+      channel?.stream.listen(
+        onMessage,
+        onError: onError,
+        onDone: onDone,
+        cancelOnError: true
+      );
+
+      isConnecting = false;
+      isConnected = true;
+      return channel;
+    } catch(e){
+      print("WebSocket connection error : $e");
+      isConnecting = false;
+      isConnected = false;
+      throw e;
+    }
+  }
+
+  Future<String?> getPusherAuth(String socketId, String channelName, String token) async{
+    try{
+      final response = await dio.post(
+        'https://$host/api/pusher/auth',
+        data: {
+          'socket_id': socketId,
+          'channel_name': channelName,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        )
+      );
+
+      final responseData = response.data is String ? jsonDecode(response.data) : response.data;
+      if(response.statusCode == 200 && responseData['auth'] != null){
+        String auth = responseData['auth'];
+        print("Got Pusher auth signature: $auth");
+        return auth;
+      }
+      return null;
+    } catch(e){
+      print("Error di getPusherAuth: $e");
+      throw e;
+    }
+  }
+
+  void disconnect (){
+    channel?.sink.close();
+    isConnected = false;
+    isSubscribed = false;
+  }
+
+  
   Future<String?> getToken() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? token = preferences.getString('auth_token');
@@ -182,7 +274,7 @@ class ChatService {
     }
   }
 
-Future<Response> sendMessage(String message, String recipientKey) async {
+Future<bool> sendMessage(String message, String recipientKey) async {
   final token = await getToken();
   if (token == null) throw Exception("Token not found");
 
@@ -201,7 +293,9 @@ Future<Response> sendMessage(String message, String recipientKey) async {
       ),
     );
     print("Response chat: ${response.data}");
-    return response;
+    return response.data[
+      'status'
+    ] == 'Message sent';
   } on DioException catch (dioError) {
     if (dioError.response != null) {
       // The server responded with an error
@@ -237,19 +331,27 @@ Future<Response> sendMessage(String message, String recipientKey) async {
     throw Exception(e);
   }
 }
-    Future<Response> getMessage(String key) async{
+    Future<List<MessageData>> getMessage(String recipientKey) async{
     final token = await getToken();
     if (token == null) throw Exception("Token not found");
     try {
-      final response = await dio.get("${ApiConstants.baseUrl}message/retrieve?key=$key",
+      final response = await dio.get("${ApiConstants.baseUrl}message/retrieve",
+      queryParameters: {
+        "key": recipientKey},
           options: Options(
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
             },
           ));
+
+
       print("Response chat get: ${response.data}");
-      return response;
+      final List<dynamic> messageDataList = response.data['messages']['data'];
+      return messageDataList
+          .map((message) => MessageData.fromJson(message))
+          .toList()
+          .toList();
     } catch (e) {
       print("Error di getMessage: $e");
       throw Exception(e);
