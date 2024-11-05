@@ -1,55 +1,288 @@
+import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:eat_this_app/app/data/models/history_model.dart';
+import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
+
+class HomePage extends GetView<HomeController> {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            const CustomAppBar(username: 'Rusmita'),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+      body: RefreshIndicator(
+        onRefresh: () => controller.refreshData(),
+        child: SafeArea(
+          child: Column(
+            children: [
+              CustomAppBar(
+                username: 'Rusmita', // TODO: Get from user profile
+                onProfileTap: () => Get.toNamed('/profile'),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const LastScannedCard(
-                        productName: 'Citato Ayam Bawang',
-                        productType: 'Chips',
-                        date: 'Sunday, 12 June',
-                        time: '12:00 AM',
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Rekomendasi',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      RecommendationSection(),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Near Pharmacy',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      PharmacySection(),
+                      _buildRecentScansSection(),
+                      _buildStatsSection(),
+                      _buildPharmacySection(),
                     ],
                   ),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () => Get.toNamed('/scanner'),
+      //   icon: const Icon(Icons.qr_code_scanner),
+      //   label: const Text('Scan Product'),
+      // ),
+    );
+  }
+
+  Widget _buildRecentScansSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Last Scanned',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              // TextButton(
+              //   onPressed: () => Get.toNamed('/history'),
+              //   child: const Text('See All'),
+              // ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 200,
+          child: Obx(() {
+            if (controller.isLoadingScans.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (controller.error.value != null) {
+              return Center(
+                child: Text(
+                  'Error: ${controller.error.value}',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+
+            if (controller.recentScans.isEmpty) {
+              return const Center(
+                child: Text('No recent scans'),
+              );
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              scrollDirection: Axis.horizontal,
+              itemCount: controller.recentScans.length,
+              itemBuilder: (context, index) {
+                final scan = controller.recentScans[index];
+                return ProductHistoryCard(product: scan);
+              },
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatsSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Colors.blue, Colors.lightBlue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  const Icon(Icons.qr_code_scanner,
+                      color: Colors.white, size: 32),
+                  const SizedBox(height: 8),
+                  Obx(() => Text(
+                        '${controller.recentScans.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
+                  const Text(
+                    'Scanned Items',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 1,
+              height: 50,
+              color: Colors.white.withOpacity(0.5),
+            ),
+            const Expanded(
+              child: Column(
+                children: [
+                  Icon(Icons.trending_up, color: Colors.white, size: 32),
+                  SizedBox(height: 8),
+                  Text(
+                    '80%', // TODO: pake data ril cb
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Healthy Products',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPharmacySection() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Nearby Pharmacies',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextButton(
+                onPressed: () => Get.toNamed('/pharmacies'),
+                child: const Text('See All'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const PharmacySection(),
+        ],
+      ),
+    );
+  }
+}
+
+class ProductHistoryCard extends StatelessWidget {
+  final Products product;
+
+  const ProductHistoryCard({
+    super.key,
+    required this.product,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final String formattedDate = DateFormat('MMM d, y').format(
+      DateTime.parse(product.pivot?.createdAt ?? DateTime.now().toString()),
+    );
+
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/product/alternative', arguments: product.id);
+      },
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 16),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
+                child: Image.network(
+                  product.imageUrl ?? '',
+                  height: 120,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 120,
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.image_not_supported),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name ?? 'Unknown',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      formattedDate,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -58,8 +291,10 @@ class HomePage extends StatelessWidget {
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String username;
+  final Function onProfileTap;
 
-  const CustomAppBar({super.key, required this.username});
+  const CustomAppBar(
+      {super.key, required this.username, required this.onProfileTap});
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +335,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           GestureDetector(
             onTap: () {
+              onProfileTap();
               Get.toNamed('/profile');
             },
             child: const CircleAvatar(
@@ -165,11 +401,13 @@ class LastScannedCard extends StatelessWidget {
                     children: [
                       const Icon(Icons.calendar_today, size: 16),
                       const SizedBox(width: 4),
-                      Expanded(child: Text(date, overflow: TextOverflow.ellipsis)),
+                      Expanded(
+                          child: Text(date, overflow: TextOverflow.ellipsis)),
                       const SizedBox(width: 16),
                       const Icon(Icons.access_time, size: 16),
                       const SizedBox(width: 4),
-                      Expanded(child: Text(time, overflow: TextOverflow.ellipsis)),
+                      Expanded(
+                          child: Text(time, overflow: TextOverflow.ellipsis)),
                     ],
                   ),
                 ],
@@ -194,7 +432,8 @@ class RecommendationSection extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         children: const [
           RecommendationItem(name: 'Citato', image: 'assets/images/farhan.png'),
-          RecommendationItem(name: 'Biskuat', image: 'assets/images/farhan.png'),
+          RecommendationItem(
+              name: 'Biskuat', image: 'assets/images/farhan.png'),
           RecommendationItem(name: 'Monde', image: 'assets/images/farhan.png'),
           RecommendationItem(name: 'Nextar', image: 'assets/images/farhan.png'),
         ],
@@ -207,7 +446,8 @@ class RecommendationItem extends StatelessWidget {
   final String name;
   final String image;
 
-  const RecommendationItem({super.key, required this.name, required this.image});
+  const RecommendationItem(
+      {super.key, required this.name, required this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +466,8 @@ class RecommendationItem extends StatelessWidget {
             );
           }),
           const SizedBox(height: 4),
-          Text(name, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
+          Text(name,
+              textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
         ],
       ),
     );
@@ -317,7 +558,8 @@ class PharmacyItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                      const Icon(Icons.location_on,
+                          size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(distance,
@@ -341,7 +583,8 @@ class PharmacyItem extends StatelessWidget {
                   if (openTime.isNotEmpty)
                     Row(
                       children: [
-                        const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                        const Icon(Icons.access_time,
+                            size: 16, color: Colors.grey),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text('Open at $openTime',

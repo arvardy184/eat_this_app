@@ -1,6 +1,7 @@
 // lib/widgets/persistent_bottom_nav_bar.dart
 import 'package:eat_this_app/app/modules/chat/controllers/chat_controller.dart';
 import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
+import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
 import 'package:eat_this_app/app/modules/pharmacy/views/controllers/pharmacy_controller.dart';
 import 'package:eat_this_app/app/modules/pharmacy/views/views/pharmacy_page.dart';
@@ -22,7 +23,10 @@ class PersistentBottomNavBar extends StatelessWidget {
     List<Widget> buildScreens() {
       return [
         // Gunakan GetX untuk inject dependencies
-        HomePage(),
+      GetBuilder<HomeController>(
+        init: HomeController(),
+        builder: (controller) => HomePage(),
+      ),
         // GetBuilder<HomeController>(
         //   init: HomeController(),
         //   builder: (controller) => HomePage(),

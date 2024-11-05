@@ -10,6 +10,7 @@ import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/chat_room_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/consultant_req_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/list_consultant.dart';
+import 'package:eat_this_app/app/modules/home/bindings/home_binding.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
 import 'package:eat_this_app/app/modules/pharmacy/views/bindings/pharmacy_binding.dart';
 import 'package:eat_this_app/app/modules/pharmacy/views/views/pharmacy_page.dart';
@@ -36,7 +37,8 @@ class AppPages {
         // binding: NavBindings()
         // binding: HomeBinding(),
         ),
-    GetPage(name: '/beranda', page: () => const HomePage()),
+    GetPage(name: '/beranda', page: () => const HomePage(),
+        binding: HomeBinding()),
     GetPage(name: '/search', page: () => const SearchPage()),
     GetPage(name: '/login', page: () => const LoginPage()),
     GetPage(name: '/scan', page: () => ScanPage()),
