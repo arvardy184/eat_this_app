@@ -151,20 +151,20 @@ class HomePage extends GetView<HomeController> {
               height: 50,
               color: Colors.white.withOpacity(0.5),
             ),
-            const Expanded(
+           Expanded(
               child: Column(
                 children: [
-                  Icon(Icons.trending_up, color: Colors.white, size: 32),
-                  SizedBox(height: 8),
-                  Text(
-                    '80%', // TODO: pake data ril cb
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                 const Icon(Icons.trending_up, color: Colors.white, size: 32),
+                 const SizedBox(height: 8),
+                 Obx(() => Text(
+                  '${controller.healthyPercentage.value.toStringAsFixed(1)}%',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Text(
+                )),
+                 const  Text(
                     'Healthy Products',
                     style: TextStyle(
                       color: Colors.white,

@@ -10,33 +10,52 @@ class HomeController extends BaseController {
   final recentScans = <Products>[].obs;
   final isLoadingScans = false.obs;
   final isLoadingPharmacies = false.obs;
+  final  healthyPercentage = 0.0.obs;
   final error = Rx<String?>(null);
 
   
   @override
   void onInit() {
     super.onInit();
+    loadInitialData();
   }
 
-  Future<void> loadInitialData() async{
-    await Future.wait([
-      loadRecentScans(),
-      
-    ]);
+  Future<void> loadInitialData() async {
+    await loadRecentScans();
+    calculateHealthyPercentage();
   }
+
+
+  void calculateHealthyPercentage() {
+    if (recentScans.isEmpty) {
+      healthyPercentage.value = 0.0;
+      return;
+    }
+
+    int healthyCount = 0;
+    
+    for (var product in recentScans) {
+      final nutriscore = product.nutriscore?.toLowerCase() ?? 'unknown';
+      print("Nutriscore: $nutriscore");
+      if (nutriscore == 'a' || nutriscore == 'b') {
+        healthyCount++;
+      }
+    }
+
+    healthyPercentage.value = (healthyCount / recentScans.length) * 100;
+  }
+
 
 
   Future<void> loadRecentScans() async{
     try{
       isLoadingScans(true);
-      final response = await _homeService.getRecentScans();
-
      
      final products = await _homeService.getRecentScans();
-      if(products != null){
+    
         recentScans.assignAll(products);
 
-      }
+      
     }catch(e){
       error.value = e.toString();
     }finally{
