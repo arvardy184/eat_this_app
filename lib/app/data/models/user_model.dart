@@ -30,6 +30,9 @@ class User {
   String? createdAt;
   String? updatedAt;
   String? birthDate;
+  String? latitude;
+  String? longitude;
+  String ? address;
   List<Allergens>? allergens;
   Package? package;
 
@@ -45,6 +48,9 @@ class User {
     this.updatedAt,
     this.allergens,
     this.birthDate,
+    this.latitude,
+    this.longitude,
+    this.address,
     this.package,
   });
 
@@ -59,6 +65,9 @@ class User {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     birthDate = json['birth_date'];
+    latitude = json['latitude'];
+    longitude = json['longitude'];
+    address = json['address'];
     if (json['allergens'] != null) {
       allergens = <Allergens>[];
       json['allergens'].forEach((v) {
@@ -81,6 +90,9 @@ class User {
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['birth_date'] = birthDate;
+    data['latitude'] = latitude;  
+    data['longitude'] = longitude;
+    data['address'] = address;
     if (allergens != null) {
       data['allergens'] = allergens!.map((v) => v.toJson()).toList();
     }

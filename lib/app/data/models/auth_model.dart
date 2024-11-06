@@ -28,7 +28,11 @@ class User {
   String? email;
   String? emailVerifiedAt;
   String? profilePicture;
+  String? birthDate;
   String? type;
+  String? latitude;
+  String? longitude;
+  String? address;
   String? conversationKey;
   String? createdAt;
   String? updatedAt;
@@ -40,7 +44,11 @@ class User {
       this.email,
       this.emailVerifiedAt,
       this.profilePicture,
+      this.birthDate,
       this.type,
+      this.latitude,
+      this.longitude,
+      this.address,
       this.conversationKey,
       this.createdAt,
       this.updatedAt,
@@ -52,7 +60,11 @@ class User {
     email = json['email'];
     emailVerifiedAt = json['email_verified_at'];
     profilePicture = json['profile_picture'];
+    birthDate = json['birth_date'];
     type = json['type'];
+    latitude = json['latitude'];
+    longitude = json['longitude'];
+    address = json['address'];
     conversationKey = json['conversation_key'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
@@ -66,7 +78,11 @@ class User {
     data['email'] = this.email;
     data['email_verified_at'] = this.emailVerifiedAt;
     data['profile_picture'] = this.profilePicture;
+    data['birth_date'] = this.birthDate;
     data['type'] = this.type;
+    data['latitude'] = this.latitude;
+    data['longitude'] = this.longitude;
+    data['address'] = this.address;
     data['conversation_key'] = this.conversationKey;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;

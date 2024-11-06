@@ -31,6 +31,9 @@ class Users {
   String? emailVerifiedAt;
   String? profilePicture;
   String? birthDate;
+  String? latitude;
+  String? longitude;
+  String? address;
   String? type;
   String? conversationKey;
   String? createdAt;
@@ -44,6 +47,9 @@ class Users {
       this.emailVerifiedAt,
       this.profilePicture,
       this.birthDate,
+      this.latitude,
+      this.longitude,
+      this.address,
       this.type,
       this.conversationKey,
       this.createdAt,
@@ -56,7 +62,11 @@ class Users {
     email = json['email'];
     emailVerifiedAt = json['email_verified_at'];
     profilePicture = json['profile_picture'];
-    birthDate = json['birth_date'];
+    birthDate = json
+    ['birth_date'];
+    latitude = json['latitude'];
+    longitude = json['longitude'];
+    address = json['address'];
     type = json['type'];
     conversationKey = json['conversation_key'];
     createdAt = json['created_at'];
@@ -72,6 +82,9 @@ class Users {
     data['email_verified_at'] = this.emailVerifiedAt;
     data['profile_picture'] = this.profilePicture;
     data['birth_date'] = this.birthDate;
+    data['latitude'] = this.latitude;
+    data['longitude'] = this.longitude;
+    data['address'] = this.address;
     data['type'] = this.type;
     data['conversation_key'] = this.conversationKey;
     data['created_at'] = this.createdAt;
