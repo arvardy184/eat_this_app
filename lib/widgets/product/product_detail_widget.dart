@@ -276,7 +276,7 @@ class ProductDetailWidget extends StatelessWidget {
             _buildNutrientRow('Fiber', nutrients.fiber?.toString(), 'g'),
             _buildNutrientRow('Protein', nutrients.protein?.toString(), 'g'),
             _buildNutrientRow('Salt', nutrients.salt?.toString(), 'g'),
-            _buildNutrientRow('Alcohol', nutrients.alcohol, '%'),
+            _buildNutrientRow('Alcohol', nutrients.alcohol.toString(), '%'),
           ],
         ),
         SizedBox(height: 8),

@@ -14,7 +14,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class ChatController extends BaseController {
   final ChatService _chatService = ChatService();
 
-  final ApiService _authService = Get.put(ApiService());
+  final ApiProvider _authService = Get.put(ApiProvider());
   final RxList consultants = [].obs;
   final messages = <MessageData>[].obs;
   final RxList<ConsultantData> addedConsultants = RxList<ConsultantData>();
@@ -234,7 +234,8 @@ Future<void> sendMessage(String text) async {
         addedConsultants.value = result.consultants!;
         print("hasil 2 result addes : $addedConsultants");
         if (addedConsultants.isEmpty) {
-          showError('No added consultants found');
+          // showError('No added consultants found');
+          print("No added consultants found");
         }
       } else {
         showError('Failed to load added consultants');

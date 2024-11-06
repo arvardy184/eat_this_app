@@ -174,7 +174,7 @@ class PharmacyPage extends StatelessWidget {
                       title: Text(pharmacy.name,
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(
-                          "${pharmacy.distance.toStringAsFixed(2)} meters away"),
+                          "${pharmacy.address}"),
                       onTap: () {
                         mapController.move(
                             LatLng(pharmacy.latitude, pharmacy.longitude),

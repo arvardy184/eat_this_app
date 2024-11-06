@@ -11,7 +11,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatRoomController extends BaseController {
   final ChatService _chatService = Get.find<ChatService>();
-  final ApiService _apiService = Get.find<ApiService>();
+  final ApiProvider _apiService = Get.find<ApiProvider>();
 
   final messages = <MessageData>[].obs;
   final isConnected = false.obs;

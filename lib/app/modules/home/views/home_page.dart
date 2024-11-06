@@ -19,10 +19,7 @@ class HomePage extends GetView<HomeController> {
         child: SafeArea(
           child: Column(
             children: [
-              CustomAppBar(
-                username: 'Rusmita', // TODO: Get from user profile
-                onProfileTap: () => Get.toNamed('/profile'),
-              ),
+              CustomAppBar(controller: controller),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -78,9 +75,10 @@ class HomePage extends GetView<HomeController> {
             }
 
             if (controller.error.value != null) {
+              print("error ${controller.error.value}");
               return Center(
                 child: Text(
-                  'Error: ${controller.error.value}',
+                  'Product Not FOund',
                   style: const TextStyle(color: Colors.red),
                 ),
               );
@@ -290,11 +288,10 @@ class ProductHistoryCard extends StatelessWidget {
 }
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String username;
-  final Function onProfileTap;
+  HomeController controller = Get.find<HomeController>();
 
-  const CustomAppBar(
-      {super.key, required this.username, required this.onProfileTap});
+   CustomAppBar(
+      {super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -310,12 +307,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Column(
+        Expanded(
+            child: Obx(() => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hi, $username',
+                  'Hi, ${controller.userData.value?.user?.name ?? 'User'}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -323,26 +320,71 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const Text(
-                  'Welcome back!',
-                  style: TextStyle(
+                Text(
+                  '${controller.userData.value?.user?.package?.name ?? 'Free'} Package',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
                 ),
               ],
-            ),
+            )),
           ),
-          GestureDetector(
-            onTap: () {
-              onProfileTap();
-              Get.toNamed('/profile');
-            },
-            child: const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/farhan.png'),
-              radius: 25,
+            Obx(() => GestureDetector(
+            onTap: () => Get.toNamed('/profile'),
+            child: ClipOval(
+                child: controller.userData.value?.user?.profilePicture != null
+                    ? Image.network(
+                        controller.userData.value?.user?.profilePicture ?? '',
+                        fit: BoxFit.cover,
+                        // Error handling ketika gambar gagal dimuat
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Error loading profile image: $error');
+                          // Menampilkan fallback image atau placeholder
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          );
+                        },
+                        // Loading placeholder
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                        size: 30,
+                        ),
+                      ),
+              ),
             ),
-          ),
+          )
+          // GestureDetector(
+          //   onTap: () {
+              
+          //     Get.toNamed('/profile');
+          //   },
+          //   child: const CircleAvatar(
+          //     backgroundImage: AssetImage('assets/images/farhan.png'),
+          //     radius: 25,
+          //   ),
+          // ),
         ],
       ),
     );

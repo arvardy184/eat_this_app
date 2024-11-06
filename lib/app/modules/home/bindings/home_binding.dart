@@ -10,6 +10,6 @@ class HomeBinding  implements Bindings{
   void dependencies() {
   Get.lazyPut(() => ApiService());
     Get.lazyPut(() => HomeService(Get.find<ApiService>()));
-    Get.lazyPut(() => HomeController());
+     Get.lazyPut(() => HomeController());
   }
 }

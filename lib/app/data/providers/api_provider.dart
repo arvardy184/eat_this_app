@@ -1,19 +1,20 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:get/get.dart' as getx;
 import 'package:get/get_core/src/get_main.dart';
 // import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ApiService {
+class ApiProvider {
   final Dio _dio = Dio();
   static String? _accessToken;
   static String? _refreshToken;
   static String? _type;
 
-  ApiService() {
+  ApiProvider() {
     _dio.options.baseUrl = ApiConstants.baseUrl;
 
     // _dio.interceptors.add(InterceptorsWrapper(
@@ -103,12 +104,25 @@ class ApiService {
   }
 
  Future<void> saveUserData(Map<String, dynamic> userData) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('user_id', userData['id'] ?? '');
-  await prefs.setString('user_name', userData['name'] ?? '');
-  await prefs.setString('conversation_key', userData['conversation_key'] ?? '');
-  await prefs.setString('type', userData['type'] ?? '');
-}
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_id', userData['id'] ?? '');
+    await prefs.setString('user_name', userData['name'] ?? '');
+    await prefs.setString('user_email', userData['email'] ?? '');
+    await prefs.setString('user_profile_picture', userData['profile_picture'] ?? '');
+    await prefs.setString('conversation_key', userData['conversation_key'] ?? '');
+    await prefs.setString('type', userData['type'] ?? '');
+    await prefs.setString('user_data', json.encode(userData)); // Save complete user data
+  }
+
+ Future<UserModel?> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user_data');
+    if (userData != null) {
+      return UserModel.fromJson(json.decode(userData));
+    }
+    return null;
+  }
+
 
 
   Future<void> _saveTypes({required String type}) async {
