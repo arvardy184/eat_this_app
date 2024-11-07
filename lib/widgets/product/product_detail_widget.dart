@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 class ProductDetailWidget extends StatelessWidget {
   final ProductModel productData;
-   final Function(List<String>) onRefreshAlternatives;
+  final Function(List<String>) onRefreshAlternatives;
   final List<Products>? alternativeProducts;
   final bool isLoadingAlternatives;
   final bool isLoading;

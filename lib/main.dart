@@ -36,6 +36,7 @@ class CIETApp extends StatelessWidget {
   ThemeData setupTheme() {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: CIETTheme.font_family,
       textTheme: const TextTheme(
         labelLarge: TextStyle(
             fontFamily: CIETTheme.font_family, fontSize: CIETTheme.font_size),
@@ -45,7 +46,6 @@ class CIETApp extends StatelessWidget {
             TextStyle(fontFamily: CIETTheme.font_family, color: Colors.black),
         bodyLarge: TextStyle(
           fontFamily: CIETTheme.font_family,
-          // fontSize: CIETTheme.font_sizer
         ),
         bodyMedium: TextStyle(
             fontFamily: CIETTheme.font_family, fontSize: CIETTheme.font_size),

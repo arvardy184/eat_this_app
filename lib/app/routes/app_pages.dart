@@ -21,6 +21,7 @@ import 'package:eat_this_app/app/modules/scan/bindings/alternative_bindings.dart
 import 'package:eat_this_app/app/modules/scan/views/scan_view.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
 import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
+import 'package:eat_this_app/app/utils/term_of_service.dart';
 import 'package:get/get.dart';
 
 import '../modules/scan/views/alternative_product_page.dart';
@@ -60,7 +61,10 @@ class AppPages {
         name: '/pharmacy',
         page: () => PharmacyPage(),
         bindings: [PharmacyBinding()]),
-
+   GetPage(
+      name:'/terms',
+      page: () => const TermsOfServicePage(),
+    ),
     //chat and consult
     GetPage(name: '/chat', page: () => ChatPage(), binding: ChatBinding(),bindings: [
       SubscriptionBinding(),

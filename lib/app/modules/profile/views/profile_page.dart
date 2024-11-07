@@ -142,7 +142,9 @@ class ProfilePage extends GetView<ProfileController> {
               ListTile(
                 leading: const Icon(Icons.privacy_tip),
                 title: const Text("Privacy Policy"),
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed('/terms');
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.settings),

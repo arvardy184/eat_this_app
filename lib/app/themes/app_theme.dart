@@ -1,4 +1,3 @@
-// ignore_for_file: constant_identifier_names
 
 import 'package:flutter/material.dart';
 
@@ -10,7 +9,6 @@ class AppTheme {
       backgroundColor: CIETTheme.primary_color,
       elevation: 0,
     ),
-    // Add more customizations here
   );
 
   static final dark = ThemeData.dark().copyWith(
@@ -20,7 +18,6 @@ class AppTheme {
       backgroundColor: CIETTheme.primary_color,
       elevation: 0,
     ),
-    // Add more customizations here
   );
 }
 
