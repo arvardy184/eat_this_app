@@ -3,8 +3,8 @@ import 'package:eat_this_app/app/modules/chat/controllers/chat_controller.dart';
 import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
 import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
-import 'package:eat_this_app/app/modules/pharmacy/views/controllers/pharmacy_controller.dart';
-import 'package:eat_this_app/app/modules/pharmacy/views/views/pharmacy_page.dart';
+import 'package:eat_this_app/app/modules/pharmacy/controllers/pharmacy_controller.dart';
+import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_page.dart';
 import 'package:eat_this_app/app/modules/scan/controllers/scan_controller.dart';
 import 'package:eat_this_app/app/modules/scan/views/scan_view.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
@@ -23,10 +23,10 @@ class PersistentBottomNavBar extends StatelessWidget {
     List<Widget> buildScreens() {
       return [
         // Gunakan GetX untuk inject dependencies
-      GetBuilder<HomeController>(
-        init: HomeController(),
-        builder: (controller) => HomePage(),
-      ),
+        GetBuilder<HomeController>(
+          init: HomeController(),
+          builder: (controller) => HomePage(),
+        ),
         // GetBuilder<HomeController>(
         //   init: HomeController(),
         //   builder: (controller) => HomePage(),

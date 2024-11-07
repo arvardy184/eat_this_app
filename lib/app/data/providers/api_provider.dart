@@ -35,23 +35,21 @@ class ApiService {
 
       print("Response status code: ${response.statusCode}");
       print("Response data: ${response.data}");
-    
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data; 
+        final data = response.data;
         await _saveTokens(
-          accessToken: data['token'] ?? '', 
-          refreshToken: data['refresh_token'] ??
-              '',
+          accessToken: data['token'] ?? '',
+          refreshToken: data['refresh_token'] ?? '',
         );
         await _saveTypes(type: data['user']['type'] ?? '');
-       await saveUserData(data['user'] ?? {});
+        await saveUserData(data['user'] ?? {});
         return response;
       } else {
         print("Login failed with status code: ${response.statusCode}");
         return response;
       }
     } catch (e) {
-      
       print("Login error: $e");
       throw e;
     }
@@ -102,14 +100,14 @@ class ApiService {
     }
   }
 
- Future<void> saveUserData(Map<String, dynamic> userData) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('user_id', userData['id'] ?? '');
-  await prefs.setString('user_name', userData['name'] ?? '');
-  await prefs.setString('conversation_key', userData['conversation_key'] ?? '');
-  await prefs.setString('type', userData['type'] ?? '');
-}
-
+  Future<void> saveUserData(Map<String, dynamic> userData) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_id', userData['id'] ?? '');
+    await prefs.setString('user_name', userData['name'] ?? '');
+    await prefs.setString(
+        'conversation_key', userData['conversation_key'] ?? '');
+    await prefs.setString('type', userData['type'] ?? '');
+  }
 
   Future<void> _saveTypes({required String type}) async {
     final prefs = await SharedPreferences.getInstance();
@@ -125,7 +123,7 @@ class ApiService {
     return type;
   }
 
-  Future<String?> getCurrentUserKey() async{
+  Future<String?> getCurrentUserKey() async {
     final prefs = await SharedPreferences.getInstance();
     final conversationKey = prefs.getString('conversation_key');
     print("cek conversation key ${conversationKey}");

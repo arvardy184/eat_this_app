@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/pharmacy_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
@@ -100,6 +99,108 @@ class PharmacyService {
       }
     } catch (e) {
       throw Exception('Error fetching medicines: $e');
+    }
+  }
+
+  Future<String?> getType() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? type = preferences.getString('type');
+    return type;
+  }
+
+  Future<String?> getUserId() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? userId = preferences.getString('user_id');
+    return userId;
+  }
+
+  Future<void> addMedicine(
+    String pharmacyId,
+    String name,
+    String content,
+    String imageUrl,
+  ) async {
+    final token = await getToken();
+    if (token == null) throw Exception("Token not found");
+
+    try {
+      final response = await _dio.post(
+        '${ApiConstants.baseUrl}pharmacy/medicines/add',
+        data: {
+          'pharmacy_id': pharmacyId,
+          'name': name,
+          'content': content,
+          'image_url': imageUrl,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to add medicine');
+      }
+    } catch (e) {
+      throw Exception('Error adding medicine: $e');
+    }
+  }
+
+  Future<void> updateMedicine(
+    String medicineId,
+    String name,
+    String content,
+    String imageUrl,
+  ) async {
+    final token = await getToken();
+    if (token == null) throw Exception("Token not found");
+
+    try {
+      final response = await _dio.post(
+        '${ApiConstants.baseUrl}pharmacy/medicines/update/$medicineId',
+        data: {
+          'name': name,
+          'content': content,
+          'image_url': imageUrl,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update medicine');
+      }
+    } catch (e) {
+      throw Exception('Error updating medicine: $e');
+    }
+  }
+
+  Future<void> deleteMedicine(String medicineId) async {
+    final token = await getToken();
+    if (token == null) throw Exception("Token not found");
+
+    try {
+      final response = await _dio.delete(
+        '${ApiConstants.baseUrl}pharmacy/medicines/$medicineId',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete medicine');
+      }
+    } catch (e) {
+      throw Exception('Error deleting medicine: $e');
     }
   }
 }

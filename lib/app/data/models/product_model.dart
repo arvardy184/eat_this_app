@@ -6,7 +6,8 @@ class ProductModel {
 
   ProductModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    product = json['product'] != null ? Product.fromJson(json['product']) : null;
+    product =
+        json['product'] != null ? Product.fromJson(json['product']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -70,7 +71,9 @@ class Product {
         allergens!.add(Allergens.fromJson(v));
       });
     }
-    nutrients = json['nutrients'] != null ? Nutrients.fromJson(json['nutrients']) : null;
+    nutrients = json['nutrients'] != null
+        ? Nutrients.fromJson(json['nutrients'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {

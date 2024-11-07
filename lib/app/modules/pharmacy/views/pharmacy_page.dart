@@ -8,22 +8,37 @@ import 'pharmacy_detail_page.dart';
 class PharmacyPage extends StatelessWidget {
   final PharmacyController controller = Get.put(PharmacyController());
   final MapController mapController = MapController();
+  bool _isFirstLoad = true;
 
   PharmacyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    if (_isFirstLoad) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // Tunggu sampai loading selesai
+        while (controller.isLoading.value) {
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+
+        // Cek dan redirect jika user adalah pharmacy
+        if (controller.isPharmacy.value && controller.pharmacies.isNotEmpty) {
+          controller.redirectToPharmacyDetail();
+        }
+      });
+      _isFirstLoad = false;
+    }
     return Scaffold(
+      backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
-        title: const Text("Apotek Terdekat"),
+        title: const Text("Apotek Terdekat",
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => controller.refreshPharmacies(),
-          ),
-        ],
+        foregroundColor: Colors.white,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -80,7 +95,6 @@ class PharmacyPage extends StatelessWidget {
                   ),
                   MarkerLayer(
                     markers: [
-                      // User location marker
                       Marker(
                         point: LatLng(
                             userPosition.latitude, userPosition.longitude),
@@ -90,20 +104,23 @@ class PharmacyPage extends StatelessWidget {
                           size: 20,
                         ),
                       ),
-                      // Pharmacy markers
                       ...controller.pharmacies.map((pharmacy) {
                         return Marker(
                           point: LatLng(pharmacy.latitude, pharmacy.longitude),
                           alignment: Alignment.topCenter,
                           child: GestureDetector(
                             onTap: () {
-                              Get.to(() =>
-                                  PharmacyDetailPage(pharmacyId: pharmacy.id));
+                              Get.to(() => PharmacyDetailPage(
+                                    pharmacyId: pharmacy.id,
+                                    latitude: pharmacy.latitude,
+                                    longitude: pharmacy.longitude,
+                                    name: pharmacy.name,
+                                  ));
                             },
                             child: Stack(
                               clipBehavior: Clip.none,
                               children: [
-                              const Positioned(
+                                const Positioned(
                                   top: 0,
                                   child: Icon(
                                     Icons.local_pharmacy,
@@ -150,38 +167,73 @@ class PharmacyPage extends StatelessWidget {
                 ],
               ),
             ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              width: double.infinity,
+              color: Colors.blue.shade50,
+              child: const Text(
+                "Daftar Apotek",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Divider(
+                color: Colors.blue.shade200,
+                thickness: 3,
+              ),
+            ),
             Expanded(
               flex: 1,
               child: RefreshIndicator(
                 onRefresh: () => controller.refreshPharmacies(),
-                child: ListView.builder(
+                child: ListView.separated(
                   itemCount: controller.pharmacies.length,
+                  separatorBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Divider(
+                      color: Colors.blue.shade200,
+                      thickness: 3,
+                    ),
+                  ),
                   itemBuilder: (context, index) {
                     final pharmacy = controller.pharmacies[index];
-                    return ListTile(
-                      leading: pharmacy.profilePicture != null
-                          ? Image.network(
-                              pharmacy.profilePicture!,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.local_pharmacy,
-                                      size: 50, color: Colors.blue),
-                            )
-                          : const Icon(Icons.local_pharmacy,
-                              size: 50, color: Colors.blue),
-                      title: Text(pharmacy.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(
-                          "${pharmacy.distance.toStringAsFixed(2)} meters away"),
-                      onTap: () {
-                        mapController.move(
-                            LatLng(pharmacy.latitude, pharmacy.longitude),
-                            16.0);
-                        Get.to(
-                            () => PharmacyDetailPage(pharmacyId: pharmacy.id));
-                      },
+                    return Container(
+                      color: Colors.blue.shade50,
+                      child: ListTile(
+                        leading: pharmacy.profilePicture != null
+                            ? Image.network(
+                                pharmacy.profilePicture!,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.local_pharmacy,
+                                        size: 50, color: Colors.blue),
+                              )
+                            : const Icon(Icons.local_pharmacy,
+                                size: 50, color: Colors.blue),
+                        title: Text(pharmacy.name,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(pharmacy.address),
+                        onTap: () {
+                          mapController.move(
+                              LatLng(pharmacy.latitude, pharmacy.longitude),
+                              16.0);
+                          Get.to(() => PharmacyDetailPage(
+                                pharmacyId: pharmacy.id,
+                                latitude: pharmacy.latitude,
+                                longitude: pharmacy.longitude,
+                                name: pharmacy.name,
+                              ));
+                        },
+                      ),
                     );
                   },
                 ),
