@@ -1,19 +1,16 @@
-
-
 import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/consultant_model.dart';
 import 'package:eat_this_app/app/data/models/history_model.dart';
 import 'package:eat_this_app/app/data/models/pharmacy_model.dart';
+import 'package:eat_this_app/app/data/models/recommendation_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:eat_this_app/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeService {
   final ApiService apiService;
-  
 
   HomeService(this.apiService);
-
 
   final Dio _dio = Dio()
     ..options = BaseOptions(
@@ -24,30 +21,30 @@ class HomeService {
       receiveTimeout: const Duration(seconds: 15),
       connectTimeout: const Duration(seconds: 15),
     );
-    Future<String?> getToken() async {
+
+  Future<String?> getToken() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? token = preferences.getString('auth_token');
     return token;
   }
 
-
   Future<List<Products>> getRecentScans() async {
-    try{
-    final response = await apiService.get('product/history');
-    if(response.data == null){
-      throw Exception("Failed to fetch recent scans");
+    try {
+      final response = await apiService.get('product/history');
+      if (response.data == null) {
+        throw Exception("Failed to fetch recent scans");
+      }
+
+      final productsData = response.data['products'] as List;
+      print("cek data history: $productsData");
+      return productsData.map((json) => Products.fromJson(json)).toList();
+    } catch (e) {
+      print("Error get recent scans: $e");
+      throw Exception("Failed to fetch recent scans: $e");
     }
-
-    final productsData = response.data['products'] as List;
-    print("cek data history: $productsData");
-    return productsData.map((json) => Products.fromJson(json)).toList();
-
-  } catch(e){
-    throw Exception("Failed to fetch recent scans: $e");
-  }
   }
 
-   Future<List<Pharmacy>> getNearbyPharmacies(
+  Future<List<Pharmacy>> getNearbyPharmacies(
       double latitude, double longitude) async {
     final token = await getToken();
     if (token == null) throw Exception("Token not found");
@@ -120,6 +117,29 @@ class HomeService {
       return ConsultantModel.fromJson(response.data);
     } catch (e) {
       print("Error get  consultant: $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<ProductsRec>> getRecommendation() async {
+    final token = await getToken();
+    if (token == null) throw Exception("Token not found");
+    print("Using token: $token");
+    try {
+      final response =
+          await _dio.get("${ApiConstants.baseUrl}product/recommendation",
+              options: Options(
+                headers: {
+                  'Authorization': 'Bearer $token',
+                  'Content-Type': 'application/json',
+                },
+              ));
+      print("Response get recommendation: ${response.data}");
+      final product = response.data['products'] as List;
+      print("hasil product : $product");
+      return product.map((json) => ProductsRec.fromJson(json)).toList();
+    } catch (e) {
+      print("Error get  recommendation: $e");
       throw Exception(e);
     }
   }

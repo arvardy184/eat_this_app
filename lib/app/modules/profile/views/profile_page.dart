@@ -18,107 +18,114 @@ class ProfilePage extends GetView<ProfileController> {
         centerTitle: true,
         elevation: 0,
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
-        }
-
-        final user = controller.user.value;
-        if (user == null) {
-          return Center(child: Text('No user data available'));
-        }
-
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Profile Picture and Name
-              GestureDetector(
-                onTap: () => _showImagePickerBottomSheet(context),
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: user.profilePicture != null
-                          ? NetworkImage(user.profilePicture!)
-                          : const AssetImage('assets/images/default_avatar.png')
-                              as ImageProvider,
+      body: Column(
+        children: [
+          Obx(() {
+            if (controller.isLoading.value) {
+              return Center(child: CircularProgressIndicator());
+            }
+          
+            final user = controller.user.value;
+            if (user == null) {
+              return Center(child: Text('No user data available'));
+            }
+          
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Profile Picture and Name
+                  GestureDetector(
+                    onTap: () => _showImagePickerBottomSheet(context),
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: user.profilePicture != null
+                              ? NetworkImage(user.profilePicture!)
+                              : const AssetImage('assets/images/default_avatar.png')
+                                  as ImageProvider,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: CIETTheme.secondary_color,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: CIETTheme.secondary_color,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 20,
-                        ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    user.name ?? 'No Name',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 5),
+          
+                  // Premium Badge
+                  if (user.package?.id != null)
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: CIETTheme.secondary_color,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                user.name ?? 'No Name',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 5),
-
-              // Premium Badge
-              if (user.package?.id != null)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: CIETTheme.secondary_color,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    "Premium Account",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16),
-                  ),
-                ),
-              const SizedBox(height: 20),
-
-              // Allergies Section
-              if (user.allergens != null && user.allergens!.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  color: Colors.blue.shade50,
-                  child: Column(
-                    children: [
-                      const Text(
-                        "My Allergen",
+                      child: const Text(
+                        "Premium Account",
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16),
                       ),
-                      const SizedBox(height: 10),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: user.allergens!
-                              .map((allergen) => _buildAllergyTag(
-                                  allergen.name ?? '', Colors.orange))
-                              .toList(),
-                        ),
+                    ),
+                  const SizedBox(height: 20),
+          
+                  // Allergies Section
+                  if (user.allergens != null && user.allergens!.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      color: CIETTheme.primary_color,
+                      child: Column(
+                        children: [
+                          const Text(
+                            "My Allergen",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: user.allergens!
+                                  .map((allergen) => _buildAllergyTag(
+                                      allergen.name ?? '', Colors.orange))
+                                  .toList(),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-
-              const SizedBox(height: 20),
+                    ),
+          
+             
+                ],
+              ),
+            );
+          }),
+               const SizedBox(height: 20),
               // Account Settings
               ListTile(
                 leading: const Icon(Icons.person),
@@ -158,10 +165,8 @@ class ProfilePage extends GetView<ProfileController> {
                   _auth.logout();
                 },
               ),
-            ],
-          ),
-        );
-      }),
+        ],
+      ),
     );
   }
 

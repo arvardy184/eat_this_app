@@ -32,7 +32,7 @@ class User {
   String? birthDate;
   String? latitude;
   String? longitude;
-  String ? address;
+  String? address;
   List<Allergens>? allergens;
   Package? package;
 
@@ -104,33 +104,38 @@ class User {
 }
 
 class Package {
-  int? id;
-  String? name;
-  int? price;
-  int? maxScan;
-  int? maxConsultant;
-  String? createdAt;
-  String? updatedAt;
+  final int id;
+  final String name;
+  final int price;
+  final int maxScan;
+  final int maxConsultant;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Package({
-    this.id,
-    this.name,
-    this.price,
-    this.maxScan,
-    this.maxConsultant,
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.maxScan,
+    required this.maxConsultant,
     this.createdAt,
     this.updatedAt,
   });
 
-  Package.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    price = json['price'];
-    maxScan = json['max_scan'];
-    maxConsultant = json['max_consultant'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+  factory Package.fromJson(Map<String, dynamic> json) {
+    return Package(
+      id: json['id'],
+      name: json['name'],
+      price: json['price'],
+      maxScan: json['max_scan'],
+      maxConsultant: json['max_consultant'],
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+    );
   }
+
+  bool get isPremium => name.toLowerCase() != 'free';
+
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -144,6 +149,7 @@ class Package {
     return data;
   }
 }
+
 
 class Allergens {
   String? name;

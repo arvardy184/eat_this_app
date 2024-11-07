@@ -13,10 +13,10 @@ class Pharmacy {
     required this.name,
     required this.email,
     required this.profilePicture,
+    required this.address,
     required this.latitude,
     required this.longitude,
     required this.distance,
-    required this.address,
   });
 
   factory Pharmacy.fromJson(Map<String, dynamic> json) {

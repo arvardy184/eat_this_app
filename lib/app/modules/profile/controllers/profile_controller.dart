@@ -27,16 +27,20 @@ class ProfileController extends BaseController {
       isLoading.value = true;
       final response = await _userService.getUserProfile();
       user.value = response.user;
-
+     
       if (user.value == null) {
         showError('Failed to load user profile');
       }
     } catch (e) {
+       print("data user profile ${user.value}");
+      print("Error loading user profile: $e");
       handleError(e);
     } finally {
       isLoading.value = false;
     }
   }
+
+  
 
   Future<void> updateProfileImage() async {
     try {

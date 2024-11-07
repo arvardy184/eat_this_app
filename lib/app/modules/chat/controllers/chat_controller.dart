@@ -1,23 +1,24 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:eat_this_app/app/data/models/chat_user_model.dart';
 import 'package:eat_this_app/app/data/models/consultant2_model.dart';
 import 'package:eat_this_app/app/data/models/message_model.dart';
+import 'package:eat_this_app/app/data/models/package_model.dart';
 import 'package:eat_this_app/app/data/models/user2_model.dart';
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
-import 'package:eat_this_app/app/utils/chat_channel_utils.dart';
+import 'package:eat_this_app/app/modules/chat/controllers/subscription_controller.dart';
 import 'package:eat_this_app/services/chat_service.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatController extends BaseController {
   final ChatService _chatService = ChatService();
-
-  final ApiService _authService = Get.put(ApiService());
+  final ApiProvider _authService = Get.put(ApiProvider());
+  final SubscriptionController subsController = Get.find<SubscriptionController>();
   final RxList consultants = [].obs;
   final messages = <MessageData>[].obs;
   final RxList<ConsultantData> addedConsultants = RxList<ConsultantData>();
+  final RxList<Packages> packages = RxList<Packages>();
   final RxList<Users> users = RxList<Users>(); 
   final RxList<Users> acquaintances = RxList<Users>(); // For accepted users
   final RxList<Users> requests = RxList<Users>(); // For pending requests
@@ -121,6 +122,8 @@ Future<void> sendMessage(String text) async {
     // _initChatRoom();
   }
 
+  
+
   //  Future<void> _initChatRoom() async {
   //   try {
   //     isLoading(true);
@@ -152,6 +155,11 @@ Future<void> sendMessage(String text) async {
   //   }
   // }
 
+  bool canAccessChat() {
+    if(isConsultant.value) return true;
+    return subsController.isPremium.value;
+  }
+
   Future<void> _initializeUserData() async {
     try {
       // Get conversation_key
@@ -164,9 +172,18 @@ Future<void> sendMessage(String text) async {
       }
 
       await checkConsultantStatus();
+      if(canAccessChat()){
+        await _loadInitialData();
+      }
       await _loadInitialData();
     } catch (e) {
       handleError(e);
+    }
+  }
+
+  void checkChatAccess(){
+    if(!canAccessChat()){
+      subsController.showUpgradeDialog();
     }
   }
 
@@ -234,7 +251,8 @@ Future<void> sendMessage(String text) async {
         addedConsultants.value = result.consultants!;
         print("hasil 2 result addes : $addedConsultants");
         if (addedConsultants.isEmpty) {
-          showError('No added consultants found');
+          // showError('No added consultants found');
+          print("No added consultants found");
         }
       } else {
         showError('Failed to load added consultants');
@@ -248,22 +266,40 @@ Future<void> sendMessage(String text) async {
 
   // Add consultant
 
-  Future<void> addConsultant(String consultantId) async {
-    try {
-      isLoading.value = true;
-      final result = await _chatService.addConsultant(consultantId);
-      if (result != null) {
-        addedConsultants.add(result);
-        showSuccess('Consultant added successfully');
-      } else {
-        showError('Failed to add consultant');
-      }
-    } catch (e) {
-      handleError(e);
-    } finally {
-      isLoading.value = false;
-    }
+Future<void> addConsultant(String consultantId) async {
+  try {
+    isLoading.value = true;
+    
+
+    final result = await _chatService.addConsultant(consultantId);
+    
+   
+    addedConsultants.add(result);
+    
+   
+    showSuccess('Consultant added successfully');
+  } catch (e) {
+  
+    handleError(e);
+  } finally {
+   
+    isLoading.value = false;
   }
+}
+
+Future<void> listPackage() async{
+  try{
+    isLoading.value = true;
+
+    final result = await _chatService.getPackages();
+    packages .value = result;
+
+  }catch(e){
+    handleError(e);
+  }finally{
+    isLoading.value = false;
+  }
+}
 
   // Request to become a consultant
 

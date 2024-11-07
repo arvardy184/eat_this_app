@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/allergen_model.dart';
 import 'package:eat_this_app/app/data/models/user_model.dart';
+import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
   final Dio _dio = Dio();
+  final ApiProvider _apiProvider = ApiProvider();
   Future<UserModel> getUserProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -26,10 +28,17 @@ class UserService {
       ),
     );
 
+    print("responset d di user service ${response.data}");
+
     if (response.statusCode == 200) {
       print("res di user service ${response.data}");
+      await _apiProvider.saveUserData(response.data['user'] ?? {});
       return UserModel.fromJson(response.data);
+    } else if (response.statusCode == 500) {
+      print("res di user service ${response.data}");
+      throw Exception('Failed to fetch user profile');
     } else {
+      print("res di user service ${response.data}");
       throw Exception('Failed to fetch user profile');
     }
   }
@@ -81,7 +90,7 @@ class UserService {
 
       print("API Response: ${response.data}");
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return UserModel.fromJson(response.data);
       } else {
         throw Exception('Failed to update profile');

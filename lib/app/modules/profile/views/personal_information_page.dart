@@ -1,9 +1,10 @@
-import 'package:eat_this_app/app/data/models/allergen_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../controllers/profile_controller.dart';
 
+// ignore: must_be_immutable
 class PersonalInformationPage extends GetView<ProfileController> {
   PersonalInformationPage({Key? key}) : super(key: key);
 

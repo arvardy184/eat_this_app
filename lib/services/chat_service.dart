@@ -4,9 +4,12 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/answer_model.dart';
 import 'package:eat_this_app/app/data/models/consultant2_model.dart';
-import 'package:eat_this_app/app/data/models/consultant_model.dart' hide ConsultantData;
+import 'package:eat_this_app/app/data/models/consultant_model.dart'
+    hide ConsultantData;
 import 'package:eat_this_app/app/data/models/message_model.dart';
+import 'package:eat_this_app/app/data/models/package_model.dart';
 import 'package:eat_this_app/app/data/models/user2_model.dart';
+import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,44 +24,44 @@ class ChatService {
   final String host = 'ciet.site';
   final int port = 443;
   final String cluster = 'us2';
-  
+
   bool isConnected = false;
   bool isConnecting = false;
   bool isSubscribed = false;
-  
-  Future<WebSocketChannel?> connectWebSocket(String channelName, String token, Function(dynamic) onMessage, Function(dynamic) onError, Function() onDone) async{
-    if(isConnecting) return null;
+
+  Future<WebSocketChannel?> connectWebSocket(
+      String channelName,
+      String token,
+      Function(dynamic) onMessage,
+      Function(dynamic) onError,
+      Function() onDone) async {
+    if (isConnecting) return null;
     isConnecting = true;
 
-    try{
+    try {
       final wsUrl = "wss://$host:$port/app/$appKey";
       print("Connect to WebSocket: $wsUrl");
 
-      final webSocket = await WebSocket.connect(
-        wsUrl,
-        protocols: ['ws', 'wss'],
-        headers: {
-          'Authorization': 'Bearer $token',
-          'cluster': cluster,
-          'useTLS': 'true',
-          'version': '7.0',
-          'client': 'dart',
-        }
-      );
+      final webSocket = await WebSocket.connect(wsUrl, protocols: [
+        'ws',
+        'wss'
+      ], headers: {
+        'Authorization': 'Bearer $token',
+        'cluster': cluster,
+        'useTLS': 'true',
+        'version': '7.0',
+        'client': 'dart',
+      });
 
       channel = IOWebSocketChannel(webSocket);
 
-      channel?.stream.listen(
-        onMessage,
-        onError: onError,
-        onDone: onDone,
-        cancelOnError: true
-      );
+      channel?.stream.listen(onMessage,
+          onError: onError, onDone: onDone, cancelOnError: true);
 
       isConnecting = false;
       isConnected = true;
       return channel;
-    } catch(e){
+    } catch (e) {
       print("WebSocket connection error : $e");
       isConnecting = false;
       isConnected = false;
@@ -66,55 +69,52 @@ class ChatService {
     }
   }
 
-  Future<String?> getPusherAuth(String socketId, String channelName, String token) async{
-    try{
-      final response = await dio.post(
-        'https://$host/api/pusher/auth',
-        data: {
-          'socket_id': socketId,
-          'channel_name': channelName,
-        },
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
+  Future<String?> getPusherAuth(
+      String socketId, String channelName, String token) async {
+    try {
+      final response = await dio.post('https://$host/api/pusher/auth',
+          data: {
+            'socket_id': socketId,
+            'channel_name': channelName,
           },
-        )
-      );
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          ));
 
-      final responseData = response.data is String ? jsonDecode(response.data) : response.data;
-      if(response.statusCode == 200 && responseData['auth'] != null){
+      final responseData =
+          response.data is String ? jsonDecode(response.data) : response.data;
+      if (response.statusCode == 200 && responseData['auth'] != null) {
         String auth = responseData['auth'];
         print("Got Pusher auth signature: $auth");
         return auth;
       }
       return null;
-    } catch(e){
+    } catch (e) {
       print("Error di getPusherAuth: $e");
       throw e;
     }
   }
 
-  void disconnect (){
+  void disconnect() {
     channel?.sink.close();
     isConnected = false;
     isSubscribed = false;
   }
 
-  
   Future<String?> getToken() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? token = preferences.getString('auth_token');
     return token;
   }
 
-  Future<String?> getType() async{
+  Future<String?> getType() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? type = preferences.getString('type');
     return type;
   }
-
-
 
   Future<ConsultantModel> getConsultants({String? name}) async {
     final token = await getToken();
@@ -157,74 +157,76 @@ class ChatService {
     }
   }
 
- Future<ConsultantData> addConsultant(String consultantId) async {
-  final token = await getToken();
-  if (token == null) throw Exception("Token not found");
-  
-  try {
-    final response = await dio.post(
-      "${ApiConstants.baseUrl}user/consultants/add",
-      data: {"consultant_id": consultantId},
-      options: Options(
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      ),
-    );
-    print("Request user id: $consultantId");
-    print("Response add consultant: ${response.data}");
-    Get.back();
-    return ConsultantData.fromJson(response.data);
-  } on DioException catch (dioError) {
-    if (dioError.response != null) {
-      // Jika server merespons dengan error
-      print("Server error: ${dioError.response?.statusCode}");
-      print("Error data: ${dioError.response?.data}");
-      
-      Get.snackbar(
-        'Error',
-        'Failed to add consultant: ${dioError.response?.statusMessage} (Code: ${dioError.response?.statusCode})',
-      );
-    } else if (dioError.type == DioExceptionType.connectionTimeout) {
-      // Timeout koneksi
-      print("Connection timeout occurred");
-      Get.snackbar('Error', 'Connection timeout. Please try again.');
-    } else if (dioError.type == DioExceptionType.receiveTimeout) {
-      // Timeout penerimaan data
-      print("Receive timeout occurred");
-      Get.snackbar('Error', 'Receive timeout. Please try again.');
-    } else if (dioError.type == DioExceptionType.unknown) {
-      // Error lain seperti koneksi internet
-      print("Network issue: ${dioError.message}");
-      Get.snackbar('Error', 'Network issue. Please check your connection.');
-    } else {
-      // Error lainnya
-      print("Unexpected error occurred: ${dioError.message}");
-      Get.snackbar('Error', 'An unexpected error occurred.');
-    }
-    throw Exception(dioError);
-  } catch (e) {
-    // Error lain di luar Dio
-    print("Unexpected error in addConsultant: $e");
-    Get.snackbar('Error', 'Failed to add consultant due to an unexpected error.');
-    throw Exception(e);
-  }
-}
+  Future<ConsultantData> addConsultant(String consultantId) async {
+    final token = await getToken(); // Mendapatkan token untuk otentikasi
+    if (token == null) throw Exception("Token not found");
 
+    try {
+      final response = await dio.post(
+        "${ApiConstants.baseUrl}user/consultants/add",
+        data: {"consultant_id": consultantId},
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      // Menampilkan informasi respons di konsol untuk keperluan debugging
+      print("Request user id: $consultantId");
+      print("Response add consultant: ${response.data}");
+
+      // Cek apakah respons mengandung data yang dibutuhkan
+      if (response.statusCode == 200 && response.data != null) {
+        // Mengonversi respons JSON ke dalam objek ConsultantData
+        return ConsultantData.fromJson(response.data);
+      } else {
+        // Jika status code bukan 200 atau data tidak sesuai
+        throw Exception("Failed to add consultant, invalid response data");
+      }
+    } on DioException catch (dioError) {
+      // Menangani error spesifik dari Dio
+      if (dioError.response != null) {
+        print("Server error: ${dioError.response?.statusCode}");
+        print("Error data: ${dioError.response?.data}");
+        Get.snackbar(
+          'Error',
+          'Failed to add consultant: ${dioError.response?.statusMessage} (Code: ${dioError.response?.statusCode})',
+        );
+      } else if (dioError.type == DioExceptionType.connectionTimeout) {
+        print("Connection timeout occurred");
+        Get.snackbar('Error', 'Connection timeout. Please try again.');
+      } else if (dioError.type == DioExceptionType.receiveTimeout) {
+        print("Receive timeout occurred");
+        Get.snackbar('Error', 'Receive timeout. Please try again.');
+      } else if (dioError.type == DioExceptionType.unknown) {
+        print("Network issue: ${dioError.message}");
+        Get.snackbar('Error', 'Network issue. Please check your connection.');
+      } else {
+        print("Unexpected error occurred: ${dioError.message}");
+        Get.snackbar('Error', 'An unexpected error occurred.');
+      }
+      throw Exception(dioError);
+    } catch (e) {
+      print("Unexpected error in addConsultant: $e");
+      Get.snackbar(
+          'Error', 'Failed to add consultant due to an unexpected error.');
+      throw Exception(e);
+    }
+  }
 
   Future<User2Model> reqAsConsultant() async {
     final token = await getToken();
     if (token == null) throw Exception("Token not found");
     try {
-      final response =
-          await dio.get("${ApiConstants.baseUrl}user/requests",
-              options: Options(
-                headers: {
-                  'Authorization': 'Bearer $token',
-                  'Content-Type': 'application/json',
-                },
-              ));
+      final response = await dio.get("${ApiConstants.baseUrl}user/requests",
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          ));
       print("Response req: ${response.data}");
       return User2Model.fromJson(response.data);
     } catch (e) {
@@ -233,18 +235,18 @@ class ChatService {
     }
   }
 
-
   Future<User2Model> getAquaintances() async {
     final token = await getToken();
     if (token == null) throw Exception("Token not found");
     try {
-      final response = await dio.get("${ApiConstants.baseUrl}user/acquaintances",
-          options: Options(
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            },
-          ));
+      final response =
+          await dio.get("${ApiConstants.baseUrl}user/acquaintances",
+              options: Options(
+                headers: {
+                  'Authorization': 'Bearer $token',
+                  'Content-Type': 'application/json',
+                },
+              ));
       print("Response: ${response.data}");
       return User2Model.fromJson(response.data);
     } catch (e) {
@@ -274,77 +276,76 @@ class ChatService {
     }
   }
 
-Future<bool> sendMessage(String message, String recipientKey) async {
-  final token = await getToken();
-  if (token == null) throw Exception("Token not found");
+  Future<bool> sendMessage(String message, String recipientKey) async {
+    final token = await getToken();
+    if (token == null) throw Exception("Token not found");
 
-  try {
-    final response = await dio.post(
-      "${ApiConstants.baseUrl}message/send",
-      data: {
-        "message": message,
-        "recipient_key": recipientKey,
-      },
-      options: Options(
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
+    try {
+      final response = await dio.post(
+        "${ApiConstants.baseUrl}message/send",
+        data: {
+          "message": message,
+          "recipient_key": recipientKey,
         },
-      ),
-    );
-    print("Response chat: ${response.data}");
-    return response.data[
-      'status'
-    ] == 'Message sent';
-  } on DioException catch (dioError) {
-    if (dioError.response != null) {
-      // The server responded with an error
-      print("Server responded with an error: ${dioError.response?.statusCode}");
-      print("Error data: ${dioError.response?.data}");
-
-      Get.snackbar(
-        'Error',
-        'Failed to send message: ${dioError.response?.statusMessage} (Code: ${dioError.response?.statusCode})',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
       );
-    } else if (dioError.type == DioExceptionType.connectionTimeout) {
-      // Connection timeout
-      print("Connection timeout occurred");
-      Get.snackbar('Error', 'Connection timeout. Please try again.');
-    } else if (dioError.type == DioExceptionType.receiveTimeout) {
-      // Receive timeout
-      print("Receive timeout occurred");
-      Get.snackbar('Error', 'Receive timeout. Please try again.');
-    } else if (dioError.type == DioExceptionType.unknown) {
-      // Other errors like no internet connection
-      print("Network issue: ${dioError.message}");
-      Get.snackbar('Error', 'Network issue. Please check your connection.');
-    } else {
-      // Unknown DioError
-      print("Unknown error occurred: ${dioError.message}");
-      Get.snackbar('Error', 'An unexpected error occurred.');
+      print("Response chat: ${response.data}");
+      return response.data['status'] == 'Message sent';
+    } on DioException catch (dioError) {
+      if (dioError.response != null) {
+        // The server responded with an error
+        print(
+            "Server responded with an error: ${dioError.response?.statusCode}");
+        print("Error data: ${dioError.response?.data}");
+
+        Get.snackbar(
+          'Error',
+          'Failed to send message: ${dioError.response?.statusMessage} (Code: ${dioError.response?.statusCode})',
+        );
+      } else if (dioError.type == DioExceptionType.connectionTimeout) {
+        // Connection timeout
+        print("Connection timeout occurred");
+        Get.snackbar('Error', 'Connection timeout. Please try again.');
+      } else if (dioError.type == DioExceptionType.receiveTimeout) {
+        // Receive timeout
+        print("Receive timeout occurred");
+        Get.snackbar('Error', 'Receive timeout. Please try again.');
+      } else if (dioError.type == DioExceptionType.unknown) {
+        // Other errors like no internet connection
+        print("Network issue: ${dioError.message}");
+        Get.snackbar('Error', 'Network issue. Please check your connection.');
+      } else {
+        // Unknown DioError
+        print("Unknown error occurred: ${dioError.message}");
+        Get.snackbar('Error', 'An unexpected error occurred.');
+      }
+      throw Exception(dioError);
+    } catch (e) {
+      // Other errors (non-Dio errors)
+      print("Unexpected error in sendMessage: $e");
+      Get.snackbar(
+          'Error', 'Failed to send message due to an unexpected error.');
+      throw Exception(e);
     }
-    throw Exception(dioError);
-  } catch (e) {
-    // Other errors (non-Dio errors)
-    print("Unexpected error in sendMessage: $e");
-    Get.snackbar('Error', 'Failed to send message due to an unexpected error.');
-    throw Exception(e);
   }
-}
-    Future<List<MessageData>> getMessage(String recipientKey) async{
+
+  Future<List<MessageData>> getMessage(String recipientKey) async {
     final token = await getToken();
     if (token == null) throw Exception("Token not found");
     try {
       final response = await dio.get("${ApiConstants.baseUrl}message/retrieve",
-      queryParameters: {
-        "key": recipientKey},
+          queryParameters: {"key": recipientKey},
           options: Options(
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
             },
           ));
-
 
       print("Response chat get: ${response.data}");
       final List<dynamic> messageDataList = response.data['messages']['data'];
@@ -356,6 +357,26 @@ Future<bool> sendMessage(String message, String recipientKey) async {
       print("Error di getMessage: $e");
       throw Exception(e);
     }
-    
-}
+  }
+
+  Future<List<Packages>> getPackages() async {
+    final token = await getToken();
+    if (token == null) throw Exception("Token not found");
+    try {
+      final response = await dio.get("${ApiConstants.baseUrl}packages",
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          ));
+      print("Response chat get service chat: ${response.data}");
+      final package = response.data['package'] as List;
+      print("Package: $package");
+      return package.map((json) => Packages.fromJson(json)).toList();
+    } catch (e) {
+      print("Error di getPackages chat : $e");
+      throw Exception(e);
+    }
+  }
 }

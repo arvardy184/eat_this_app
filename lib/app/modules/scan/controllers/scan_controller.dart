@@ -68,11 +68,7 @@ class ScanController extends BaseController {
       alternativeProducts.assignAll(filtered);
     } catch (e) {
       print("Error loading alternatives: $e");
-      Get.snackbar(
-        'Error',
-        'Failed to load alternative products',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+  
     } finally {
       isLoadingAlternatives(false);
     }

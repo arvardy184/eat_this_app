@@ -1,7 +1,7 @@
 import 'package:eat_this_app/app/data/models/alternative_model.dart';
 import 'package:eat_this_app/app/data/models/product_model.dart';
-import 'package:eat_this_app/app/modules/scan/views/alternative_product_page.dart';
-import 'package:eat_this_app/services/product_service.dart';
+import 'package:eat_this_app/app/themes/app_theme.dart';
+import 'package:eat_this_app/widgets/product/shimmer_product_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,17 +10,22 @@ class ProductDetailWidget extends StatelessWidget {
    final Function(List<String>) onRefreshAlternatives;
   final List<Products>? alternativeProducts;
   final bool isLoadingAlternatives;
+  final bool isLoading;
 
    const ProductDetailWidget({
     required this.productData,
     required this.onRefreshAlternatives,
     this.alternativeProducts,
     this.isLoadingAlternatives = false,
+    this.isLoading = false,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if(isLoading){
+      return const ProductDetailShimmer();
+    }
     final product = productData.product;
     
     return SingleChildScrollView(
@@ -92,7 +97,7 @@ class ProductDetailWidget extends StatelessWidget {
                 if (product?.keywords != null)
                   Card(
                     elevation: 0,
-                    color: Colors.blue[50],
+                    color: CIETTheme.primary_color,
                     child: Padding(
                       padding: EdgeInsets.all(12),
                       child: Text(
@@ -165,12 +170,12 @@ class ProductDetailWidget extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.blue[50],
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.blue[200]!),
+                        border: Border.all(color: CIETTheme.primary_color),
                       ),
                       child: Text(
                         category.value ?? '',
                         style: TextStyle(
-                          color: Colors.blue[900],
+                          color: CIETTheme.primary_color,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -217,7 +222,7 @@ class ProductDetailWidget extends StatelessWidget {
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
-          color: Colors.blue[900],
+          color: CIETTheme.primary_color,
         ),
       ),
     );
@@ -276,7 +281,7 @@ class ProductDetailWidget extends StatelessWidget {
             _buildNutrientRow('Fiber', nutrients.fiber?.toString(), 'g'),
             _buildNutrientRow('Protein', nutrients.protein?.toString(), 'g'),
             _buildNutrientRow('Salt', nutrients.salt?.toString(), 'g'),
-            _buildNutrientRow('Alcohol', nutrients.alcohol, '%'),
+            _buildNutrientRow('Alcohol', nutrients.alcohol.toString(), '%'),
           ],
         ),
         SizedBox(height: 8),
@@ -316,11 +321,11 @@ Widget _buildAlternativeProducts(BuildContext context) {
               'Alternative Products',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.blue[900],
+                color: CIETTheme.primary_color,
               ),
             ),
             IconButton(
-              icon: Icon(Icons.refresh, color: Colors.blue),
+              icon: Icon(Icons.refresh, color: CIETTheme.primary_color),
               onPressed: isLoadingAlternatives 
                 ? null 
                 : () => onRefreshAlternatives(

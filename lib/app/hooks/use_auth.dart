@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UseAuth {
-  final ApiService _apiService = ApiService();
+  final ApiProvider _apiService = ApiProvider();
 
   Future<void> login(String email, String password) async {
   try {

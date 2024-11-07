@@ -1,15 +1,20 @@
+import 'package:eat_this_app/app/data/providers/api_provider.dart';
+import 'package:eat_this_app/app/modules/chat/controllers/subscription_controller.dart';
 import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
+import 'package:eat_this_app/app/themes/app_theme.dart';
+import 'package:eat_this_app/services/package_service.dart';
+import 'package:eat_this_app/widgets/product/recommendation_widget.dart';
+import 'package:eat_this_app/widgets/product/subscription_status_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:eat_this_app/app/data/models/history_model.dart';
-import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 
 class HomePage extends GetView<HomeController> {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
+
+final SubscriptionController subscriptionController = Get.put(SubscriptionController(Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +24,23 @@ class HomePage extends GetView<HomeController> {
         child: SafeArea(
           child: Column(
             children: [
-              CustomAppBar(
-                username: 'Rusmita', // TODO: Get from user profile
-                onProfileTap: () => Get.toNamed('/profile'),
-              ),
+              CustomAppBar(controller: controller),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      GetBuilder<SubscriptionController>(
+                        init: subscriptionController,
+                        builder: (controller) => SubscriptionStatusWidget(),
+                      ),
                       _buildRecentScansSection(),
                       _buildStatsSection(),
+
+                      Obx(() => RecommendationSection(
+                        recommendations: controller.recommendation,
+                        isLoading: controller.isLoadingPharmacies.value,
+                      )),
                       _buildPharmacySection(),
                     ],
                   ),
@@ -78,9 +89,10 @@ class HomePage extends GetView<HomeController> {
             }
 
             if (controller.error.value != null) {
+              print("error ${controller.error.value}");
               return Center(
                 child: Text(
-                  'Error: ${controller.error.value}',
+                  'Product Not Found',
                   style: const TextStyle(color: Colors.red),
                 ),
               );
@@ -114,7 +126,7 @@ class HomePage extends GetView<HomeController> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Colors.blue, Colors.lightBlue],
+            colors: [CIETTheme.primary_color, Colors.lightBlue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -290,18 +302,17 @@ class ProductHistoryCard extends StatelessWidget {
 }
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String username;
-  final Function onProfileTap;
+  HomeController controller = Get.put(HomeController());
 
-  const CustomAppBar(
-      {super.key, required this.username, required this.onProfileTap});
+   CustomAppBar(
+      {super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
-        color: Colors.blue,
+        color: CIETTheme.primary_color,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),
@@ -310,12 +321,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Column(
+        Expanded(
+            child: Obx(() => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hi, $username',
+                  'Hi, ${controller.userData.value?.name ?? 'User'}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -323,26 +334,72 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const Text(
-                  'Welcome back!',
-                  style: TextStyle(
+                Text(
+                  '${controller.userData.value?.package?.name ?? 'Free'} Package',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
                 ),
               ],
-            ),
+            )),
           ),
-          GestureDetector(
-            onTap: () {
-              onProfileTap();
-              Get.toNamed('/profile');
-            },
-            child: const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/farhan.png'),
-              radius: 25,
+            Obx(() => GestureDetector(
+            onTap: () => Get.toNamed('/profile'),
+            child: ClipOval(
+                child: controller.userData.value?.profilePicture != null
+                    ? Image.network(
+                        height: 50,
+                        controller.userData.value?.profilePicture ?? '',
+                        fit: BoxFit.cover,
+                        // Error handling ketika gambar gagal dimuat
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Error loading profile image: $error');
+                          // Menampilkan fallback image atau placeholder
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          );
+                        },
+                        // Loading placeholder
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                        size: 30,
+                        ),
+                      ),
+              ),
             ),
-          ),
+          )
+          // GestureDetector(
+          //   onTap: () {
+              
+          //     Get.toNamed('/profile');
+          //   },
+          //   child: const CircleAvatar(
+          //     backgroundImage: AssetImage('assets/images/farhan.png'),
+          //     radius: 25,
+          //   ),
+          // ),
         ],
       ),
     );
@@ -421,26 +478,26 @@ class LastScannedCard extends StatelessWidget {
   }
 }
 
-class RecommendationSection extends StatelessWidget {
-  const RecommendationSection({super.key});
+// class RecommendationSection extends StatelessWidget {
+//   const RecommendationSection({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: const [
-          RecommendationItem(name: 'Citato', image: 'assets/images/farhan.png'),
-          RecommendationItem(
-              name: 'Biskuat', image: 'assets/images/farhan.png'),
-          RecommendationItem(name: 'Monde', image: 'assets/images/farhan.png'),
-          RecommendationItem(name: 'Nextar', image: 'assets/images/farhan.png'),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox(
+//       height: 100,
+//       child: ListView(
+//         scrollDirection: Axis.horizontal,
+//         children: const [
+//           RecommendationItem(name: 'Citato', image: 'assets/images/farhan.png'),
+//           RecommendationItem(
+//               name: 'Biskuat', image: 'assets/images/farhan.png'),
+//           RecommendationItem(name: 'Monde', image: 'assets/images/farhan.png'),
+//           RecommendationItem(name: 'Nextar', image: 'assets/images/farhan.png'),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class RecommendationItem extends StatelessWidget {
   final String name;

@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static final light = ThemeData.light().copyWith(
-    primaryColor: Colors.blue,
+    primaryColor: CIETTheme.primary_color,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.blue,
+      backgroundColor: CIETTheme.primary_color,
       elevation: 0,
     ),
     // Add more customizations here
   );
 
   static final dark = ThemeData.dark().copyWith(
-    primaryColor: Colors.blueGrey,
+    primaryColor: Colors.blue.shade900,
     scaffoldBackgroundColor: Colors.grey[900],
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.blueGrey,
+      backgroundColor: CIETTheme.primary_color,
       elevation: 0,
     ),
     // Add more customizations here

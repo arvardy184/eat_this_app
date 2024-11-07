@@ -21,25 +21,27 @@ class ScanPage extends StatelessWidget {
         children: [
           Expanded(
             flex: 2,
-            child: Obx(
-              () => controller.isScanning.value
-                  ? Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.black,
-                      ),
-                      child: SizedBox(
-                        height: 300,
-                        width: double.infinity,
-                        child: ScannerWidget(onDetect: controller.handleDetection),
-                      ),
-                    )
-                  : ProductDetailWidget(
-  productData: controller.productData.value ?? ProductModel(),
-  onRefreshAlternatives: (keywords) => controller.refreshAlternatives(keywords),
-  isLoadingAlternatives: controller.isLoadingAlternatives.value,
-  alternativeProducts: controller.alternativeProducts,
-)
-            ),
+            child: Obx(() => controller.isScanning.value
+                ? Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.black,
+                    ),
+                    child: SizedBox(
+                      height: 300,
+                      width: double.infinity,
+                      child:
+                          ScannerWidget(onDetect: controller.handleDetection),
+                    ),
+                  )
+                : ProductDetailWidget(
+                    productData: controller.productData.value ?? ProductModel(),
+                    onRefreshAlternatives: (keywords) =>
+                        controller.refreshAlternatives(keywords),
+                    isLoadingAlternatives:
+                        controller.isLoadingAlternatives.value,
+                    alternativeProducts: controller.alternativeProducts,
+                    isLoading: controller.isLoading.value,
+                  )),
           ),
           Container(
             padding: const EdgeInsets.all(16),
@@ -52,9 +54,11 @@ class ScanPage extends StatelessWidget {
                 ),
               ),
               child: Obx(() => Text(
-                controller.isScanning.value ? 'Stop Scanning' : 'Scan Again',
-                style: const TextStyle(fontSize: 16),
-              )),
+                    controller.isScanning.value
+                        ? 'Stop Scanning'
+                        : 'Scan Again',
+                    style: const TextStyle(fontSize: 16),
+                  )),
             ),
           ),
         ],

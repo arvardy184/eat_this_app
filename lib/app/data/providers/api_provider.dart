@@ -1,19 +1,23 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:get/get.dart' as getx;
 import 'package:get/get_core/src/get_main.dart';
 // import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ApiService {
+class ApiProvider {
   final Dio _dio = Dio();
   static String? _accessToken;
-  static String? _refreshToken;
   static String? _type;
 
-  ApiService() {
+  static const String _packageKey = 'user_package';
+  static const String _scanCountKey = 'scan_count';
+  static const String _consultCountKey = 'consult_count';
+
+  ApiProvider() {
     _dio.options.baseUrl = ApiConstants.baseUrl;
 
     // _dio.interceptors.add(InterceptorsWrapper(
@@ -64,7 +68,7 @@ class ApiService {
       });
       return response;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -104,9 +108,46 @@ class ApiService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_id', userData['id'] ?? '');
     await prefs.setString('user_name', userData['name'] ?? '');
+    await prefs.setString('user_email', userData['email'] ?? '');
+    await prefs.setString(
+        'user_profile_picture', userData['profile_picture'] ?? '');
     await prefs.setString(
         'conversation_key', userData['conversation_key'] ?? '');
     await prefs.setString('type', userData['type'] ?? '');
+    await prefs.setString(
+        'user_data', json.encode(userData)); // Save complete user data
+    print("Cek user data ${userData}");
+    print("Cek user data yang disimpan: ${json.encode(userData)}");
+  }
+
+  Future<void> savePackageData(Package package) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_packageKey, jsonEncode(package));
+
+    await resetCounters();
+  }
+
+  Future<void> resetCounters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    final lastReset =
+        DateTime.fromMillisecondsSinceEpoch(prefs.getInt(_scanCountKey) ?? 0);
+
+    if (now.difference(lastReset).inDays >= 1) {
+      await prefs.setInt(_scanCountKey, 0);
+      await prefs.setInt(_consultCountKey, 0);
+      await prefs.setInt('last_reset', now.millisecondsSinceEpoch);
+    }
+  }
+
+  Future<User?> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user_data');
+    print("Cek user data di get user data ${userData}");
+    if (userData != null) {
+      return User.fromJson(json.decode(userData));
+    }
+    return null;
   }
 
   Future<void> _saveTypes({required String type}) async {
@@ -142,7 +183,6 @@ class ApiService {
     }
 
     _accessToken = accessToken;
-    _refreshToken = refreshToken;
   }
 
   Future<void> logout() async {
@@ -153,7 +193,6 @@ class ApiService {
     await prefs.remove('conversation_key');
 
     _accessToken = null;
-    _refreshToken = null;
     Get.offAllNamed('/login');
   }
 }

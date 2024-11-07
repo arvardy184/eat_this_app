@@ -1,3 +1,4 @@
+import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -20,7 +21,7 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: isPassword,
-      cursorColor: Colors.blue,
+      cursorColor: CIETTheme.primary_color,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.grey),
@@ -35,7 +36,7 @@ class CustomTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.blue),
+          borderSide: BorderSide(color: CIETTheme.primary_color),
         ),
       ),
     );

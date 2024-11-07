@@ -23,9 +23,12 @@ abstract class BaseController extends GetxController {
             case 404:
               showError('Resource not found');
               break;
+            case 500:
+              showError("Internal server error");
+              break;
             default:
               showError(
-                  error.response?.data['message'] ?? 'Something went wrong');
+                  error.response?.data['status'] ?? 'Something went wrong');
           }
           break;
         default:

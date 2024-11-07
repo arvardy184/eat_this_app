@@ -4,6 +4,7 @@ import 'package:eat_this_app/app/modules/auth/views/login_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/login_page.dart';
 import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
 import 'package:eat_this_app/app/modules/chat/bindings/chat_binding.dart';
+import 'package:eat_this_app/app/modules/chat/bindings/subscription_binding.dart';
 import 'package:eat_this_app/app/modules/chat/views/acquiantances_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/chat_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/chat_room_page.dart';
@@ -32,16 +33,25 @@ class AppPages {
     GetPage(name: '/home', page: () => PersistentBottomNavBar(), bindings: [
       ProfileBinding(),
       ChatBinding(),
+      HomeBinding(),
+      SubscriptionBinding(),
     ], middlewares: [
       AuthMiddleware()
     ]
         // binding: NavBindings()
         // binding: HomeBinding(),
         ),
-    GetPage(
-        name: '/beranda', page: () => const HomePage(), binding: HomeBinding()),
+    GetPage(name: '/beranda', page: () => HomePage(), binding: HomeBinding()),
     GetPage(
         name: '/search', page: () => SearchPage(), binding: SearchBinding()),
+    GetPage(
+        name: '/beranda',
+        page: () => HomePage(),
+        binding: HomeBinding(),
+        bindings: [
+          SubscriptionBinding(),
+        ]),
+    GetPage(name: '/search', page: () => SearchPage()),
     GetPage(name: '/login', page: () => const LoginPage()),
     GetPage(name: '/scan', page: () => ScanPage()),
     GetPage(name: '/loginForm', page: () => const LoginForm()),
@@ -56,7 +66,13 @@ class AppPages {
         page: () => PharmacyPage(),
         bindings: [PharmacyBinding()]),
     //chat and consult
-    GetPage(name: '/chat', page: () => ChatPage(), binding: ChatBinding()),
+    GetPage(
+        name: '/chat',
+        page: () => ChatPage(),
+        binding: ChatBinding(),
+        bindings: [
+          SubscriptionBinding(),
+        ]),
     GetPage(
         name: '/add-consultant',
         page: () => ListConsultantPage(),

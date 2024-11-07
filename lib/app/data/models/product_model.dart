@@ -140,17 +140,17 @@ class Categories {
 
 class Nutrients {
   int? id;
-  int? serving;
+  double? serving;
   String? unit;
-  int? energy; // Updated to int
-  double? fat; // Updated to double
+  double? energy; 
+  double? fat; 
   double? saturatedFat;
   double? carbohydrate;
   double? sugar;
   double? fiber;
   double? protein;
   double? salt;
-  String? alcohol;
+  double? alcohol;
   String? productId;
 
   Nutrients({

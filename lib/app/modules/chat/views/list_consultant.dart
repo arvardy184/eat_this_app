@@ -70,7 +70,8 @@ class ListConsultantPage extends GetView<ChatController> {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancel'),
+                              child: const Text('Cancel',style: TextStyle(
+                                color: CIETTheme.primary_color)),
                             ),
                             ElevatedButton(
                               onPressed: () async {
@@ -80,7 +81,9 @@ class ListConsultantPage extends GetView<ChatController> {
                                 Get.back();
                                
                               },
-                              child: const Text('Add Consultant'),
+                              child: const Text('Add Consultant', style: TextStyle(
+                                color: CIETTheme.primary_color
+                              ),),
                             ),
                           ],
                         ),
