@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/pharmacy_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';

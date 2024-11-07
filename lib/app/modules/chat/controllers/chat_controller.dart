@@ -6,7 +6,6 @@ import 'package:eat_this_app/app/data/models/message_model.dart';
 import 'package:eat_this_app/app/data/models/user2_model.dart';
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
-import 'package:eat_this_app/app/utils/chat_channel_utils.dart';
 import 'package:eat_this_app/services/chat_service.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -249,22 +248,26 @@ Future<void> sendMessage(String text) async {
 
   // Add consultant
 
-  Future<void> addConsultant(String consultantId) async {
-    try {
-      isLoading.value = true;
-      final result = await _chatService.addConsultant(consultantId);
-      if (result != null) {
-        addedConsultants.add(result);
-        showSuccess('Consultant added successfully');
-      } else {
-        showError('Failed to add consultant');
-      }
-    } catch (e) {
-      handleError(e);
-    } finally {
-      isLoading.value = false;
-    }
+Future<void> addConsultant(String consultantId) async {
+  try {
+    isLoading.value = true;
+    
+
+    final result = await _chatService.addConsultant(consultantId);
+    
+   
+    addedConsultants.add(result);
+    
+   
+    showSuccess('Consultant added successfully');
+  } catch (e) {
+  
+    handleError(e);
+  } finally {
+   
+    isLoading.value = false;
   }
+}
 
   // Request to become a consultant
 

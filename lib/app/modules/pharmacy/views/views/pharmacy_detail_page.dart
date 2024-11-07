@@ -1,3 +1,4 @@
+import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/services/pharmacy_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eat_this_app/app/data/models/pharmacy_model.dart';
@@ -34,7 +35,7 @@ class _PharmacyDetailPageState extends State<PharmacyDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Detail Apotek"),
-        backgroundColor: Colors.blue,
+        backgroundColor: CIETTheme.primary_color,
       ),
       body: medicines.isEmpty
           ? const Center(child: Text("Belum ada obat"))

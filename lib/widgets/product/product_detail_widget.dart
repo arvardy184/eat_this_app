@@ -1,7 +1,6 @@
 import 'package:eat_this_app/app/data/models/alternative_model.dart';
 import 'package:eat_this_app/app/data/models/product_model.dart';
-import 'package:eat_this_app/app/modules/scan/views/alternative_product_page.dart';
-import 'package:eat_this_app/services/product_service.dart';
+import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/widgets/product/shimmer_product_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -98,7 +97,7 @@ class ProductDetailWidget extends StatelessWidget {
                 if (product?.keywords != null)
                   Card(
                     elevation: 0,
-                    color: Colors.blue[50],
+                    color: CIETTheme.primary_color,
                     child: Padding(
                       padding: EdgeInsets.all(12),
                       child: Text(
@@ -169,14 +168,14 @@ class ProductDetailWidget extends StatelessWidget {
                     children: product.categories!.map((category) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.blue[50],
+                        color: CIETTheme.primary_color,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.blue[200]!),
+                        border: Border.all(color: CIETTheme.primary_color),
                       ),
                       child: Text(
                         category.value ?? '',
                         style: TextStyle(
-                          color: Colors.blue[900],
+                          color: CIETTheme.primary_color,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -223,7 +222,7 @@ class ProductDetailWidget extends StatelessWidget {
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
-          color: Colors.blue[900],
+          color: CIETTheme.primary_color,
         ),
       ),
     );
@@ -322,11 +321,11 @@ Widget _buildAlternativeProducts(BuildContext context) {
               'Alternative Products',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.blue[900],
+                color: CIETTheme.primary_color,
               ),
             ),
             IconButton(
-              icon: Icon(Icons.refresh, color: Colors.blue),
+              icon: Icon(Icons.refresh, color: CIETTheme.primary_color),
               onPressed: isLoadingAlternatives 
                 ? null 
                 : () => onRefreshAlternatives(

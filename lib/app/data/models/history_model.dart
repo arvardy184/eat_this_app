@@ -6,19 +6,23 @@ class HistoryModel {
 
   HistoryModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    if (json['products'] != null) {
-      products = <Products>[];
+    if (json['products'] != null && json['products'] is List) {
+      products = [];
       json['products'].forEach((v) {
-        products!.add(new Products.fromJson(v));
+        products!.add(Products.fromJson(v));
       });
+    } else {
+      products = [];  
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    if (this.products != null) {
-      data['products'] = this.products!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    if (products != null && products!.isNotEmpty) {
+      data['products'] = products!.map((v) => v.toJson()).toList();
+    } else {
+      data['products'] = [];
     }
     return data;
   }
@@ -58,22 +62,22 @@ class Products {
     nutriscore = json['nutriscore'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    pivot = json['pivot'] != null ? new Pivot.fromJson(json['pivot']) : null;
+    pivot = json['pivot'] != null ? Pivot.fromJson(json['pivot']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['keywords'] = this.keywords;
-    data['image_url'] = this.imageUrl;
-    data['name'] = this.name;
-    data['ingredients'] = this.ingredients;
-    data['quantity'] = this.quantity;
-    data['nutriscore'] = this.nutriscore;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    if (this.pivot != null) {
-      data['pivot'] = this.pivot!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['keywords'] = keywords;
+    data['image_url'] = imageUrl;
+    data['name'] = name;
+    data['ingredients'] = ingredients;
+    data['quantity'] = quantity;
+    data['nutriscore'] = nutriscore;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    if (pivot != null) {
+      data['pivot'] = pivot!.toJson();
     }
     return data;
   }
@@ -95,11 +99,11 @@ class Pivot {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['user_id'] = this.userId;
-    data['product_id'] = this.productId;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['user_id'] = userId;
+    data['product_id'] = productId;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }

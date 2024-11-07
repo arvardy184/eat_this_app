@@ -157,10 +157,10 @@ class ChatService {
     }
   }
 
- Future<ConsultantData> addConsultant(String consultantId) async {
-  final token = await getToken();
+Future<ConsultantData> addConsultant(String consultantId) async {
+  final token = await getToken(); // Mendapatkan token untuk otentikasi
   if (token == null) throw Exception("Token not found");
-  
+
   try {
     final response = await dio.post(
       "${ApiConstants.baseUrl}user/consultants/add",
@@ -172,45 +172,49 @@ class ChatService {
         },
       ),
     );
+
+    // Menampilkan informasi respons di konsol untuk keperluan debugging
     print("Request user id: $consultantId");
     print("Response add consultant: ${response.data}");
-    Get.back();
-    return ConsultantData.fromJson(response.data);
+
+    // Cek apakah respons mengandung data yang dibutuhkan
+    if (response.statusCode == 200 && response.data != null) {
+      // Mengonversi respons JSON ke dalam objek ConsultantData
+      return ConsultantData.fromJson(response.data);
+    } else {
+      // Jika status code bukan 200 atau data tidak sesuai
+      throw Exception("Failed to add consultant, invalid response data");
+    }
   } on DioException catch (dioError) {
+    // Menangani error spesifik dari Dio
     if (dioError.response != null) {
-      // Jika server merespons dengan error
       print("Server error: ${dioError.response?.statusCode}");
       print("Error data: ${dioError.response?.data}");
-      
       Get.snackbar(
         'Error',
         'Failed to add consultant: ${dioError.response?.statusMessage} (Code: ${dioError.response?.statusCode})',
       );
     } else if (dioError.type == DioExceptionType.connectionTimeout) {
-      // Timeout koneksi
       print("Connection timeout occurred");
       Get.snackbar('Error', 'Connection timeout. Please try again.');
     } else if (dioError.type == DioExceptionType.receiveTimeout) {
-      // Timeout penerimaan data
       print("Receive timeout occurred");
       Get.snackbar('Error', 'Receive timeout. Please try again.');
     } else if (dioError.type == DioExceptionType.unknown) {
-      // Error lain seperti koneksi internet
       print("Network issue: ${dioError.message}");
       Get.snackbar('Error', 'Network issue. Please check your connection.');
     } else {
-      // Error lainnya
       print("Unexpected error occurred: ${dioError.message}");
       Get.snackbar('Error', 'An unexpected error occurred.');
     }
     throw Exception(dioError);
   } catch (e) {
-    // Error lain di luar Dio
     print("Unexpected error in addConsultant: $e");
     Get.snackbar('Error', 'Failed to add consultant due to an unexpected error.');
     throw Exception(e);
   }
 }
+
 
 
   Future<User2Model> reqAsConsultant() async {

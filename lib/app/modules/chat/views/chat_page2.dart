@@ -633,7 +633,7 @@
 //         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
 //         padding: const EdgeInsets.all(12.0),
 //         decoration: BoxDecoration(
-//           color: isCurrentUser ? Colors.blue : Colors.grey[300],
+//           color: isCurrentUser ? CIETTheme.primary_color : Colors.grey[300],
 //           borderRadius: BorderRadius.circular(12.0),
 //         ),
 //         child: Column(

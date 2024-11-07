@@ -4,6 +4,7 @@ import 'package:eat_this_app/app/components/SocialLoginButton.dart';
 import 'package:eat_this_app/app/hooks/use_auth.dart';
 import 'package:eat_this_app/app/modules/auth/views/forgetPassword_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
+import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -133,7 +134,7 @@ class _LoginFormState extends State<LoginForm> {
                       Get.off(() => SignupForm());
                     },
                     child: const Text("Sign Up",
-                        style: TextStyle(color: Colors.blue)),
+                        style: TextStyle(color: CIETTheme.primary_color)),
                   ),
                 ],
               )

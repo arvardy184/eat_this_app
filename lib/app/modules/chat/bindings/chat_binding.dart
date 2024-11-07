@@ -10,5 +10,6 @@ class ChatBinding  extends Bindings{
     Get.lazyPut<ChatController>(() => ChatController());
      Get.lazyPut<ChatRoomController>(() => ChatRoomController());
     Get.put(ChatService() );
+    
   }
 }

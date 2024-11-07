@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../../themes/app_theme.dart';
 import '../controllers/pharmacy_controller.dart';
 import 'pharmacy_detail_page.dart';
 
@@ -17,7 +18,7 @@ class PharmacyPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Apotek Terdekat"),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: CIETTheme.primary_color,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -86,7 +87,7 @@ class PharmacyPage extends StatelessWidget {
                             userPosition.latitude, userPosition.longitude),
                         child: const Icon(
                           Icons.my_location,
-                          color: Colors.blue,
+                          color: CIETTheme.primary_color,
                           size: 20,
                         ),
                       ),
@@ -161,16 +162,16 @@ class PharmacyPage extends StatelessWidget {
                     return ListTile(
                       leading: pharmacy.profilePicture != null
                           ? Image.network(
-                              pharmacy.profilePicture!,
+                              pharmacy.profilePicture,
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   const Icon(Icons.local_pharmacy,
-                                      size: 50, color: Colors.blue),
+                                      size: 50, color: CIETTheme.primary_color),
                             )
                           : const Icon(Icons.local_pharmacy,
-                              size: 50, color: Colors.blue),
+                              size: 50, color: CIETTheme.primary_color),
                       title: Text(pharmacy.name,
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(

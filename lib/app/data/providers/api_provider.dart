@@ -11,11 +11,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiProvider {
   final Dio _dio = Dio();
   static String? _accessToken;
-  static String? _refreshToken;
   static String? _type;
 
+  static const String _packageKey = 'user_package';
+  static const String _scanCountKey = 'scan_count';
+  static const String _consultCountKey = 'consult_count';
+
+
   ApiProvider() {
+    
     _dio.options.baseUrl = ApiConstants.baseUrl;
+    
+    
 
     // _dio.interceptors.add(InterceptorsWrapper(
     //   onRequest: (options, handler) async {
@@ -36,23 +43,21 @@ class ApiProvider {
 
       print("Response status code: ${response.statusCode}");
       print("Response data: ${response.data}");
-    
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data; 
+        final data = response.data;
         await _saveTokens(
-          accessToken: data['token'] ?? '', 
-          refreshToken: data['refresh_token'] ??
-              '',
+          accessToken: data['token'] ?? '',
+          refreshToken: data['refresh_token'] ?? '',
         );
         await _saveTypes(type: data['user']['type'] ?? '');
-       await saveUserData(data['user'] ?? {});
+        await saveUserData(data['user'] ?? {});
         return response;
       } else {
         print("Login failed with status code: ${response.statusCode}");
         return response;
       }
     } catch (e) {
-      
       print("Login error: $e");
       throw e;
     }
@@ -67,7 +72,7 @@ class ApiProvider {
       });
       return response;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -103,18 +108,43 @@ class ApiProvider {
     }
   }
 
- Future<void> saveUserData(Map<String, dynamic> userData) async {
+  Future<void> saveUserData(Map<String, dynamic> userData) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_id', userData['id'] ?? '');
     await prefs.setString('user_name', userData['name'] ?? '');
     await prefs.setString('user_email', userData['email'] ?? '');
-    await prefs.setString('user_profile_picture', userData['profile_picture'] ?? '');
-    await prefs.setString('conversation_key', userData['conversation_key'] ?? '');
+    await prefs.setString(
+        'user_profile_picture', userData['profile_picture'] ?? '');
+    await prefs.setString(
+        'conversation_key', userData['conversation_key'] ?? '');
     await prefs.setString('type', userData['type'] ?? '');
-    await prefs.setString('user_data', json.encode(userData)); // Save complete user data
+    await prefs.setString(
+        'user_data', json.encode(userData)); // Save complete user data
   }
 
- Future<UserModel?> getUserData() async {
+  Future<void> savePackageData(Package package) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_packageKey, jsonEncode(package));
+
+    await resetCounters();
+  }
+
+  
+  Future<void> resetCounters() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    final lastReset = DateTime.fromMillisecondsSinceEpoch(
+      prefs.getInt(_scanCountKey) ?? 0
+    );
+
+    if (now.difference(lastReset).inDays >= 1) {
+      await prefs.setInt(_scanCountKey, 0);
+      await prefs.setInt(_consultCountKey, 0);
+      await prefs.setInt('last_reset', now.millisecondsSinceEpoch);
+    }
+  }
+
+  Future<UserModel?> getUserData() async {
     final prefs = await SharedPreferences.getInstance();
     final userData = prefs.getString('user_data');
     if (userData != null) {
@@ -122,8 +152,6 @@ class ApiProvider {
     }
     return null;
   }
-
-
 
   Future<void> _saveTypes({required String type}) async {
     final prefs = await SharedPreferences.getInstance();
@@ -139,7 +167,7 @@ class ApiProvider {
     return type;
   }
 
-  Future<String?> getCurrentUserKey() async{
+  Future<String?> getCurrentUserKey() async {
     final prefs = await SharedPreferences.getInstance();
     final conversationKey = prefs.getString('conversation_key');
     print("cek conversation key ${conversationKey}");
@@ -158,7 +186,6 @@ class ApiProvider {
     }
 
     _accessToken = accessToken;
-    _refreshToken = refreshToken;
   }
 
   Future<void> logout() async {
@@ -169,7 +196,6 @@ class ApiProvider {
     await prefs.remove('conversation_key');
 
     _accessToken = null;
-    _refreshToken = null;
     Get.offAllNamed('/login');
   }
 }

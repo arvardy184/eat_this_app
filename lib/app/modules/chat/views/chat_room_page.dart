@@ -1,5 +1,6 @@
 import 'package:eat_this_app/app/modules/chat/controllers/chat_controller.dart';
 import 'package:eat_this_app/app/modules/chat/controllers/chat_room_controller.dart';
+import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/widgets/chats/chat_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -37,7 +38,7 @@ AppBar _buildAppBar() {
                 ? NetworkImage(recipient.profilePicture!)
                 : null,
             child: recipient.profilePicture == null
-                ? Text(recipient.name![0])
+                ? Text(recipient.name[0])
                 : null,
           ),
           const SizedBox(width: 12),
@@ -119,7 +120,7 @@ AppBar _buildAppBar() {
                 onPressed: controller.isConnected.value 
                     ? () => _sendMessage() 
                     : null,
-                color: Colors.blue,
+                color: CIETTheme.primary_color,
               )),
         ],
       ),

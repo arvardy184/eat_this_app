@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/alternative_model.dart';

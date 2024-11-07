@@ -1,4 +1,5 @@
 import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
+import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/widgets/product/recommendation_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -84,7 +85,7 @@ class HomePage extends GetView<HomeController> {
               print("error ${controller.error.value}");
               return Center(
                 child: Text(
-                  'Product Not FOund',
+                  'Product Not Found',
                   style: const TextStyle(color: Colors.red),
                 ),
               );
@@ -118,7 +119,7 @@ class HomePage extends GetView<HomeController> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Colors.blue, Colors.lightBlue],
+            colors: [CIETTheme.primary_color, Colors.lightBlue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -294,7 +295,7 @@ class ProductHistoryCard extends StatelessWidget {
 }
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  HomeController controller = Get.find<HomeController>();
+  HomeController controller = Get.put(HomeController());
 
    CustomAppBar(
       {super.key, required this.controller});
@@ -304,7 +305,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
-        color: Colors.blue,
+        color: CIETTheme.primary_color,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),

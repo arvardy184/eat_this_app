@@ -1,7 +1,6 @@
 import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class ChatBubble extends StatelessWidget {
   final String message;
@@ -119,7 +118,7 @@ class ChatBubble extends StatelessWidget {
                   Icon(
                     Icons.done_all,
                     size: 14,
-                    color: Colors.blue,
+                    color: CIETTheme.primary_color,
                   ),
                 ],
               ],

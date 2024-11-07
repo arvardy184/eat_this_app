@@ -26,10 +26,17 @@ class UserService {
       ),
     );
 
+    print("responset d di user service ${response.data}");
+
     if (response.statusCode == 200) {
       print("res di user service ${response.data}");
       return UserModel.fromJson(response.data);
-    } else {
+    } else if(response.statusCode == 500){
+      print("res di user service ${response.data}");
+      throw Exception('Failed to fetch user profile');
+    }
+      else {
+      print("res di user service ${response.data}");
       throw Exception('Failed to fetch user profile');
     }
   }

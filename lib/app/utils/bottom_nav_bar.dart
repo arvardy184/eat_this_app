@@ -8,12 +8,14 @@ import 'package:eat_this_app/app/modules/pharmacy/views/views/pharmacy_page.dart
 import 'package:eat_this_app/app/modules/scan/controllers/scan_controller.dart';
 import 'package:eat_this_app/app/modules/scan/views/scan_view.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
+import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 class PersistentBottomNavBar extends StatelessWidget {
   const PersistentBottomNavBar({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +28,9 @@ class PersistentBottomNavBar extends StatelessWidget {
       GetBuilder<HomeController>(
         init: HomeController(),
         builder: (controller) => HomePage(),
+        
       ),
-        // GetBuilder<HomeController>(
-        //   init: HomeController(),
-        //   builder: (controller) => HomePage(),
-        // ),
+   
         SearchPage(),
         // GetBuilder<SearchController>(
         //   init: SearchController(),
@@ -57,13 +57,13 @@ class PersistentBottomNavBar extends StatelessWidget {
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.home_rounded),
           title: "Home",
-          activeColorPrimary: Colors.blue,
+          activeColorPrimary: CIETTheme.primary_color,
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.search_rounded),
           title: "Product",
-          activeColorPrimary: Colors.blue,
+          activeColorPrimary: CIETTheme.primary_color,
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
@@ -72,20 +72,20 @@ class PersistentBottomNavBar extends StatelessWidget {
             color: Colors.white,
           ),
           title: "Scan",
-          activeColorPrimary: Colors.blue,
+          activeColorPrimary: CIETTheme.primary_color,
           inactiveColorPrimary: Colors.grey,
           activeColorSecondary: Colors.white,
         ),
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.local_pharmacy_rounded),
           title: "Pharmacy",
-          activeColorPrimary: Colors.blue,
+          activeColorPrimary: CIETTheme.primary_color,
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.chat_rounded),
           title: "Chat",
-          activeColorPrimary: Colors.blue,
+          activeColorPrimary: CIETTheme.primary_color,
           inactiveColorPrimary: Colors.grey,
         ),
       ];

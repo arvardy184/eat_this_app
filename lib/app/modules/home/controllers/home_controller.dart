@@ -16,6 +16,7 @@ class HomeController extends BaseController {
   final isLoadingPharmacies = false.obs;
   final healthyPercentage = 0.0.obs;
   final error = Rx<String?>(null);
+  final errorRecom = Rx<String?>(null);
   final userData = Rx<UserModel?>(null);
   final recommendation = <ProductsRec>[].obs;
 
@@ -46,6 +47,7 @@ class HomeController extends BaseController {
           userData.value = user;
         }
       } catch(e){
+        print("Error load user data: $e");
         error.value = e.toString();
       }
   }
@@ -82,6 +84,7 @@ class HomeController extends BaseController {
 
       
     }catch(e){
+      print("Error load recent scans: $e");
       error.value = e.toString();
     }finally{
       isLoadingScans(false);
@@ -95,7 +98,8 @@ class HomeController extends BaseController {
       recommendation.assignAll(products);
       print("hasil di home controller recommendation: $recommendation");
     }catch(e){
-      error.value = e.toString();
+      print("Error load recommendation: $e");
+      errorRecom.value = e.toString();
     }finally{
       isLoadingPharmacies(false);
     }
