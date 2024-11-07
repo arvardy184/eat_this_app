@@ -120,6 +120,8 @@ class ApiProvider {
     await prefs.setString('type', userData['type'] ?? '');
     await prefs.setString(
         'user_data', json.encode(userData)); // Save complete user data
+        print("Cek user data ${userData}");
+        print("Cek user data yang disimpan: ${json.encode(userData)}");
   }
 
   Future<void> savePackageData(Package package) async {

@@ -26,6 +26,7 @@ class HomeController extends BaseController {
     super.onInit();
     loadInitialData();
     loadRecommendation();
+    loadUserData();
   }
 
   
@@ -33,6 +34,7 @@ class HomeController extends BaseController {
     error.value = null;
     await loadInitialData();
     await loadRecommendation(); 
+    await loadUserData();
   }
 
   Future<void> loadInitialData() async {
@@ -45,6 +47,7 @@ class HomeController extends BaseController {
         final user = await _apiProvider.getUserData();
         if(user != null){
           userData.value = user;
+          print("data user profile ${userData.value!}  ${userData.value?.user?.name}");
         }
       } catch(e){
         print("Error load user data: $e");
