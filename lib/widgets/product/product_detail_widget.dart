@@ -2,6 +2,7 @@ import 'package:eat_this_app/app/data/models/alternative_model.dart';
 import 'package:eat_this_app/app/data/models/product_model.dart';
 import 'package:eat_this_app/app/modules/scan/views/alternative_product_page.dart';
 import 'package:eat_this_app/services/product_service.dart';
+import 'package:eat_this_app/widgets/product/shimmer_product_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,17 +11,22 @@ class ProductDetailWidget extends StatelessWidget {
    final Function(List<String>) onRefreshAlternatives;
   final List<Products>? alternativeProducts;
   final bool isLoadingAlternatives;
+  final bool isLoading;
 
    const ProductDetailWidget({
     required this.productData,
     required this.onRefreshAlternatives,
     this.alternativeProducts,
     this.isLoadingAlternatives = false,
+    this.isLoading = false,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if(isLoading){
+      return const ProductDetailShimmer();
+    }
     final product = productData.product;
     
     return SingleChildScrollView(

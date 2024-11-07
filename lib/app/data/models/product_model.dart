@@ -147,7 +147,7 @@ class Nutrients {
   double? fiber;
   double? protein;
   double? salt;
- int? alcohol;
+  int? alcohol;
   String? productId;
 
   Nutrients({

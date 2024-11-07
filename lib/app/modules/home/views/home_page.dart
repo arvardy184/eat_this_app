@@ -1,4 +1,5 @@
 import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
+import 'package:eat_this_app/widgets/product/recommendation_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,6 +28,11 @@ class HomePage extends GetView<HomeController> {
                     children: [
                       _buildRecentScansSection(),
                       _buildStatsSection(),
+
+                      Obx(() => RecommendationSection(
+                        recommendations: controller.recommendation,
+                        isLoading: controller.isLoadingPharmacies.value,
+                      )),
                       _buildPharmacySection(),
                     ],
                   ),
@@ -463,26 +469,26 @@ class LastScannedCard extends StatelessWidget {
   }
 }
 
-class RecommendationSection extends StatelessWidget {
-  const RecommendationSection({super.key});
+// class RecommendationSection extends StatelessWidget {
+//   const RecommendationSection({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: const [
-          RecommendationItem(name: 'Citato', image: 'assets/images/farhan.png'),
-          RecommendationItem(
-              name: 'Biskuat', image: 'assets/images/farhan.png'),
-          RecommendationItem(name: 'Monde', image: 'assets/images/farhan.png'),
-          RecommendationItem(name: 'Nextar', image: 'assets/images/farhan.png'),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox(
+//       height: 100,
+//       child: ListView(
+//         scrollDirection: Axis.horizontal,
+//         children: const [
+//           RecommendationItem(name: 'Citato', image: 'assets/images/farhan.png'),
+//           RecommendationItem(
+//               name: 'Biskuat', image: 'assets/images/farhan.png'),
+//           RecommendationItem(name: 'Monde', image: 'assets/images/farhan.png'),
+//           RecommendationItem(name: 'Nextar', image: 'assets/images/farhan.png'),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class RecommendationItem extends StatelessWidget {
   final String name;

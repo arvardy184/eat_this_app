@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/consultant_model.dart';
 import 'package:eat_this_app/app/data/models/history_model.dart';
 import 'package:eat_this_app/app/data/models/pharmacy_model.dart';
+import 'package:eat_this_app/app/data/models/recommendation_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:eat_this_app/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -120,6 +121,28 @@ class HomeService {
       return ConsultantModel.fromJson(response.data);
     } catch (e) {
       print("Error get  consultant: $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<ProductsRec>> getRecommendation() async {
+    final token = await getToken();
+    if (token == null) throw Exception("Token not found");
+    print("Using token: $token");
+    try {
+      final response = await _dio.get("${ApiConstants.baseUrl}product/recommendation",
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          ));
+      print("Response get recommendation: ${response.data}");
+      final product = response.data['products'] as List;
+      print("hasil product : $product");
+      return product.map((json) => ProductsRec.fromJson(json)).toList();
+    } catch (e) {
+      print("Error get  recommendation: $e");
       throw Exception(e);
     }
   }
