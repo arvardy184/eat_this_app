@@ -2,14 +2,20 @@ import 'package:eat_this_app/app/modules/chat/controllers/subscription_controlle
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SubscriptionStatusWidget extends GetWidget<SubscriptionController> {
+class SubscriptionStatusWidget extends StatelessWidget
+
+{
+
+SubscriptionStatusWidget({super.key});
+
+ 
   @override
   Widget build(BuildContext context) {
+     final SubscriptionController controller = Get.find<SubscriptionController>();
     return Obx(() {
       if (controller.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
       }
-
       return Card(
         margin: const EdgeInsets.all(16),
         child: Padding(
@@ -62,29 +68,43 @@ class SubscriptionStatusWidget extends GetWidget<SubscriptionController> {
     });
   }
 
-  Widget _buildQuotaInfo(String label, int value, bool isPremium) {
-    return Row(
-      children: [
-        Icon(
-          isPremium ? Icons.all_inclusive : Icons.timer,
-          size: 20,
-          color: Colors.grey[600],
-        ),
-        SizedBox(width: 8),
-        Text(
+Widget _buildQuotaInfo(String label, int value, bool isPremium) {
+  return Row(
+    children: [
+      Icon(
+        isPremium ? Icons.all_inclusive : Icons.timer,
+        size: 20,
+        color: Colors.grey[600],
+      ),
+      SizedBox(width: 8),
+      Flexible(
+        child: Text(
           '$label: ',
           style: TextStyle(
+            fontSize: 16,
             color: Colors.grey[600],
           ),
+          overflow: TextOverflow.clip, // Tambahkan jika diperlukan
         ),
-        Text(
-          isPremium ? 'Unlimited' : '$value remaining',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: value > 0 ? Colors.blue[900] : Colors.red,
+      ),
+      // SizedBox(width: 8),
+      Flexible(
+        
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            isPremium ? 'Unlimited' : '$value remaining',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: value > 0 ? Colors.blue[900] : Colors.red,
+            ),
+            overflow: TextOverflow.ellipsis, // Tambahkan jika diperlukan
           ),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
+
 }

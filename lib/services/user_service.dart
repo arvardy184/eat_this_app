@@ -32,13 +32,12 @@ class UserService {
 
     if (response.statusCode == 200) {
       print("res di user service ${response.data}");
-        await _apiProvider.saveUserData(response.data['user'] ?? {});
+      await _apiProvider.saveUserData(response.data['user'] ?? {});
       return UserModel.fromJson(response.data);
-    } else if(response.statusCode == 500){
+    } else if (response.statusCode == 500) {
       print("res di user service ${response.data}");
       throw Exception('Failed to fetch user profile');
-    }
-      else {
+    } else {
       print("res di user service ${response.data}");
       throw Exception('Failed to fetch user profile');
     }
@@ -91,7 +90,7 @@ class UserService {
 
       print("API Response: ${response.data}");
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return UserModel.fromJson(response.data);
       } else {
         throw Exception('Failed to update profile');

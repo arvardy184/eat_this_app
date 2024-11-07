@@ -1,17 +1,20 @@
+import 'package:eat_this_app/app/data/providers/api_provider.dart';
+import 'package:eat_this_app/app/modules/chat/controllers/subscription_controller.dart';
 import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 import 'package:eat_this_app/app/themes/app_theme.dart';
+import 'package:eat_this_app/services/package_service.dart';
 import 'package:eat_this_app/widgets/product/recommendation_widget.dart';
+import 'package:eat_this_app/widgets/product/subscription_status_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:eat_this_app/app/data/models/history_model.dart';
-import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 
 class HomePage extends GetView<HomeController> {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
+
+final SubscriptionController subscriptionController = Get.put(SubscriptionController(Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +30,10 @@ class HomePage extends GetView<HomeController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      GetBuilder<SubscriptionController>(
+                        init: subscriptionController,
+                        builder: (controller) => SubscriptionStatusWidget(),
+                      ),
                       _buildRecentScansSection(),
                       _buildStatsSection(),
 
@@ -319,7 +326,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hi, ${controller.userData.value?.user?.name ?? 'User'}',
+                  'Hi, ${controller.userData.value?.name ?? 'User'}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -328,7 +335,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '${controller.userData.value?.user?.package?.name ?? 'Free'} Package',
+                  '${controller.userData.value?.package?.name ?? 'Free'} Package',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -340,9 +347,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             Obx(() => GestureDetector(
             onTap: () => Get.toNamed('/profile'),
             child: ClipOval(
-                child: controller.userData.value?.user?.profilePicture != null
+                child: controller.userData.value?.profilePicture != null
                     ? Image.network(
-                        controller.userData.value?.user?.profilePicture ?? '',
+                        height: 50,
+                        controller.userData.value?.profilePicture ?? '',
                         fit: BoxFit.cover,
                         // Error handling ketika gambar gagal dimuat
                         errorBuilder: (context, error, stackTrace) {

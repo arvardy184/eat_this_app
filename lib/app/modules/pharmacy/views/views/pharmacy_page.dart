@@ -1,3 +1,5 @@
+import 'package:eat_this_app/app/hooks/use_auth.dart';
+import 'package:eat_this_app/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
@@ -9,6 +11,7 @@ import 'pharmacy_detail_page.dart';
 class PharmacyPage extends StatelessWidget {
   final PharmacyController controller = Get.put(PharmacyController());
   final MapController mapController = MapController();
+  UseAuth useAuth = UseAuth();
 
   PharmacyPage({super.key});
 
@@ -45,6 +48,11 @@ class PharmacyPage extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () => controller.refreshPharmacies(),
                   child: const Text("Coba Lagi"),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => useAuth.handleUnauthorized(),
+                  child: const Text("Logout"),
                 ),
               ],
             ),

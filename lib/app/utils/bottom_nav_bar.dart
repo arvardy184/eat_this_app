@@ -28,7 +28,6 @@ class PersistentBottomNavBar extends StatelessWidget {
       GetBuilder<HomeController>(
         init: HomeController(),
         builder: (controller) => HomePage(),
-        
       ),
    
         SearchPage(),
@@ -76,6 +75,7 @@ class PersistentBottomNavBar extends StatelessWidget {
           inactiveColorPrimary: Colors.grey,
           activeColorSecondary: Colors.white,
         ),
+      
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.local_pharmacy_rounded),
           title: "Pharmacy",

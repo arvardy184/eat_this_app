@@ -21,6 +21,7 @@ class HomeService {
       receiveTimeout: const Duration(seconds: 15),
       connectTimeout: const Duration(seconds: 15),
     );
+
   Future<String?> getToken() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? token = preferences.getString('auth_token');

@@ -17,7 +17,7 @@ class HomeController extends BaseController {
   final healthyPercentage = 0.0.obs;
   final error = Rx<String?>(null);
   final errorRecom = Rx<String?>(null);
-  final userData = Rx<UserModel?>(null);
+  final userData = Rx<User?>(null);
   final recommendation = <ProductsRec>[].obs;
 
  
@@ -35,6 +35,7 @@ class HomeController extends BaseController {
     await loadInitialData();
     await loadRecommendation(); 
     await loadUserData();
+    
   }
 
   Future<void> loadInitialData() async {
@@ -47,7 +48,7 @@ class HomeController extends BaseController {
         final user = await _apiProvider.getUserData();
         if(user != null){
           userData.value = user;
-          print("data user profile ${userData.value!}  ${userData.value?.user?.name}");
+          print("data user profile ${userData.value!}  ${userData.value?.name}");
         }
       } catch(e){
         print("Error load user data: $e");

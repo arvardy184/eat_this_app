@@ -146,11 +146,12 @@ class ApiProvider {
     }
   }
 
-  Future<UserModel?> getUserData() async {
+  Future<User?> getUserData() async {
     final prefs = await SharedPreferences.getInstance();
     final userData = prefs.getString('user_data');
+    print("Cek user data di get user data ${userData}");
     if (userData != null) {
-      return UserModel.fromJson(json.decode(userData));
+      return User.fromJson(json.decode(userData));
     }
     return null;
   }
