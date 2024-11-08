@@ -1,4 +1,4 @@
-// chat_user.dart
+
 class ChatUser {
   final String conversationKey;
   final String? name;

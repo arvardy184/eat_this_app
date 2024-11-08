@@ -23,34 +23,20 @@ class PersistentBottomNavBar extends StatelessWidget {
 
     List<Widget> buildScreens() {
       return [
-        // Gunakan GetX untuk inject dependencies
         GetBuilder<HomeController>(
           init: HomeController(),
           builder: (controller) => HomePage(),
         ),
-        // GetBuilder<HomeController>(
-        //   init: HomeController(),
-        //   builder: (controller) => HomePage(),
-        // ),
-        // GetBuilder<HomeController>(
-        //   init: HomeController(),
-        //   builder: (controller) => HomePage(),
-        // ),
+
 
         SearchPage(),
-        // GetBuilder<SearchController>(
-        //   init: SearchController(),
-        //   builder: (controller) => const SearchPage(),
-        // ),
+
         GetBuilder<ScanController>(
           init: ScanController(),
           builder: (controller) => ScanPage(),
         ),
         PharmacyPage(),
-        // GetBuilder<PharmacyController>(
-        //   init: PharmacyController(),
-        //   builder: (controller) => PharmacyPage(),
-        // ),
+
         GetBuilder<ChatController>(
           init: ChatController(),
           builder: (controller) => ChatPage(),
@@ -100,11 +86,14 @@ class PersistentBottomNavBar extends StatelessWidget {
     return PersistentTabView(
       context,
       controller: controller,
+      confineToSafeArea: true,
+      padding: EdgeInsets.all(8),
       screens: buildScreens(),
       items: navBarsItems(),
       backgroundColor: Colors.white,
       handleAndroidBackButtonPress: true,
       resizeToAvoidBottomInset: true,
+      navBarHeight: 70,
       stateManagement: true,
       hideNavigationBarWhenKeyboardAppears: true,
       decoration: NavBarDecoration(
@@ -120,11 +109,7 @@ class PersistentBottomNavBar extends StatelessWidget {
         ],
       ),
       navBarStyle: NavBarStyle.style15,
-      // screenTransitionAnimation: const ScreenTransitionAnimation(
-      //   animateTabTransition: true,
-      //   curve: Curves.easeInOut,
-      //   duration: Duration(milliseconds: 200),
-      // ),
+   
     );
   }
 }

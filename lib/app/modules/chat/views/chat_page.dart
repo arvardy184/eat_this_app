@@ -367,13 +367,7 @@ class ChatPage extends GetView<ChatController> {
                                       color: isPremium ? Colors.blue : Colors.grey[800],
                                     ),
                                   ),
-                                  // Text(
-                                  //   'per month',
-                                  //   style: TextStyle(
-                                  //     color: Colors.grey[600],
-                                  //     fontSize: 12,
-                                  //   ),
-                                  // ),
+                         
                                 ],
                               ),
                             ],

@@ -14,15 +14,18 @@ class SubscriptionController extends BaseController {
   final RxInt remainingConsultations = 0.obs;
   final RxBool isLoading = false.obs;
   final RxList<Packages> packages = <Packages>[].obs;
+  final RxString email = ''.obs;
 
   SubscriptionController(PackageService find, {required this.packageService});
 
   @override
+
   void onInit() {
     super.onInit();
     checkSubscription();
     loadPackages();
   }
+
 
   Future<void> checkSubscription() async {
     try {
@@ -48,11 +51,12 @@ class SubscriptionController extends BaseController {
     }
   }
 
-  void contactAdmin() {
+  Future<void> contactAdmin()async {
     final waUrl = packageService.getWhatsAppLink();
     launchUrlString(waUrl);
     print("launchUrlString: $waUrl");
   }
+
 
   void showUpgradeDialog() {
     // Pastikan ada paket premium

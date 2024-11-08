@@ -5,7 +5,6 @@ import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:get/get.dart' as getx;
 import 'package:get/get_core/src/get_main.dart';
-// import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiProvider {
@@ -20,15 +19,7 @@ class ApiProvider {
   ApiProvider() {
     _dio.options.baseUrl = ApiConstants.baseUrl;
 
-    // _dio.interceptors.add(InterceptorsWrapper(
-    //   onRequest: (options, handler) async {
-    //     final token = await _authStorage.getToken();
-    //     if (token != null) {
-    //       options.headers['Authorization'] = 'Bearer $token';
-    //     }
-    //     return handler.next(options);
-    //   },
-    // ));
+
   }
   Future<Response> login(String email, String password) async {
     try {

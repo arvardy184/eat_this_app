@@ -42,7 +42,7 @@ class AppPages {
       AuthMiddleware()
     ]
         ),
-    // GetPage(name: '/beranda', page: () => HomePage(), binding: HomeBinding()),
+  
     GetPage(
         name: '/search', page: () => SearchPage(), binding: SearchBinding()),
     GetPage(
@@ -71,7 +71,7 @@ class AppPages {
       name:'/terms',
       page: () => const TermsOfServicePage(),
     ),
-    //chat and consult
+
     GetPage(
         name: '/chat',
         page: () => ChatPage(),
@@ -91,7 +91,7 @@ class AppPages {
         name: '/consultant/acquaitances',
         page: () => AcquaintancesPage(),
         binding: ChatBinding()),
-    // tambah rute baru disini
+
     GetPage(
         name: '/chat/room', page: () => ChatRoomPage(), binding: ChatBinding()),
     GetPage(

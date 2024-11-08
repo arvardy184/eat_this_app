@@ -29,13 +29,13 @@ class RecommendationSection extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              if (recommendations.isNotEmpty)
-                TextButton(
-                  onPressed: () {
-                    // Navigate to all recommendations
-                  },
-                  child: const Text('See All'),
-                ),
+              // if (recommendations.isNotEmpty)
+                // TextButton(
+                //   onPressed: () {
+                //     // Navigate to all recommendations
+                //   },
+                //   child: const Text('See All'),
+                // ),
             ],
           ),
         ),

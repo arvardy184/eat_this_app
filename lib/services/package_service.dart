@@ -11,10 +11,12 @@ class PackageService {
 
   final Dio dio = Dio();
 
+
+  String email = '';
   Future<bool> checkSubscription() async {
     try {
       final userData = await apiProvider.getUserData();
-
+      email = userData?.email ?? '';
       if (userData?.package == null) return false;
       final package = userData?.package;
       print("package now: $package");
@@ -40,17 +42,13 @@ Future<List<Packages>> getPackages() async {
         ));
     print("Response packages: ${response.data}");
     
-    // Cek struktur response
     if (response.data['packages'] == null) {
       print("Warning: 'packages' key is null in response");
       return [];
     }
-
-    // Pastikan menggunakan key yang benar 'packages' bukan 'package'
     final packages = response.data['packages'] as List;
     print("Parsed packages: $packages");
 
-    // Add null check and error handling for mapping
     try {
       final result = packages.map((json) => Packages.fromJson(json)).toList();
       print("Mapped packages count: ${result.length}");
@@ -66,7 +64,7 @@ Future<List<Packages>> getPackages() async {
   }
 }
 
-// Tambahkan method untuk debug response
+
 void _debugPrintResponse(dynamic response) {
   print("\n=== DEBUG RESPONSE ===");
   print("Response type: ${response.runtimeType}");
@@ -80,6 +78,7 @@ void _debugPrintResponse(dynamic response) {
   Future<int> getRemainingScans() async {
     try {
       final userData = await apiProvider.getUserData();
+      email = userData?.email ?? '';
       if (userData?.package == null) return 0;
       final maxScans = userData!.package!.maxScan;
       print('Max scans: $maxScans');
@@ -95,6 +94,7 @@ void _debugPrintResponse(dynamic response) {
       final userData = await apiProvider.getUserData();
       if (userData?.package == null) return 0;
 
+      email = userData?.email ?? '';
       return userData!.package!.maxConsultant;
     } catch (e) {
       print('Error getting remaining consultations: $e');
@@ -102,10 +102,11 @@ void _debugPrintResponse(dynamic response) {
     }
   }
 
-  String getWhatsAppLink() {
+ String getWhatsAppLink() {
+
     // Ganti dengan nomor WhatsApp admin
     const adminPhone = '+6285156536353';
-    const message = 'Halo, saya ingin upgrade ke Premium Package CanIEatThis?';
+    final message = 'Halo, saya ingin upgrade ke Premium Package CanIEatThis? dengan email ${email}';
 
     final encodedMessage = Uri.encodeFull(message);
     return 'https://wa.me/$adminPhone?text=$encodedMessage';
