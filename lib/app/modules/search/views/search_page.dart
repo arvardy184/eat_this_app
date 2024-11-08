@@ -10,49 +10,97 @@ class SearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue.shade50,
+      backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.blue,
-              child: Row(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: TextField(
-                      onChanged: (query) =>
-                          controller.searchQuery.value = query,
-                      decoration: InputDecoration(
-                        hintText: 'Search product name or code',
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon:
-                            const Icon(Icons.search, color: Colors.grey),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                      ),
+                  const Text(
+                    'Search Products',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 25,
-                      child: IconButton(
-                        icon: const Icon(Icons.search, color: Colors.blue),
-                        onPressed: () {
-                          controller
-                              .searchProducts(controller.searchQuery.value);
-                        },
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                          child: TextField(
+                            onChanged: (query) => 
+                                controller.searchQuery.value = query,
+                            decoration: InputDecoration(
+                              hintText: 'Search by name or product code...',
+                              hintStyle: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: Colors.grey[600],
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.blue[600]!, Colors.blue[400]!],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
+                              controller.searchProducts(
+                                  controller.searchQuery.value);
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Icon(
+                                Icons.search,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -60,56 +108,138 @@ class SearchPage extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (controller.products.isEmpty) {
-                  return const Center(
-                    child: Text('No products found'),
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Searching products...',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 }
 
-                return ListView.separated(
+                if (controller.products.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No products found',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: controller.products.length,
-                  separatorBuilder: (context, index) => const Divider(),
                   itemBuilder: (context, index) {
                     final product = controller.products[index];
 
-                    return ListTile(
-                      onTap: () {
-                        Get.toNamed(
-                          '/product/details',
-                          arguments: product
-                              .id, // Mengirimkan ID produk ke halaman detail
-                        );
-                      },
-                      leading: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: product.imageUrl != null
-                              ? DecorationImage(
-                                  image: NetworkImage(product.imageUrl!),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
-                        ),
-                        child: product.imageUrl == null
-                            ? const Icon(Icons.image_not_supported)
-                            : null,
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      title: Text(
-                        product.name ?? 'Tidak ada Produk',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            Get.toNamed(
+                              '/product/details',
+                              arguments: product.id,
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: product.imageUrl != null
+                                        ? DecorationImage(
+                                            image: NetworkImage(
+                                                product.imageUrl!),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                    color: Colors.grey[200],
+                                  ),
+                                  child: product.imageUrl == null
+                                      ? Icon(
+                                          Icons.image_not_supported,
+                                          color: Colors.grey[400],
+                                          size: 24,
+                                        )
+                                      : null,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        product.name ?? 'No Product Name',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        product.keywords ??
+                                            'No Keywords Available',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 14,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.grey[400],
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      subtitle: Text(
-                        product.keywords ?? 'Tidak ada Kata Kunci',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     );
                   },

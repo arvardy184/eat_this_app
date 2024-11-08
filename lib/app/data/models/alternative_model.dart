@@ -1,62 +1,77 @@
+class Products {
+  String? id;
+  String? keywords;
+  String? imageUrl;
+  String? name;
+  String? ingredients;
+  List<String>? allergens;
+
+  Products({
+    this.id,
+    this.keywords,
+    this.imageUrl,
+    this.name,
+    this.ingredients,
+    this.allergens,
+  });
+
+  factory Products.fromJson(Map<String, dynamic> json) {
+    // Handle allergens parsing
+    List<String>? parseAllergens(dynamic allergensData) {
+      if (allergensData == null) return [];
+      
+      if (allergensData is List) {
+        return allergensData.map((e) => e.toString()).toList();
+      }
+      
+      return [];
+    }
+
+    return Products(
+      id: json['id'] as String?,
+      keywords: json['keywords'] as String?,
+      imageUrl: json['image_url'] as String?,
+      name: json['name'] as String?,
+      ingredients: json['ingredients'] as String?,
+      allergens: parseAllergens(json['allergens']),
+    );
+  }
+
+  // Untuk debugging
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'keywords': keywords,
+      'image_url': imageUrl,
+      'name': name,
+      'ingredients': ingredients,
+      'allergens': allergens,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'Products(id: $id, name: $name, allergens: $allergens)';
+  }
+}
+
 class GetAlternativeModel {
   String? status;
   List<Products>? products;
 
-  GetAlternativeModel({this.status, this.products});
+  GetAlternativeModel({
+    this.status,
+    this.products,
+  });
 
-  GetAlternativeModel.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    if (json['products'] != null) {
-      products = <Products>[];
-      json['products'].forEach((v) {
-        products!.add(new Products.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    if (this.products != null) {
-      data['products'] = this.products!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class Products {
-  String? id;
-  String? keywords;
-  String? name;
-  String? imageUrl;
-  String? ingredients;
-  List<String>? allergens;
-
-  Products(
-      {this.id,
-      this.keywords,
-      this.name,
-      this.imageUrl,
-      this.ingredients,
-      this.allergens});
-
-  Products.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    keywords = json['keywords'];
-    name = json['name'];
-    imageUrl = json['image_url'];
-    ingredients = json['ingredients'];
-    allergens = json['allergens'].cast<String>();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['keywords'] = this.keywords;
-    data['name'] = this.name;
-    data['image_url'] = this.imageUrl;
-    data['ingredients'] = this.ingredients;
-    data['allergens'] = this.allergens;
-    return data;
+  factory GetAlternativeModel.fromJson(Map<String, dynamic> json) {
+    return GetAlternativeModel(
+      status: json['status'] as String?,
+      products: json['products'] != null
+          ? (json['products'] as List)
+              .map((product) => Products.fromJson(product as Map<String, dynamic>))
+              .toList()
+          : null,
+    );
   }
 }

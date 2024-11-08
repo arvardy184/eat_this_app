@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/alternative_model.dart';
 import 'package:eat_this_app/app/data/models/product_model.dart';
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
@@ -46,7 +47,7 @@ class ScanController extends BaseController {
   }
         showSuccess('Product found successfully');
         loadInitialAlternatives();
-        
+
         await subscriptionController.incrementDailyScanCount();
       } else {
         showError('No product found for this barcode');
@@ -75,12 +76,13 @@ class ScanController extends BaseController {
       
       // Remove current product from alternatives if present
       final currentProductId = productData.value?.product?.id;
+      print("Current product ID: $currentProductId");
       final filtered = results.where((p) => p.id != currentProductId).toList();
       
+      print("Alternative products found: ${filtered.length} after filtering");
       alternativeProducts.assignAll(filtered);
-    } catch (e) {
+    } on DioException catch (e) {
       print("Error loading alternatives: $e");
-  
     } finally {
       isLoadingAlternatives(false);
     }

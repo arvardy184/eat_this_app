@@ -44,6 +44,7 @@ class AlternativeProductController extends GetxController {
       // Remove current product from alternatives
       final filtered =
           results.where((p) => p.id != productData.value?.product?.id).toList();
+      print("Alternative products found: ${filtered.length}");
       alternativeProducts.assignAll(filtered);
     } catch (e) {
       print('Error loading alternatives: $e');

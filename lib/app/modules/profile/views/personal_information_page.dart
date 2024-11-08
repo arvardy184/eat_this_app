@@ -48,7 +48,7 @@ class PersonalInformationPage extends GetView<ProfileController> {
                     onPressed: () => _handleEditSave(context),
                     child: Text(
                       isEditing.value ? 'Save' : 'Edit',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   )),
             ],

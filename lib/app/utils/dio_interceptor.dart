@@ -16,7 +16,7 @@ class DioInterceptor  extends Interceptor{
    Future<void> handleExpiredToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // Clear all stored data
-    
+    print("Session Expired di dio interceptor");
     // Navigate to login
     Get.offAllNamed('/login');
     Get.snackbar(

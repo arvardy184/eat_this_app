@@ -139,9 +139,6 @@ class ProductService {
       } else {
         throw Exception('Failed to fetch product data: ${e.message}');
       }
-    } catch (e) {
-      print('General error: $e');
-      throw Exception('Error: $e');
-    }
+    } 
   }
 }

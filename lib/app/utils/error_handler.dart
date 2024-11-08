@@ -7,5 +7,6 @@ class ErrorHandler {
     await preferences.remove('auth_token');
     Get.offAllNamed('/login');
     Get.snackbar('Session Expired', 'Please login again.');
+    print("Session Expired di error handler");
   }
 }
