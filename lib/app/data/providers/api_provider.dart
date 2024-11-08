@@ -20,15 +20,45 @@ class ApiProvider {
   ApiProvider() {
     _dio.options.baseUrl = ApiConstants.baseUrl;
 
-    // _dio.interceptors.add(InterceptorsWrapper(
-    //   onRequest: (options, handler) async {
-    //     final token = await _authStorage.getToken();
-    //     if (token != null) {
-    //       options.headers['Authorization'] = 'Bearer $token';
-    //     }
-    //     return handler.next(options);
-    //   },
-    // ));
+    // Tambahkan Interceptor
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('auth_token');
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+        return handler.next(options);
+      },
+      onResponse: (response, handler) {
+        return handler.next(response);
+      },
+      onError: (DioError e, handler) async {
+        if (e.response?.statusCode == 401) {
+          try {
+            await refreshToken();
+            final requestOptions = e.requestOptions;
+            final prefs = await SharedPreferences.getInstance();
+            final token = prefs.getString('auth_token');
+            requestOptions.headers['Authorization'] = 'Bearer $token';
+
+            final response = await _dio.request(
+              requestOptions.path,
+              options: Options(
+                method: requestOptions.method,
+                headers: requestOptions.headers,
+              ),
+              data: requestOptions.data,
+              queryParameters: requestOptions.queryParameters,
+            );
+            return handler.resolve(response);
+          } catch (_) {
+            await logout();
+          }
+        }
+        return handler.next(e);
+      },
+    ));
   }
   Future<Response> login(String email, String password) async {
     try {

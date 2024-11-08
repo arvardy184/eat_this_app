@@ -17,22 +17,44 @@ class SearchPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               color: Colors.blue,
-              child: TextField(
-                onChanged: controller.onSearchQueryChanged,
-                decoration: InputDecoration(
-                  hintText: 'Search product name or code',
-                  filled: true,
-                  fillColor: Colors.white,
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      onChanged: (query) =>
+                          controller.searchQuery.value = query,
+                      decoration: InputDecoration(
+                        hintText: 'Search product name or code',
+                        filled: true,
+                        fillColor: Colors.white,
+                        prefixIcon:
+                            const Icon(Icons.search, color: Colors.grey),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 25,
+                      child: IconButton(
+                        icon: const Icon(Icons.search, color: Colors.blue),
+                        onPressed: () {
+                          controller
+                              .searchProducts(controller.searchQuery.value);
+                        },
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
             Expanded(
@@ -52,13 +74,16 @@ class SearchPage extends StatelessWidget {
                   itemCount: controller.products.length,
                   separatorBuilder: (context, index) => const Divider(),
                   itemBuilder: (context, index) {
-                    print("index: $index");
-                    final productModel = controller.products[index];
-                    print("product1: ${productModel}");
-                    final product = productModel;
-                    print("product2: $product");
+                    final product = controller.products[index];
 
                     return ListTile(
+                      onTap: () {
+                        Get.toNamed(
+                          '/product/details',
+                          arguments: product
+                              .id, // Mengirimkan ID produk ke halaman detail
+                        );
+                      },
                       leading: Container(
                         width: 50,
                         height: 50,

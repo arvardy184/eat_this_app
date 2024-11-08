@@ -142,8 +142,8 @@ class Nutrients {
   int? id;
   double? serving;
   String? unit;
-  double? energy; 
-  double? fat; 
+  double? energy;
+  double? fat;
   double? saturatedFat;
   double? carbohydrate;
   double? sugar;
@@ -170,19 +170,19 @@ class Nutrients {
   });
 
   Nutrients.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    serving = json['serving'];
-    unit = json['unit'];
-    energy = json['energy'];
-    fat = json['fat'] != null ? double.tryParse(json['fat'].toString()) : null;
-    saturatedFat = json['saturated_fat']?.toDouble();
-    carbohydrate = json['carbohydrate']?.toDouble();
-    sugar = json['sugar']?.toDouble();
-    fiber = json['fiber']?.toDouble();
-    protein = json['protein']?.toDouble();
-    salt = json['salt']?.toDouble();
-    alcohol = json['alcohol'];
-    productId = json['product_id'];
+    id = json['id'] as int?;
+    serving = (json['serving'] as num?)?.toDouble(); // Konversi int ke double
+    unit = json['unit'] as String?;
+    energy = (json['energy'] as num?)?.toDouble();
+    fat = (json['fat'] as num?)?.toDouble();
+    saturatedFat = (json['saturated_fat'] as num?)?.toDouble();
+    carbohydrate = (json['carbohydrate'] as num?)?.toDouble();
+    sugar = (json['sugar'] as num?)?.toDouble();
+    fiber = (json['fiber'] as num?)?.toDouble();
+    protein = (json['protein'] as num?)?.toDouble();
+    salt = (json['salt'] as num?)?.toDouble();
+    alcohol = (json['alcohol'] as num?)?.toDouble();
+    productId = json['product_id'] as String?;
   }
 
   Map<String, dynamic> toJson() {

@@ -5,13 +5,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthMiddleware extends GetMiddleware {
   @override
   Future<GetNavConfig?> redirectDelegate(GetNavConfig route) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
+    try {
+      // Ambil token dari SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
 
-    if (token == null) {
-      final newRoute = GetNavConfig.fromRoute('/login');
-      return newRoute;
+      // Jika token tidak ada, arahkan ke halaman login
+      if (token == null || token.isEmpty) {
+        return GetNavConfig.fromRoute('/login');
+      }
+
+      // Jika token valid, lanjutkan ke rute yang diminta
+      return await super.redirectDelegate(route);
+    } catch (e) {
+      // Jika terjadi error, arahkan ke halaman login untuk berjaga-jaga
+      return GetNavConfig.fromRoute('/login');
     }
-    return await super.redirectDelegate(route);
   }
 }

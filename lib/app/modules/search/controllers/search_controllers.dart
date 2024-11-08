@@ -6,7 +6,7 @@ import 'package:get/get_rx/src/rx_types/rx_types.dart';
 
 class SearchControllers extends BaseController {
   final SearchService _searchService = SearchService();
-  final RxList<Products> products = <Products>[].obs;
+  final RxList products = [].obs;
   final RxString searchQuery = ''.obs;
   final RxBool isSearching = false.obs;
 
@@ -16,7 +16,7 @@ class SearchControllers extends BaseController {
     loadRecommendedProducts();
   }
 
-  Future<void> loadRecommendedProducts() async {
+  Future loadRecommendedProducts() async {
     try {
       isLoading.value = true;
       final recommendedProducts = await _searchService.getRecommendedProducts();
@@ -28,37 +28,22 @@ class SearchControllers extends BaseController {
     }
   }
 
-  Future<void> searchProducts(String query) async {
-    // if (query.isEmpty) {
-    //   await loadRecommendedProducts();
-    //   return;
-    // }
+  Future searchProducts(String query) async {
+    if (query.isEmpty) {
+      await loadRecommendedProducts();
+      return;
+    }
 
     try {
       isLoading.value = true;
       isSearching.value = true;
       final searchResults = await _searchService.searchProducts(query);
-      print("Search Results: $searchResults"); 
-       products.value = searchResults;
-      print("data search: $products");
+      products.value = searchResults;
     } catch (e) {
-      print("Error searching products: $e");
       handleError(e);
     } finally {
       isLoading.value = false;
+      isSearching.value = false;
     }
-  }
-
-  void onSearchQueryChanged(String query) {
-    searchQuery.value = query;
-    _debounceSearch();
-  }
-
-  void _debounceSearch() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (searchQuery.value == searchQuery.value) {
-        searchProducts(searchQuery.value);
-      }
-    });
   }
 }

@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 class AlternativeProductController extends GetxController {
-  final ProductService _productService = Get.find<ProductService>();
+  final ProductService _productService = Get.put(ProductService());
   final productData = Rx<ProductModel?>(null);
   final alternativeProducts = <Products>[].obs;
   final isLoadingAlternatives = false.obs;
@@ -23,7 +23,7 @@ class AlternativeProductController extends GetxController {
       isLoading(true);
       final result = await _productService.fetchProductData(productId);
       productData.value = result;
-      
+
       // Load alternatives
       if (result.product?.keywords != null) {
         final keywords = result.product!.keywords!.split(',');
@@ -40,9 +40,10 @@ class AlternativeProductController extends GetxController {
     try {
       isLoadingAlternatives(true);
       final results = await _productService.getAlternative(keywords);
-      
+
       // Remove current product from alternatives
-      final filtered = results.where((p) => p.id != productData.value?.product?.id).toList();
+      final filtered =
+          results.where((p) => p.id != productData.value?.product?.id).toList();
       alternativeProducts.assignAll(filtered);
     } catch (e) {
       print('Error loading alternatives: $e');
@@ -51,4 +52,3 @@ class AlternativeProductController extends GetxController {
     }
   }
 }
-
