@@ -52,8 +52,11 @@ class SearchPage extends StatelessWidget {
                   itemCount: controller.products.length,
                   separatorBuilder: (context, index) => const Divider(),
                   itemBuilder: (context, index) {
+                    print("index: $index");
                     final productModel = controller.products[index];
-                    final product = productModel.product;
+                    print("product1: ${productModel}");
+                    final product = productModel;
+                    print("product2: $product");
 
                     return ListTile(
                       leading: Container(
@@ -61,25 +64,25 @@ class SearchPage extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          image: product?.imageUrl != null
+                          image: product.imageUrl != null
                               ? DecorationImage(
-                                  image: NetworkImage(product!.imageUrl!),
+                                  image: NetworkImage(product.imageUrl!),
                                   fit: BoxFit.cover,
                                 )
                               : null,
                         ),
-                        child: product?.imageUrl == null
+                        child: product.imageUrl == null
                             ? const Icon(Icons.image_not_supported)
                             : null,
                       ),
                       title: Text(
-                        product?.name ?? 'Tidak ada Produk',
+                        product.name ?? 'Tidak ada Produk',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       subtitle: Text(
-                        product?.keywords ?? 'Tidak ada Kata Kunci',
+                        product.keywords ?? 'Tidak ada Kata Kunci',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),

@@ -31,18 +31,18 @@ class AppPages {
   static const INITIAL = Routes.HOME;
 
   static final routes = [
-    GetPage(name: '/home', page: () => PersistentBottomNavBar(), bindings: [
+    GetPage(name: '/home', page: () => PersistentBottomNavBar(),
+    binding: HomeBinding(), 
+    bindings: [
       ProfileBinding(),
       ChatBinding(),
-      HomeBinding(),
+      PharmacyBinding(),
       SubscriptionBinding(),
     ], middlewares: [
       AuthMiddleware()
     ]
-        // binding: NavBindings()
-        // binding: HomeBinding(),
         ),
-    GetPage(name: '/beranda', page: () => HomePage(), binding: HomeBinding()),
+    // GetPage(name: '/beranda', page: () => HomePage(), binding: HomeBinding()),
     GetPage(
         name: '/search', page: () => SearchPage(), binding: SearchBinding()),
     GetPage(

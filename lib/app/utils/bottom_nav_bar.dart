@@ -32,10 +32,10 @@ class PersistentBottomNavBar extends StatelessWidget {
         //   init: HomeController(),
         //   builder: (controller) => HomePage(),
         // ),
-        GetBuilder<HomeController>(
-          init: HomeController(),
-          builder: (controller) => HomePage(),
-        ),
+        // GetBuilder<HomeController>(
+        //   init: HomeController(),
+        //   builder: (controller) => HomePage(),
+        // ),
 
         SearchPage(),
         // GetBuilder<SearchController>(
