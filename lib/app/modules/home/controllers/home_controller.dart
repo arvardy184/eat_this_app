@@ -37,6 +37,15 @@ class HomeController extends BaseController {
     await loadUserData();
   }
 
+  List<Products> get todayScans => recentScans.where((scan) {
+    if (scan.pivot?.createdAt == null) return false;
+    final scanDate = DateTime.parse(scan.pivot!.createdAt!);
+    final today = DateTime.now();
+    return scanDate.year == today.year &&
+        scanDate.month == today.month &&
+        scanDate.day == today.day;
+  }).toList();
+
   Future<void> loadInitialData() async {
     await loadRecentScans();
     calculateHealthyPercentage();
@@ -77,19 +86,27 @@ class HomeController extends BaseController {
 
 
 
-  Future<void> loadRecentScans() async{
-    try{
+Future<void> loadRecentScans() async {
+    try {
       isLoadingScans(true);
-     
-     final products = await _homeService.getRecentScans();
-    
-      recentScans.assignAll(products);
-
+      final products = await _homeService.getRecentScans();
       
-    }catch(e){
+      // Sort by date, newest first
+      products.sort((a, b) {
+        final dateA = a.pivot?.createdAt != null 
+            ? DateTime.parse(a.pivot!.createdAt!) 
+            : DateTime(1900);
+        final dateB = b.pivot?.createdAt != null 
+            ? DateTime.parse(b.pivot!.createdAt!) 
+            : DateTime(1900);
+        return dateB.compareTo(dateA);
+      });
+      
+      recentScans.assignAll(products);
+    } catch (e) {
       print("Error load recent scans: $e");
       error.value = e.toString();
-    }finally{
+    } finally {
       isLoadingScans(false);
     }
   }

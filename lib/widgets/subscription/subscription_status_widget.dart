@@ -87,7 +87,7 @@ class SubscriptionStatusWidget extends StatelessWidget {
         Text(
           label == 'Daily Scans' 
               ? '$currentCount/${maxValue == 0 ? "∞" : maxValue}'
-              : isPremium ? 'Unlimited' : '$maxValue remaining',
+              : isPremium ? '$maxValue' : '$maxValue remaining',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
