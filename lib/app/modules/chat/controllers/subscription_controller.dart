@@ -1,10 +1,10 @@
+import 'package:eat_this_app/app/data/models/history_model.dart';
 import 'package:eat_this_app/app/data/models/package_model.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
 import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/services/package_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SubscriptionController extends BaseController {
@@ -15,17 +15,57 @@ class SubscriptionController extends BaseController {
   final RxBool isLoading = false.obs;
   final RxList<Packages> packages = <Packages>[].obs;
   final RxString email = ''.obs;
-
+  final totalScanPerDay = 0.obs;
+  final RxInt dailyScanCount = 0.obs;
+  final recentScans = <Products>[].obs;
   SubscriptionController(PackageService find, {required this.packageService});
 
   @override
-
   void onInit() {
     super.onInit();
     checkSubscription();
     loadPackages();
+    loadDailyScanCount();
+    loadRecentScans();
   }
 
+  Future<void> refreshData() async {
+    await checkSubscription();
+    await loadPackages();
+    await loadDailyScanCount();
+    await loadRecentScans();
+    print("package loader: $packages");
+  }
+
+  Future<void> loadRecentScans() async {
+    try {
+      final products = await packageService.getRecentScans();
+      recentScans.assignAll(products);
+      print("recent scans: ${recentScans.length}");
+    } catch (e) {
+      print("Error load recent scans: $e");
+    }
+  }
+
+  Future<void> loadDailyScanCount() async {
+    try {
+      final count = await packageService.getDailyScanCount();
+      print("Daily count: $count");
+      dailyScanCount.value = count;
+      print("Daily scan count: ${dailyScanCount.value}");
+    } catch (e) {
+      print("Error loading daily scan count: $e");
+    }
+  }
+
+  Future<void> incrementDailyScanCount() async {
+    try {
+      await packageService.incrementDailyScanCount();
+      await loadDailyScanCount();
+    } catch (e) {
+      print("Error incrementing daily scan count: $e");
+    }
+  }
 
   Future<void> checkSubscription() async {
     try {
@@ -41,7 +81,7 @@ class SubscriptionController extends BaseController {
     }
   }
 
-   Future<void> loadPackages() async {
+  Future<void> loadPackages() async {
     try {
       final packagesData = await packageService.getPackages();
       packages.assignAll(packagesData);
@@ -51,12 +91,11 @@ class SubscriptionController extends BaseController {
     }
   }
 
-  Future<void> contactAdmin()async {
+  Future<void> contactAdmin() async {
     final waUrl = packageService.getWhatsAppLink();
     launchUrlString(waUrl);
     print("launchUrlString: $waUrl");
   }
-
 
   void showUpgradeDialog() {
     // Pastikan ada paket premium
@@ -96,14 +135,20 @@ class SubscriptionController extends BaseController {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Later',style: TextStyle(color: CIETTheme.primary_color),),
+            child: Text(
+              'Later',
+              style: TextStyle(color: CIETTheme.primary_color),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               Get.back();
               contactAdmin();
             },
-            child: Text('Contact Admin',style: TextStyle(color: CIETTheme.primary_color),),
+            child: Text(
+              'Contact Admin',
+              style: TextStyle(color: CIETTheme.primary_color),
+            ),
           ),
         ],
       ),

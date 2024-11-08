@@ -35,7 +35,6 @@ class HomeController extends BaseController {
     await loadInitialData();
     await loadRecommendation(); 
     await loadUserData();
-    
   }
 
   Future<void> loadInitialData() async {
@@ -84,7 +83,7 @@ class HomeController extends BaseController {
      
      final products = await _homeService.getRecentScans();
     
-        recentScans.assignAll(products);
+      recentScans.assignAll(products);
 
       
     }catch(e){

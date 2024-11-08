@@ -97,10 +97,6 @@ Future<void> sendMessage(String text) async {
     _initializeUserData();
   }
 
-  
-
-
-
 
   bool canAccessChat() {
     if(isConsultant.value) return true;
@@ -216,8 +212,6 @@ Future<void> sendMessage(String text) async {
 Future<void> addConsultant(String consultantId) async {
   try {
     isLoading.value = true;
-    
-
     final result = await _chatService.addConsultant(consultantId);
     
    

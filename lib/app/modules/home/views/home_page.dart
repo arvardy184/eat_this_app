@@ -21,7 +21,11 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => controller.refreshData(),
+        onRefresh: () {
+          subscriptionController.refreshData();
+          return controller.refreshData();
+
+        },
         child: SafeArea(
           child: Column(
             children: [

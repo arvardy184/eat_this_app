@@ -234,7 +234,10 @@ class ChatPage extends GetView<ChatController> {
                       ),
                       title: Text(consultant.name ?? 'Unknown'),
                       subtitle: Text(
-                          consultant.lastMessage ?? 'No messages yet'),
+                          consultant.lastMessage ?? 'No messages yet',style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 14
+                          ),),
                       trailing: const Icon(Icons.chat_bubble_outline),
                       onTap: () =>
                           Get.toNamed('/chat/room', arguments: consultant),
