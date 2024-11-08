@@ -28,14 +28,16 @@ class PersistentBottomNavBar extends StatelessWidget {
           builder: (controller) => HomePage(),
         ),
 
-
         SearchPage(),
 
         GetBuilder<ScanController>(
           init: ScanController(),
           builder: (controller) => ScanPage(),
         ),
-        PharmacyPage(),
+        // PharmacyPage(),
+        GetBuilder(
+            init: PharmacyController(),
+            builder: (controller) => PharmacyPage()),
 
         GetBuilder<ChatController>(
           init: ChatController(),
@@ -109,7 +111,6 @@ class PersistentBottomNavBar extends StatelessWidget {
         ],
       ),
       navBarStyle: NavBarStyle.style15,
-   
     );
   }
 }

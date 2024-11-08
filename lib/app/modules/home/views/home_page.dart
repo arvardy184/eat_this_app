@@ -1,6 +1,7 @@
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/chat/controllers/subscription_controller.dart';
 import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
+import 'package:eat_this_app/app/modules/pharmacy/controllers/pharmacy_controller.dart';
 import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/services/package_service.dart';
 import 'package:eat_this_app/widgets/home/custom_app_bar.dart';
@@ -11,11 +12,13 @@ import 'package:eat_this_app/widgets/subscription/subscription_status_widget.dar
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 class HomePage extends GetView<HomeController> {
   HomePage({Key? key}) : super(key: key);
 
-final SubscriptionController subscriptionController = Get.put(SubscriptionController(Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
+  final SubscriptionController subscriptionController = Get.put(
+      SubscriptionController(Get.find<PackageService>(),
+          packageService: PackageService(ApiProvider())));
+  final PharmacyController pharmacyController = Get.put(PharmacyController());
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +40,10 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
                       ),
                       _buildRecentScansSection(),
                       _buildStatsSection(),
-
                       Obx(() => RecommendationSection(
-                        recommendations: controller.recommendation,
-                        isLoading: controller.isLoadingPharmacies.value,
-                      )),
+                            recommendations: controller.recommendation,
+                            isLoading: controller.isLoadingPharmacies.value,
+                          )),
                       _buildPharmacySection(),
                     ],
                   ),
@@ -51,7 +53,6 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
           ),
         ),
       ),
-    
     );
   }
 
@@ -71,7 +72,6 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
             ],
           ),
         ),
@@ -157,20 +157,20 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
               height: 50,
               color: Colors.white.withOpacity(0.5),
             ),
-           Expanded(
+            Expanded(
               child: Column(
                 children: [
-                 const Icon(Icons.trending_up, color: Colors.white, size: 32),
-                 const SizedBox(height: 8),
-                 Obx(() => Text(
-                  '${controller.healthyPercentage.value.toStringAsFixed(1)}%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )),
-                 const  Text(
+                  const Icon(Icons.trending_up, color: Colors.white, size: 32),
+                  const SizedBox(height: 8),
+                  Obx(() => Text(
+                        '${controller.healthyPercentage.value.toStringAsFixed(1)}%',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
+                  const Text(
                     'Healthy Products',
                     style: TextStyle(
                       color: Colors.white,
@@ -203,21 +203,38 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
                 ),
               ),
               TextButton(
-                onPressed: () => Get.toNamed('/pharmacies'),
+                onPressed: () => Get.toNamed('/pharmacy'),
                 child: const Text('See All'),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          const PharmacySection(),
+          const SizedBox(height: 12),
+          Obx(() {
+            if (controller.isLoadingPharmacies.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (controller.error.value != null) {
+              return Center(
+                child: Text(
+                  'Failed to load pharmacies',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+
+            if (pharmacyController.pharmacies.isEmpty) {
+              return const Center(
+                child: Text('No pharmacies found nearby'),
+              );
+            }
+
+            return PharmacySection(
+              pharmacies: pharmacyController.pharmacies,
+            );
+          }),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-

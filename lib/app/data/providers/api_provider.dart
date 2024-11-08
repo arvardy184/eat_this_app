@@ -19,7 +19,6 @@ class ApiProvider {
   ApiProvider() {
     _dio.options.baseUrl = ApiConstants.baseUrl;
 
-<<<<<<< HEAD
     // Tambahkan Interceptor
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
@@ -59,9 +58,6 @@ class ApiProvider {
         return handler.next(e);
       },
     ));
-=======
-
->>>>>>> 90d5c5c182a87f7df80f8ab2cec613511ce0f411
   }
   Future<Response> login(String email, String password) async {
     try {
