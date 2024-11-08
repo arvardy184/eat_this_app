@@ -71,6 +71,7 @@ class SubscriptionController extends BaseController {
     try {
       isLoading(true);
       isPremium.value = await packageService.checkSubscription();
+      print("cek subscription: ${isPremium.value}");
       remainingScans.value = await packageService.getRemainingScans();
       remainingConsultations.value =
           await packageService.getRemainingConsultations();

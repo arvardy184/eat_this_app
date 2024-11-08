@@ -13,9 +13,11 @@ import 'package:get/get.dart';
 
 
 class HomePage extends GetView<HomeController> {
-  HomePage({Key? key}) : super(key: key);
+  HomePage({super.key});
 
-final SubscriptionController subscriptionController = Get.put(SubscriptionController(Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
+  final SubscriptionController subscriptionController = Get.put(SubscriptionController(
+      Get.find<PackageService>(),
+      packageService: PackageService(ApiProvider())));
 
   @override
   Widget build(BuildContext context) {
@@ -24,65 +26,351 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
         onRefresh: () {
           subscriptionController.refreshData();
           return controller.refreshData();
-
         },
-        child: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            _buildSliverAppBar(),
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  _buildWelcomeCard(),
+                  _buildQuickActions(),
+                  _buildSubscriptionStatus(),
+                  _buildRecentScans(),
+                  _buildStatistics(),
+                  _buildRecommendations(),
+                  _buildNearbyPharmacies(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+     
+    );
+  }
+
+  Widget _buildSliverAppBar() {
+    return SliverAppBar(
+      expandedHeight: 120,
+      floating: true,
+      pinned: true,
+      elevation: 0,
+      backgroundColor: CIETTheme.primary_color,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [CIETTheme.primary_color, Colors.blue.shade400],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        title: Obx(() => Text(
+              'Hi, ${controller.userData.value?.name ?? 'User'}! 👋',
+              style: const TextStyle(fontSize: 20),
+            )),
+        titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
+      ),
+      actions: [
+        Obx(() => GestureDetector(
+              onTap: () => Get.toNamed('/profile'),
+              child: Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: CircleAvatar(
+                  backgroundImage: controller.userData.value?.profilePicture != null
+                      ? NetworkImage(controller.userData.value!.profilePicture!)
+                      : null,
+                  child: controller.userData.value?.profilePicture == null
+                      ? const Icon(Icons.person)
+                      : null,
+                ),
+              ),
+            )),
+        const SizedBox(width: 16),
+      ],
+    );
+  }
+
+  Widget _buildWelcomeCard() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade800, Colors.blue.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Start Your Healthy Journey',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Scan products to check their ingredients and find healthier alternatives',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActions() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildActionButton(
+            icon: Icons.history,
+            label: 'History',
+            onTap: () => Get.toNamed('/all-scan'),
+          ),
+          _buildActionButton(
+            icon: Icons.local_pharmacy,
+            label: 'Pharmacies',
+            onTap: () => Get.toNamed('/pharmacy'),
+          ),
+          _buildActionButton(
+            icon: Icons.chat,
+            label: 'Consult',
+            onTap: () => Get.toNamed('/chat'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
           child: Column(
             children: [
-              CustomAppBar(controller: controller),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GetBuilder<SubscriptionController>(
-                        init: subscriptionController,
-                        builder: (controller) => SubscriptionStatusWidget(),
-                      ),
-                      _buildRecentScansSection(),
-                      _buildStatsSection(),
-
-                      Obx(() => RecommendationSection(
-                        recommendations: controller.recommendation,
-                        isLoading: controller.isLoadingPharmacies.value,
-                      )),
-                      _buildPharmacySection(),
-                    ],
-                  ),
+              Icon(icon, color: CIETTheme.primary_color, size: 28),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
                 ),
               ),
             ],
           ),
         ),
       ),
-    
     );
   }
 
-  Widget _buildRecentScansSection() {
+  Widget _buildSubscriptionStatus() {
+    return GetBuilder<SubscriptionController>(
+      init: subscriptionController,
+      builder: (controller) => Container(
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Obx(() => Text(
+                      controller.isPremium.value ? '✨ Premium' : 'Free Package',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: controller.isPremium.value
+                            ? Colors.blue[900]
+                            : Colors.grey[700],
+                      ),
+                    )),
+                if (!controller.isPremium.value)...[
+
+                
+                  ElevatedButton(
+                    onPressed: controller.showUpgradeDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: CIETTheme.primary_color,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: const Text('Upgrade Now'),
+                  ),
+              ],
+              ]
+            ),
+            const SizedBox(height: 16),
+            _buildQuotaIndicator(
+              'Daily Scans',
+              controller.remainingScans.value,
+              controller.recentScans.length,
+              controller.isPremium.value,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+Widget _buildQuotaIndicator(
+    String label,
+    int max,
+    int current,
+    bool isPremium,
+  ) {
+    // Get total scans from controller
+    final totalScans = controller.recentScans.length;
+      print("is premiu m: $isPremium");
+    // Calculate progress
+    int progress;
+    if (isPremium) {
+      progress = 1; 
+      print("is premium progress: $progress");
+    } else if (max <= 0) {
+      print("max: $max");
+      progress = 0; 
+    } else {
+      progress = (totalScans / max).toInt(); 
+      print("progress: $progress");
+    } 
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              isPremium ? Icons.all_inclusive : Icons.timer,
+              size: 20,
+              color: Colors.grey[600],
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            Text(
+              label == 'Daily Scans'
+                  ? isPremium 
+                      ? '${controller.recentScans.length}/$max'
+                      : '${controller.recentScans.length}/$max'
+                  : isPremium 
+                      ? '$max remaining' 
+                      : '$max remaining',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: (controller.recentScans.length < max || isPremium)
+                    ? Colors.blue[900]
+                    : Colors.red,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progress.toDouble(),
+            backgroundColor: Colors.grey[200],
+            valueColor: AlwaysStoppedAnimation<Color>(
+              isPremium 
+                ? Colors.blue[900]! 
+                : controller.recentScans.length >= max 
+                    ? Colors.red 
+                    : CIETTheme.primary_color,
+            ),
+            minHeight: 8,
+          ),
+        ),
+      ],
+    );
+  }
+
+  
+  Widget _buildRecentScans() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Last Scanned',
+                'Recent Scans',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextButton(
-                  onPressed: (){
-                      Get.toNamed('/all-scan');
-                  },
-                  child: Text(
-                    "See All"
-                  ),
-              )
+              TextButton.icon(
+                onPressed: () => Get.toNamed('/all-scan'),
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text('See All'),
+              ),
             ],
           ),
         ),
@@ -93,19 +381,19 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (controller.error.value != null) {
-              print("error ${controller.error.value}");
-              return Center(
-                child: Text(
-                  'Product Not Found',
-                  style: const TextStyle(color: Colors.red),
-                ),
-              );
-            }
-
             if (controller.recentScans.isEmpty) {
-              return const Center(
-                child: Text('No recent scans'),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.history, size: 48, color: Colors.grey[400]),
+                    const SizedBox(height: 8),
+                    Text(
+                      'No recent scans',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
               );
             }
 
@@ -115,7 +403,50 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
               itemCount: controller.recentScans.length,
               itemBuilder: (context, index) {
                 final scan = controller.recentScans[index];
-                return ProductHistoryCard(product: scan);
+                return Container(
+                  width: 160,
+                  margin: const EdgeInsets.only(right: 16),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16)),
+                          child: Image.network(
+                            scan.imageUrl ?? '',
+                            height: 120,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 120,
+                                color: Colors.grey[200],
+                                child: const Icon(Icons.image_not_supported),
+                              );
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Text(
+                            scan.name ?? 'Unknown',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               },
             );
           }),
@@ -124,105 +455,368 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
     );
   }
 
-  Widget _buildStatsSection() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [CIETTheme.primary_color, Colors.lightBlue],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  Widget _buildStatistics() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [CIETTheme.primary_color, Colors.blue.shade400],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  const Icon(Icons.qr_code_scanner,
-                      color: Colors.white, size: 32),
-                  const SizedBox(height: 8),
-                  Obx(() => Text(
-                        '${controller.recentScans.length}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )),
-                  const Text(
-                    'Scanned Items',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.qr_code_scanner,
+              value: '${controller.recentScans.length}',
+              label: 'Total Scans',
             ),
-            Container(
-              width: 1,
-              height: 50,
-              color: Colors.white.withOpacity(0.5),
+          ),
+          Container(
+            width: 1,
+            height: 50,
+            color: Colors.white.withOpacity(0.3),
+          ),
+          Expanded(
+            child: _buildStatItem(
+              icon: Icons.trending_up,
+              value: '${controller.healthyPercentage.value.toStringAsFixed(1)}%',
+              label: 'Healthy Products',
             ),
-           Expanded(
-              child: Column(
-                children: [
-                 const Icon(Icons.trending_up, color: Colors.white, size: 32),
-                 const SizedBox(height: 8),
-                 Obx(() => Text(
-                  '${controller.healthyPercentage.value.toStringAsFixed(1)}%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )),
-                 const  Text(
-                    'Healthy Products',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildPharmacySection() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+  Widget _buildStatItem({
+    required IconData icon,
+    required String value,
+    required String label,
+  }) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white, size: 32),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.9),
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+Widget _buildRecommendations() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Nearby Pharmacies',
+                '🎯 Recommended For You',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextButton(
-                onPressed: () => Get.toNamed('/pharmacies'),
-                child: const Text('See All'),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 280, 
+          child: Obx(() {
+            if (controller.isLoadingPharmacies.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (controller.recommendation.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.recommend, size: 48, color: Colors.grey[400]),
+                    const SizedBox(height: 8),
+                    Text(
+                      'No recommendations yet',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Scan more products to get personalized recommendations',
+                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              scrollDirection: Axis.horizontal,
+              itemCount: controller.recommendation.length,
+              itemBuilder: (context, index) {
+                final product = controller.recommendation[index];
+                return Container(
+                  width: 180,
+                  margin: const EdgeInsets.only(right: 16),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(16)),
+                              child: Image.network(
+                                product.imageUrl ?? '',
+                                height: 120, // Reduced height
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 120,
+                                    color: Colors.grey[200],
+                                    child: const Icon(Icons.image_not_supported),
+                                  );
+                                },
+                              ),
+                            ),
+                          
+                          ],
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.name ?? 'Unknown Product',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14, // Reduced font size
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4), // Reduced spacing
+                                if (product.allergens?.isNotEmpty ?? false)
+                                  Wrap(
+                                    spacing: 4,
+                                    runSpacing: 4,
+                                    children: (product.allergens ?? [])
+                                        .take(2)
+                                        .map((allergen) {
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 2), // Reduced padding
+                                        decoration: BoxDecoration(
+                                          color: Colors.red[50],
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          allergen,
+                                          style: TextStyle(
+                                            fontSize: 10, // Reduced font size
+                                            color: Colors.red[900],
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                const Spacer(), // Push button to bottom
+                                TextButton(
+                                  onPressed: () {
+                                    Get.toNamed('/product/alternative',
+                                        arguments: product.id);
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(50, 24), // Reduced height
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: const Text('See Details →'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNearbyPharmacies() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '🏪 Nearby Pharmacies',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => Get.toNamed('/pharmacy'),
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text('See All'),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          const PharmacySection(),
-        ],
-      ),
+        ),
+        ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: 2, // Show only 2 items in homepage
+          itemBuilder: (context, index) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(12),
+                leading: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    image: const DecorationImage(
+                      image: AssetImage('assets/images/farhan.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                title: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        index == 0 ? '666 Pharmacy' : 'Satan Pharmacy',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Open',
+                        style: TextStyle(
+                          color: Colors.green[700],
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text(
+                      index == 0 ? 'Lowokwaru' : 'Lumpur Pool',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on,
+                            size: 16, color: Colors.blue[700]),
+                        const SizedBox(width: 4),
+                        Text(
+                          '1.2 KM away',
+                          style: TextStyle(
+                            color: Colors.blue[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        // if (index == 0) ...[
+                        //   Icon(Icons.star, size: 16, color: Colors.amber[700]),
+                        //   const SizedBox(width: 4),
+                        //   Text(
+                        //     '4.8 (120 reviews)',
+                        //     style: TextStyle(
+                        //       color: Colors.grey[600],
+                        //       fontWeight: FontWeight.w500,
+                        //     ),
+                        //   ),
+                        // ],
+                      ],
+                    ),
+                  ],
+                ),
+                trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
+                onTap: () {
+                  // Navigate to pharmacy details
+                },
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 80), // Space for FAB
+      ],
     );
   }
 }
