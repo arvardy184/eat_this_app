@@ -18,8 +18,8 @@ class ProductDetailWidget extends StatelessWidget {
     this.alternativeProducts,
     this.isLoadingAlternatives = false,
     this.isLoading = false,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +239,6 @@ class ProductDetailWidget extends StatelessWidget {
     }
   }
 
-  // ... rest of your methods remain the same
 
 
   Widget _buildInfoRow(String label, String? value) {
@@ -442,18 +441,7 @@ Widget _buildAlternativeCard(BuildContext context, Products product) {
                 ],
               ),
             ),
-            
-            // View Details Button
-            // TextButton(
-            //   onPressed: () {
-            //     // Navigate to product details
-            //     Get.toNamed('/product/details', arguments: product.id);
-            //   },
-            //   child: Text('View Details'),
-            //   style: TextButton.styleFrom(
-            //     minimumSize: Size(double.infinity, 36),
-            //   ),
-            // ),
+
             TextButton(
   onPressed: () {
     Get.toNamed('/product/alternative', arguments: product.id);

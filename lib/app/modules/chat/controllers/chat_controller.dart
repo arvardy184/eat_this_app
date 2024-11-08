@@ -20,8 +20,8 @@ class ChatController extends BaseController {
   final RxList<ConsultantData> addedConsultants = RxList<ConsultantData>();
   final RxList<Packages> packages = RxList<Packages>();
   final RxList<Users> users = RxList<Users>(); 
-  final RxList<Users> acquaintances = RxList<Users>(); // For accepted users
-  final RxList<Users> requests = RxList<Users>(); // For pending requests
+  final RxList<Users> acquaintances = RxList<Users>(); 
+  final RxList<Users> requests = RxList<Users>();
   final searchQuery = ''.obs;
   final isConsultant = false.obs;
   final typeUser = ''.obs;
@@ -36,7 +36,6 @@ class ChatController extends BaseController {
   late final String channelName;
   final recipient = Get.arguments;
 
-  //  late final String currentUserKey;
   late final String recipientKey;
   
 
@@ -57,29 +56,6 @@ class ChatController extends BaseController {
     }
   }
 
-//  Future<void> connectWebSocket() async {
-//     if (isConnecting.value) return;
-    
-//     try {
-//       isConnecting.value = true;
-//       final token = await _chatService.getToken();
-      
-//       if (token == null) {
-//         throw Exception('No auth token available');
-//       }
-
-//       channel = await _chatService.connectWebSocket(
-//         channelName,
-//         token,
-//         handleWebSocketMessage,
-//         handleWebSocketError,
-//         handleWebSocketDone,
-//       );
-//     } catch (e) {
-//       print("Error connecting to WebSocket: $e");
-//       handleWebSocketError(e);
-//     }
-//   }
 
 
 Future<void> sendMessage(String text) async {
@@ -119,41 +95,12 @@ Future<void> sendMessage(String text) async {
     checkConsultantStatus();
     initializeController();
     _initializeUserData();
-    // _initChatRoom();
   }
 
   
 
-  //  Future<void> _initChatRoom() async {
-  //   try {
-  //     isLoading(true);
-  //     // Get current user key
-  //     final key = await _authService.getCurrentUserKey();
-  //     if (key != null) {
-  //       print('User key found: $key');
-  //       currentUserKey.value = key;
-  //     } else {
-  //       throw Exception('User key not found');
-  //     }
-     
-      
-  //     // Set channel name
-  //     channelName = ChatChannelUtil.createChannelName(
-  //       currentUserKey.value,
-  //       recipient.conversationKey,
-  //     );
 
-  //  print("Initializing chat room with channel: $channelName");
-  //     // Load messages
-  //     await loadMessages();
-      
-  //     // Connect WebSocket
-  //     await connectWebSocket();
-  //   } catch (e) {
-  //     print("Error initializing chat room: $e");
-  //     Get.snackbar('Error', 'Failed to initialize chat');
-  //   }
-  // }
+
 
   bool canAccessChat() {
     if(isConsultant.value) return true;

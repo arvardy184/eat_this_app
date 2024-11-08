@@ -33,7 +33,6 @@ class ChatRoomController extends BaseController {
     try {
       isLoading(true);
 
-      // Get current user key
       final key = await _apiService.getCurrentUserKey();
       if (key == null) throw Exception('No auth token available');
 

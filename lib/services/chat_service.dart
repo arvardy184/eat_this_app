@@ -158,7 +158,7 @@ class ChatService {
   }
 
   Future<ConsultantData> addConsultant(String consultantId) async {
-    final token = await getToken(); // Mendapatkan token untuk otentikasi
+    final token = await getToken(); 
     if (token == null) throw Exception("Token not found");
 
     try {
@@ -173,20 +173,18 @@ class ChatService {
         ),
       );
 
-      // Menampilkan informasi respons di konsol untuk keperluan debugging
+  
       print("Request user id: $consultantId");
       print("Response add consultant: ${response.data}");
 
-      // Cek apakah respons mengandung data yang dibutuhkan
+   
       if (response.statusCode == 200 && response.data != null) {
-        // Mengonversi respons JSON ke dalam objek ConsultantData
         return ConsultantData.fromJson(response.data);
       } else {
-        // Jika status code bukan 200 atau data tidak sesuai
         throw Exception("Failed to add consultant, invalid response data");
       }
     } on DioException catch (dioError) {
-      // Menangani error spesifik dari Dio
+   
       if (dioError.response != null) {
         print("Server error: ${dioError.response?.statusCode}");
         print("Error data: ${dioError.response?.data}");
@@ -298,7 +296,6 @@ class ChatService {
       return response.data['status'] == 'Message sent';
     } on DioException catch (dioError) {
       if (dioError.response != null) {
-        // The server responded with an error
         print(
             "Server responded with an error: ${dioError.response?.statusCode}");
         print("Error data: ${dioError.response?.data}");
@@ -308,25 +305,25 @@ class ChatService {
           'Failed to send message: ${dioError.response?.statusMessage} (Code: ${dioError.response?.statusCode})',
         );
       } else if (dioError.type == DioExceptionType.connectionTimeout) {
-        // Connection timeout
+    
         print("Connection timeout occurred");
         Get.snackbar('Error', 'Connection timeout. Please try again.');
       } else if (dioError.type == DioExceptionType.receiveTimeout) {
-        // Receive timeout
+   
         print("Receive timeout occurred");
         Get.snackbar('Error', 'Receive timeout. Please try again.');
       } else if (dioError.type == DioExceptionType.unknown) {
-        // Other errors like no internet connection
+  
         print("Network issue: ${dioError.message}");
         Get.snackbar('Error', 'Network issue. Please check your connection.');
       } else {
-        // Unknown DioError
+    
         print("Unknown error occurred: ${dioError.message}");
         Get.snackbar('Error', 'An unexpected error occurred.');
       }
       throw Exception(dioError);
     } catch (e) {
-      // Other errors (non-Dio errors)
+
       print("Unexpected error in sendMessage: $e");
       Get.snackbar(
           'Error', 'Failed to send message due to an unexpected error.');
