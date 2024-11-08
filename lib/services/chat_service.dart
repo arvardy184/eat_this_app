@@ -11,6 +11,7 @@ import 'package:eat_this_app/app/data/models/package_model.dart';
 import 'package:eat_this_app/app/data/models/user2_model.dart';
 import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
+import 'package:eat_this_app/app/utils/error_handler.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
@@ -131,7 +132,12 @@ class ChatService {
           ));
       print("Response get consultant: ${response.data}");
       return ConsultantModel.fromJson(response.data);
-    } catch (e) {
+    } on DioException catch (e) {
+       if(e.response?.statusCode == 401){
+        await ErrorHandler.handleUnauthorized();
+        throw Exception("Token expired");
+        
+       }
       print("Error get  consultant: $e");
       throw Exception(e);
     }
@@ -151,8 +157,13 @@ class ChatService {
               ));
       print("Response get added: ${response.data}");
       return Consultant2Model.fromJson(response.data);
-    } catch (e) {
+    } on DioException catch (e) {
       print("Error get added: $e");
+      if(e.response?.statusCode == 401){
+        await ErrorHandler.handleUnauthorized();
+        throw Exception("Token expired");
+        
+       }
       throw Exception(e);
     }
   }
@@ -179,12 +190,13 @@ class ChatService {
 
    
       if (response.statusCode == 200 && response.data != null) {
+        //TODO handle response add success
         return ConsultantData.fromJson(response.data);
       } else {
         throw Exception("Failed to add consultant, invalid response data");
       }
     } on DioException catch (dioError) {
-   
+
       if (dioError.response != null) {
         print("Server error: ${dioError.response?.statusCode}");
         print("Error data: ${dioError.response?.data}");
@@ -201,7 +213,14 @@ class ChatService {
       } else if (dioError.type == DioExceptionType.unknown) {
         print("Network issue: ${dioError.message}");
         Get.snackbar('Error', 'Network issue. Please check your connection.');
-      } else {
+      } else if(dioError.response?.statusCode == 401){
+       
+        await ErrorHandler.handleUnauthorized();
+        throw Exception("Token expired");
+        
+       
+      }
+      else {
         print("Unexpected error occurred: ${dioError.message}");
         Get.snackbar('Error', 'An unexpected error occurred.');
       }
@@ -227,8 +246,13 @@ class ChatService {
           ));
       print("Response req: ${response.data}");
       return User2Model.fromJson(response.data);
-    } catch (e) {
+    }on DioException catch (e) {
       print("Error di req: $e");
+      if(e.response?.statusCode == 401){
+        await ErrorHandler.handleUnauthorized();
+        throw Exception("Token expired");
+        
+       }
       throw Exception(e);
     }
   }
@@ -247,7 +271,12 @@ class ChatService {
               ));
       print("Response: ${response.data}");
       return User2Model.fromJson(response.data);
-    } catch (e) {
+    } on DioException catch (e) {
+      if(e.response?.statusCode == 401){
+        await ErrorHandler.handleUnauthorized();
+        throw Exception("Token expired");
+        
+       }
       print("Error di getAquaintances: $e");
       throw Exception(e);
     }
@@ -268,7 +297,12 @@ class ChatService {
               ));
       print("Response: ${response.data}");
       return AnswerResponseModel.fromJson(response.data);
-    } catch (e) {
+    } on DioException catch (e) {
+if(e.response?.statusCode == 401){
+        await ErrorHandler.handleUnauthorized();
+        throw Exception("Token expired");
+        
+       }
       print("Error di reqAnswer: $e");
       throw Exception(e);
     }
@@ -316,7 +350,11 @@ class ChatService {
   
         print("Network issue: ${dioError.message}");
         Get.snackbar('Error', 'Network issue. Please check your connection.');
-      } else {
+      } else if(dioError.response?.statusCode == 401){
+        await ErrorHandler.handleUnauthorized();
+        throw Exception("Token expired");
+      }
+      else {
     
         print("Unknown error occurred: ${dioError.message}");
         Get.snackbar('Error', 'An unexpected error occurred.');

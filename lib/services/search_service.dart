@@ -83,6 +83,7 @@ Future<List<Products>> searchProducts(String term) async {
       throw Exception('Failed to search products');
     }
   } catch (e) {
+    print("Error searching products: $e");
     throw Exception('Error searching products: $e');
   }
 }

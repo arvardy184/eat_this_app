@@ -1,10 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:eat_this_app/app/data/models/history_model.dart';
 import 'package:eat_this_app/app/data/models/package_model.dart';
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
+import 'package:eat_this_app/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PackageService {
+
+ static const String DAILY_SCAN_COUNT_KEY = 'daily_scan_count';
+  static const String LAST_SCAN_DATE_KEY = 'last_scan_date';
   final ApiProvider apiProvider = ApiProvider();
 
   PackageService(ApiProvider find);
@@ -13,6 +18,38 @@ class PackageService {
 
 
   String email = '';
+
+  Future<int> getDailyScanCount() async{
+    final prefs = await SharedPreferences.getInstance();
+    final lastScanDate = prefs.getString(LAST_SCAN_DATE_KEY);
+    final today = DateTime.now().toIso8601String().split('T')[0];
+
+    if(lastScanDate != today){  
+      await prefs.setInt(DAILY_SCAN_COUNT_KEY, 0);
+      await prefs.setString(LAST_SCAN_DATE_KEY, today);
+      return 0;
+    }
+
+    return prefs.getInt(DAILY_SCAN_COUNT_KEY) ?? 0;
+  }
+
+  Future<void> incrementDailyScanCount() async{
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+
+    int currrentCount = prefs.getInt(DAILY_SCAN_COUNT_KEY) ?? 0;
+
+    await prefs.setInt(DAILY_SCAN_COUNT_KEY,currrentCount );
+    await prefs.setString(LAST_SCAN_DATE_KEY, today);
+  }
+
+  Future<void> resetDailyScanCount() async{
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().split('T')[0];
+
+    await prefs.setInt(DAILY_SCAN_COUNT_KEY, 0);
+    await prefs.setString(LAST_SCAN_DATE_KEY, today);
+  }
   Future<bool> checkSubscription() async {
     try {
       final userData = await apiProvider.getUserData();
@@ -25,6 +62,22 @@ class PackageService {
     } catch (e) {
       print("error checking subscription: $e");
       return false;
+    }
+  }
+
+    Future<List<Products>> getRecentScans() async {
+    try {
+      final response = await ApiService().get('product/history');
+      if (response.data == null) {
+        throw Exception("Failed to fetch recent scans");
+      }
+
+      final productsData = response.data['products'] as List;
+      print("cek data history di packaeg: $productsData");
+      return productsData.map((json) => Products.fromJson(json)).toList();
+    } catch (e) {
+      print("Error get recent scans: $e");
+      throw Exception("Failed to fetch recent scans: $e");
     }
   }
 

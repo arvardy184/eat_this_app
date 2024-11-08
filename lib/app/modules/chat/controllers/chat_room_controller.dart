@@ -192,7 +192,7 @@ class ChatRoomController extends BaseController {
     isConnected.value = false;
     isConnecting.value = false;
 
-    Get.snackbar('Error', 'Connection error occurred');
+    // Get.snackbar('Error', 'Connection error occurred');
 
     // Attempt to reconnect
     Future.delayed(const Duration(seconds: 5), () {

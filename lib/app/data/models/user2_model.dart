@@ -36,6 +36,7 @@ class Users {
   String? address;
   String? type;
   String? conversationKey;
+  String? lastMessage;
   String? createdAt;
   String? updatedAt;
   int? status;
@@ -52,6 +53,7 @@ class Users {
       this.address,
       this.type,
       this.conversationKey,
+      this.lastMessage,
       this.createdAt,
       this.updatedAt,
       this.status});
@@ -69,6 +71,7 @@ class Users {
     address = json['address'];
     type = json['type'];
     conversationKey = json['conversation_key'];
+    lastMessage = json['last_message'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     status = json['status'];
@@ -87,6 +90,7 @@ class Users {
     data['address'] = this.address;
     data['type'] = this.type;
     data['conversation_key'] = this.conversationKey;
+    data['last_message'] = this.lastMessage;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     data['status'] = this.status;

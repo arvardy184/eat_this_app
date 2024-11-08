@@ -50,7 +50,11 @@ class ProductService {
       } else if(response.statusCode == 404){  
         throw Exception('Product not found');
        
-      } else{
+      } else if(response.statusCode == 400){
+          
+        throw Exception("Maximum amount of product scanned reached");
+      }
+      else{
         throw Exception('Failed to fetch product data with status code: ${response.statusCode}');
       }
     } on DioException catch (e) {
@@ -135,9 +139,6 @@ class ProductService {
       } else {
         throw Exception('Failed to fetch product data: ${e.message}');
       }
-    } catch (e) {
-      print('General error: $e');
-      throw Exception('Error: $e');
-    }
+    } 
   }
 }

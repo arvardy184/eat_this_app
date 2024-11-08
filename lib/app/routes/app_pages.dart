@@ -26,6 +26,7 @@ import 'package:eat_this_app/app/modules/search/views/product_detail_page.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
 import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:eat_this_app/app/utils/term_of_service.dart';
+import 'package:eat_this_app/widgets/home/all_scan_page.dart';
 import 'package:get/get.dart';
 
 import '../modules/scan/views/alternative_product_page.dart';
@@ -90,6 +91,11 @@ class AppPages {
         bindings: [
           SubscriptionBinding(),
         ]),
+    GetPage(
+      name: '/all-scan',
+      page: () => const AllScanPage(),
+      binding: HomeBinding(),
+    ),
     GetPage(
         name: '/add-consultant',
         page: () => ListConsultantPage(),

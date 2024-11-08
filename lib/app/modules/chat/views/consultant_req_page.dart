@@ -102,7 +102,7 @@ class ConsultantRequestsPage extends GetView<ChatController> {
                               onPressed: () async {
                                 await controller.handleAcquaintanceRequest(
                                   request.id!,
-                                  0, // Decline
+                                2, // Decline
                                 );
                               },
                             ),

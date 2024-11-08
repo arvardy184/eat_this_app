@@ -1,6 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/alternative_model.dart';
 import 'package:eat_this_app/app/data/models/product_model.dart';
+import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
+import 'package:eat_this_app/app/modules/chat/controllers/subscription_controller.dart';
+import 'package:eat_this_app/services/package_service.dart';
 import 'package:eat_this_app/services/product_service.dart';
 
 import 'package:get/get.dart';
@@ -10,6 +14,8 @@ class ScanController extends BaseController {
   final Rx<ProductModel?> productData = Rx<ProductModel?>(null);
   final alternativeProducts = <Products>[].obs;
   final isLoadingAlternatives = false.obs;
+  final isMax  = false.obs;
+  final subscriptionController = Get.put(SubscriptionController( Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
 
   @override
   void onInit() {
@@ -34,8 +40,15 @@ class ScanController extends BaseController {
       
       if (productData.value?.product != null) {
         print("Product found: ${productData.value?.product?.name}");
+         if (subscriptionController.dailyScanCount.value >= subscriptionController.remainingScans.value 
+      && !subscriptionController.isPremium.value) {
+    subscriptionController.showUpgradeDialog();
+    return;
+  }
         showSuccess('Product found successfully');
         loadInitialAlternatives();
+
+        await subscriptionController.incrementDailyScanCount();
       } else {
         showError('No product found for this barcode');
       }
@@ -63,12 +76,13 @@ class ScanController extends BaseController {
       
       // Remove current product from alternatives if present
       final currentProductId = productData.value?.product?.id;
+      print("Current product ID: $currentProductId");
       final filtered = results.where((p) => p.id != currentProductId).toList();
       
+      print("Alternative products found: ${filtered.length} after filtering");
       alternativeProducts.assignAll(filtered);
-    } catch (e) {
+    } on DioException catch (e) {
       print("Error loading alternatives: $e");
-  
     } finally {
       isLoadingAlternatives(false);
     }

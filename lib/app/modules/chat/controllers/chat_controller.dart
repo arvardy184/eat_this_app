@@ -97,10 +97,6 @@ Future<void> sendMessage(String text) async {
     _initializeUserData();
   }
 
-  
-
-
-
 
   bool canAccessChat() {
     if(isConsultant.value) return true;
@@ -216,8 +212,6 @@ Future<void> sendMessage(String text) async {
 Future<void> addConsultant(String consultantId) async {
   try {
     isLoading.value = true;
-    
-
     final result = await _chatService.addConsultant(consultantId);
     
    
@@ -260,6 +254,7 @@ Future<void> listPackage() async{
         showError('Failed to load requests');
       }
     } catch (e) {
+      print(" Error fetch req: $e");
       handleError(e);
     } finally {
       isLoading.value = false;
@@ -276,9 +271,9 @@ Future<void> listPackage() async{
             result.users!.where((user) => user.status == 1).toList());
         requests.assignAll(
             result.users!.where((user) => user.status == 0).toList());
-        if (users.isEmpty) {
-          showError('No acquaintances found');
-        }
+        // if (users.isEmpty) {
+        //   showError('No acquaintances found');
+        // }
       } else {
         showError('Failed to load acquaintances');
       }

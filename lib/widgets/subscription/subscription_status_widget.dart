@@ -2,16 +2,12 @@ import 'package:eat_this_app/app/modules/chat/controllers/subscription_controlle
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SubscriptionStatusWidget extends StatelessWidget
+class SubscriptionStatusWidget extends StatelessWidget {
+  const SubscriptionStatusWidget({super.key});
 
-{
-
-SubscriptionStatusWidget({super.key});
-
- 
   @override
   Widget build(BuildContext context) {
-     final SubscriptionController controller = Get.find<SubscriptionController>();
+    final SubscriptionController controller = Get.find<SubscriptionController>();
     return Obx(() {
       if (controller.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
@@ -41,7 +37,7 @@ SubscriptionStatusWidget({super.key});
                   if (!controller.isPremium.value)
                     ElevatedButton(
                       onPressed: controller.showUpgradeDialog,
-                      child: Text('Upgrade'),
+                      child: const Text('Upgrade'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
@@ -51,15 +47,17 @@ SubscriptionStatusWidget({super.key});
               ),
               const SizedBox(height: 16),
               _buildQuotaInfo(
-                'Remaining Scans',
+                'Daily Scans',
                 controller.remainingScans.value,
                 controller.isPremium.value,
+                controller.recentScans.length
               ),
-             const SizedBox(height: 8),
+              const SizedBox(height: 8),
               _buildQuotaInfo(
                 'Remaining Consultations',
                 controller.remainingConsultations.value,
                 controller.isPremium.value,
+                0, // Not used for consultations
               ),
             ],
           ),
@@ -68,43 +66,37 @@ SubscriptionStatusWidget({super.key});
     });
   }
 
-Widget _buildQuotaInfo(String label, int value, bool isPremium) {
-  return Row(
-    children: [
-      Icon(
-        isPremium ? Icons.all_inclusive : Icons.timer,
-        size: 20,
-        color: Colors.grey[600],
-      ),
-      SizedBox(width: 8),
-      Flexible(
-        child: Text(
-          '$label: ',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-          ),
-          overflow: TextOverflow.clip, // Tambahkan jika diperlukan
+  Widget _buildQuotaInfo(String label, int maxValue, bool isPremium, int currentCount) {
+    return Row(
+      children: [
+        Icon(
+          isPremium ? Icons.all_inclusive : Icons.timer,
+          size: 20,
+          color: Colors.grey[600],
         ),
-      ),
-      // SizedBox(width: 8),
-      Flexible(
-        
-        child: Align(
-          alignment: Alignment.centerRight,
+        const SizedBox(width: 8),
+        Expanded(
           child: Text(
-            isPremium ? 'Unlimited' : '$value remaining',
+            '$label: ',
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: value > 0 ? Colors.blue[900] : Colors.red,
+              fontSize: 16,
+              color: Colors.grey[600],
             ),
-            overflow: TextOverflow.ellipsis, // Tambahkan jika diperlukan
           ),
         ),
-      ),
-    ],
-  );
-}
-
+        Text(
+          label == 'Daily Scans' 
+              ? '$currentCount/${maxValue == 0 ? "∞" : maxValue}'
+              : isPremium ? '$maxValue' : '$maxValue remaining',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: (currentCount < maxValue || isPremium) 
+                ? Colors.blue[900] 
+                : Colors.red,
+          ),
+        ),
+      ],
+    );
+  }
 }
