@@ -17,12 +17,8 @@ class ApiProvider {
   static const String _scanCountKey = 'scan_count';
   static const String _consultCountKey = 'consult_count';
 
-
   ApiProvider() {
-    
     _dio.options.baseUrl = ApiConstants.baseUrl;
-    
-    
 
     // _dio.interceptors.add(InterceptorsWrapper(
     //   onRequest: (options, handler) async {
@@ -120,8 +116,8 @@ class ApiProvider {
     await prefs.setString('type', userData['type'] ?? '');
     await prefs.setString(
         'user_data', json.encode(userData)); // Save complete user data
-        print("Cek user data ${userData}");
-        print("Cek user data yang disimpan: ${json.encode(userData)}");
+    print("Cek user data ${userData}");
+    print("Cek user data yang disimpan: ${json.encode(userData)}");
   }
 
   Future<void> savePackageData(Package package) async {
@@ -131,13 +127,11 @@ class ApiProvider {
     await resetCounters();
   }
 
-  
-  Future<void> resetCounters() async{
+  Future<void> resetCounters() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final now = DateTime.now();
-    final lastReset = DateTime.fromMillisecondsSinceEpoch(
-      prefs.getInt(_scanCountKey) ?? 0
-    );
+    final lastReset =
+        DateTime.fromMillisecondsSinceEpoch(prefs.getInt(_scanCountKey) ?? 0);
 
     if (now.difference(lastReset).inDays >= 1) {
       await prefs.setInt(_scanCountKey, 0);

@@ -24,8 +24,8 @@ class Pharmacy {
       id: json['id'],
       name: json['name'],
       email: json['email'],
-      profilePicture: json['profile_picture'],
       address: json['address'],
+      profilePicture: json['profile_picture'],
       latitude: double.parse(json['latitude']),
       longitude: double.parse(json['longitude']),
       distance: json['distance'],
@@ -34,18 +34,24 @@ class Pharmacy {
 }
 
 class Medicine {
+  final String id;
   final String name;
-  final String dosage;
+  final String content;
+  final String imageUrl;
 
   Medicine({
+    required this.id,
     required this.name,
-    required this.dosage,
+    required this.content,
+    required this.imageUrl,
   });
 
   factory Medicine.fromJson(Map<String, dynamic> json) {
     return Medicine(
+      id: json['id'].toString(),
       name: json['name'],
-      dosage: json['dosage'],
+      content: json['content'],
+      imageUrl: json['image_url'] ?? 'Example',
     );
   }
 }

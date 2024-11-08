@@ -1,4 +1,3 @@
-
 import 'package:eat_this_app/app/middleware/auth_middleware.dart';
 import 'package:eat_this_app/app/modules/auth/views/forgetPassword_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/login_form.dart';
@@ -13,12 +12,14 @@ import 'package:eat_this_app/app/modules/chat/views/consultant_req_page.dart';
 import 'package:eat_this_app/app/modules/chat/views/list_consultant.dart';
 import 'package:eat_this_app/app/modules/home/bindings/home_binding.dart';
 import 'package:eat_this_app/app/modules/home/views/home_page.dart';
-import 'package:eat_this_app/app/modules/pharmacy/views/bindings/pharmacy_binding.dart';
-import 'package:eat_this_app/app/modules/pharmacy/views/views/pharmacy_page.dart';
+import 'package:eat_this_app/app/modules/pharmacy/bindings/pharmacy_binding.dart';
+import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_detail_page.dart';
+import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_page.dart';
 import 'package:eat_this_app/app/modules/profile/bindings/profile_binding.dart';
 import 'package:eat_this_app/app/modules/profile/views/profile_page.dart';
 import 'package:eat_this_app/app/modules/scan/bindings/alternative_bindings.dart';
 import 'package:eat_this_app/app/modules/scan/views/scan_view.dart';
+import 'package:eat_this_app/app/modules/search/bindings/search_bindings.dart';
 import 'package:eat_this_app/app/modules/search/views/search_page.dart';
 import 'package:eat_this_app/app/utils/bottom_nav_bar.dart';
 import 'package:eat_this_app/app/utils/term_of_service.dart';
@@ -41,13 +42,17 @@ class AppPages {
         // binding: NavBindings()
         // binding: HomeBinding(),
         ),
-    GetPage(name: '/beranda', page: () =>  HomePage(),
-    binding: HomeBinding(),
-        bindings:[
+    GetPage(name: '/beranda', page: () => HomePage(), binding: HomeBinding()),
+    GetPage(
+        name: '/search', page: () => SearchPage(), binding: SearchBinding()),
+    GetPage(
+        name: '/beranda',
+        page: () => HomePage(),
+        binding: HomeBinding(),
+        bindings: [
           SubscriptionBinding(),
-        ]
-    ),
-    GetPage(name: '/search', page: () => const SearchPage()),
+        ]),
+    GetPage(name: '/search', page: () => SearchPage()),
     GetPage(name: '/login', page: () => const LoginPage()),
     GetPage(name: '/scan', page: () => ScanPage()),
     GetPage(name: '/loginForm', page: () => const LoginForm()),
@@ -61,14 +66,19 @@ class AppPages {
         name: '/pharmacy',
         page: () => PharmacyPage(),
         bindings: [PharmacyBinding()]),
+
    GetPage(
       name:'/terms',
       page: () => const TermsOfServicePage(),
     ),
     //chat and consult
-    GetPage(name: '/chat', page: () => ChatPage(), binding: ChatBinding(),bindings: [
-      SubscriptionBinding(),
-    ]),
+    GetPage(
+        name: '/chat',
+        page: () => ChatPage(),
+        binding: ChatBinding(),
+        bindings: [
+          SubscriptionBinding(),
+        ]),
     GetPage(
         name: '/add-consultant',
         page: () => ListConsultantPage(),
@@ -84,11 +94,11 @@ class AppPages {
     // tambah rute baru disini
     GetPage(
         name: '/chat/room', page: () => ChatRoomPage(), binding: ChatBinding()),
-GetPage(
-  name: '/product/alternative',
-  page: () => AlternativeProductPage(),
-  binding: AlternativeProductBinding(),
-),
+    GetPage(
+      name: '/product/alternative',
+      page: () => AlternativeProductPage(),
+      binding: AlternativeProductBinding(),
+    ),
   ];
 }
 
