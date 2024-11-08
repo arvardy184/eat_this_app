@@ -26,6 +26,8 @@ class ProductDetailWidget extends StatelessWidget {
     if(isLoading){
       return const ProductDetailShimmer();
     }
+
+    
     final product = productData.product;
     
     return SingleChildScrollView(
@@ -156,7 +158,7 @@ class ProductDetailWidget extends StatelessWidget {
                     )).toList(),
                   )
                 else
-              const    Text('No allergens information available'),
+              const  Text('No allergens information available'),
                const SizedBox(height: 16),
 
                 // Categories Section
@@ -280,7 +282,7 @@ class ProductDetailWidget extends StatelessWidget {
             _buildNutrientRow('Fiber', nutrients.fiber?.toString(), 'g'),
             _buildNutrientRow('Protein', nutrients.protein?.toString(), 'g'),
             _buildNutrientRow('Salt', nutrients.salt?.toString(), 'g'),
-            _buildNutrientRow('Alcohol', nutrients.alcohol.toString(), '%'),
+            _buildNutrientRow('Alcohol', nutrients.alcohol?.toString(), '%'),
           ],
         ),
         SizedBox(height: 8),

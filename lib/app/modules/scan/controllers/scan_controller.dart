@@ -10,6 +10,7 @@ class ScanController extends BaseController {
   final Rx<ProductModel?> productData = Rx<ProductModel?>(null);
   final alternativeProducts = <Products>[].obs;
   final isLoadingAlternatives = false.obs;
+  final isMax  = false.obs;
 
   @override
   void onInit() {

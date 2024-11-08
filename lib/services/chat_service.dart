@@ -179,6 +179,7 @@ class ChatService {
 
    
       if (response.statusCode == 200 && response.data != null) {
+        //TODO handle response add success
         return ConsultantData.fromJson(response.data);
       } else {
         throw Exception("Failed to add consultant, invalid response data");

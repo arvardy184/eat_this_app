@@ -34,6 +34,7 @@ class ConsultantData {
   String? specialization;
   String? almaMater;
   String? conversationKey;
+  String? lastMessage;
   String? createdAt;
   String? updatedAt;
 
@@ -47,6 +48,7 @@ class ConsultantData {
     this.specialization,
     this.almaMater,
     this.conversationKey,
+    this.lastMessage,
     this.createdAt,
     this.updatedAt,
   });
@@ -61,6 +63,7 @@ class ConsultantData {
     specialization = json['specialization'];
     almaMater = json['alma_mater'];
     conversationKey = json['conversation_key'];
+    lastMessage = json['last_message'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -76,6 +79,7 @@ class ConsultantData {
     data['specialization'] = specialization;
     data['alma_mater'] = almaMater;
     data['conversation_key'] = conversationKey;
+    data['last_message'] = lastMessage;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     return data;

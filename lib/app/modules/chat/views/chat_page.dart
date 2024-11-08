@@ -135,7 +135,7 @@ class ChatPage extends GetView<ChatController> {
       }
 
       return RefreshIndicator(
-        onRefresh: controller.fetchRequests, // Using dedicated method
+        onRefresh: controller.fetchRequests,
         child: ListView.builder(
           itemCount: controller.requests.length,
           itemBuilder: (context, index) {
@@ -169,7 +169,7 @@ class ChatPage extends GetView<ChatController> {
                       color: Colors.red,
                       onPressed: () => controller.handleAcquaintanceRequest(
                         request.id!,
-                        0, // Decline
+                        2, // Decline
                       ),
                     ),
                   ],
@@ -234,7 +234,7 @@ class ChatPage extends GetView<ChatController> {
                       ),
                       title: Text(consultant.name ?? 'Unknown'),
                       subtitle: Text(
-                          consultant.specialization ?? 'General Consultant'),
+                          consultant.lastMessage ?? 'No messages yet'),
                       trailing: const Icon(Icons.chat_bubble_outline),
                       onTap: () =>
                           Get.toNamed('/chat/room', arguments: consultant),

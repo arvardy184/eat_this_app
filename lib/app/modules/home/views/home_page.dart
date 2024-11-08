@@ -71,7 +71,14 @@ final SubscriptionController subscriptionController = Get.put(SubscriptionContro
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
+              TextButton(
+                  onPressed: (){
+                      Get.toNamed('/all-scan');
+                  },
+                  child: Text(
+                    "See All"
+                  ),
+              )
             ],
           ),
         ),

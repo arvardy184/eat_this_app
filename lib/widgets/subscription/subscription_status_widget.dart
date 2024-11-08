@@ -87,9 +87,7 @@ Widget _buildQuotaInfo(String label, int value, bool isPremium) {
           overflow: TextOverflow.clip, // Tambahkan jika diperlukan
         ),
       ),
-      // SizedBox(width: 8),
       Flexible(
-        
         child: Align(
           alignment: Alignment.centerRight,
           child: Text(
