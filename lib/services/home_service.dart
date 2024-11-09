@@ -10,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeService {
   final ApiService apiService;
 
+  final _cache = <String, dynamic>{};
+  final _cacheExpiry = const Duration(minutes: 5);
+DateTime? _lastFetchTime;
   HomeService(this.apiService);
 
   final Dio _dio = Dio()
@@ -28,20 +31,40 @@ class HomeService {
     return token;
   }
 
-  Future<List<Products>> getRecentScans() async {
+Future<List<Products>> getRecentScans() async {
     try {
-      final response = await apiService.get('product/history');
+      // Check if cache is still valid
+      final now = DateTime.now();
+      if (_lastFetchTime != null &&
+          now.difference(_lastFetchTime!) < _cacheExpiry &&
+          _cache.containsKey('recent_scans')) {
+        return _cache['recent_scans'] as List<Products>;
+      }
+
+      // Fetch new data
+      final response = await  apiService.get('product/history');
       if (response.data == null) {
         throw Exception("Failed to fetch recent scans");
       }
 
       final productsData = response.data['products'] as List;
-      print("cek data history: $productsData");
-      return productsData.map((json) => Products.fromJson(json)).toList();
+      final products = productsData.map((json) => Products.fromJson(json)).toList();
+
+      // Update cache
+      _cache['recent_scans'] = products;
+      _lastFetchTime = now;
+
+      return products;
     } catch (e) {
-      print("Error get recent scans: $e");
+      print("Error in getRecentScans: $e");
       throw Exception("Failed to fetch recent scans: $e");
     }
+  }
+
+    Future<List<Products>> forceRefreshRecentScans() async {
+    _cache.remove('recent_scans');
+    _lastFetchTime = null;
+    return getRecentScans();
   }
 
   Future<List<Pharmacy>> getNearbyPharmacies(

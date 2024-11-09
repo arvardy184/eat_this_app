@@ -4,6 +4,7 @@ import 'package:eat_this_app/app/data/models/product_model.dart';
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
 import 'package:eat_this_app/app/modules/chat/controllers/subscription_controller.dart';
+import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 import 'package:eat_this_app/services/package_service.dart';
 import 'package:eat_this_app/services/product_service.dart';
 
@@ -16,6 +17,7 @@ class ScanController extends BaseController {
   final isLoadingAlternatives = false.obs;
   final isMax  = false.obs;
   final subscriptionController = Get.put(SubscriptionController( Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
+  final HomeController homeController = Get.find<HomeController>();
 
   @override
   void onInit() {
@@ -49,6 +51,8 @@ class ScanController extends BaseController {
         loadInitialAlternatives();
 
         await subscriptionController.incrementDailyScanCount();
+        await homeController.loadRecentScans();
+         homeController.update();
       } else {
         showError('No product found for this barcode');
       }

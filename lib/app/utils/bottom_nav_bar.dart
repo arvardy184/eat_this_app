@@ -38,7 +38,7 @@ class PersistentBottomNavBar extends StatelessWidget {
         GetBuilder(
             init: PharmacyController(),
             builder: (controller) => PharmacyPage()),
-
+        
         GetBuilder<ChatController>(
           init: ChatController(),
           builder: (controller) => ChatPage(),

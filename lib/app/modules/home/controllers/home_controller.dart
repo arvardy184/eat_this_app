@@ -27,24 +27,43 @@ class HomeController extends BaseController {
     loadInitialData();
     loadRecommendation();
     loadUserData();
+
+      ever(recentScans, (_) {
+      calculateHealthyPercentage();
+      update(); // Force UI update
+    });
   }
 
   
-   Future<void> refreshData() async {
-    error.value = null;
-    await loadInitialData();
-    await loadRecommendation(); 
-    await loadUserData();
+  Future<void> refreshData() async {
+    try {
+      error.value = null;
+      await Future.wait([
+        loadRecentScans(),
+        loadRecommendation(),
+        loadUserData(),
+      ]);
+    } catch (e) {
+      print("Error refreshing data: $e");
+      error.value = e.toString();
+    }
   }
 
-  List<Products> get todayScans => recentScans.where((scan) {
-    if (scan.pivot?.createdAt == null) return false;
-    final scanDate = DateTime.parse(scan.pivot!.createdAt!);
+List<Products> get todayScans {
     final today = DateTime.now();
-    return scanDate.year == today.year &&
-        scanDate.month == today.month &&
-        scanDate.day == today.day;
-  }).toList();
+    return recentScans.where((scan) {
+      if (scan.pivot?.createdAt == null) return false;
+      try {
+        final scanDate = DateTime.parse(scan.pivot!.createdAt!);
+        return scanDate.year == today.year &&
+            scanDate.month == today.month &&
+            scanDate.day == today.day;
+      } catch (e) {
+        print("Error parsing date: $e");
+        return false;
+      }
+    }).toList();
+}
 
   Future<void> loadInitialData() async {
     await loadRecentScans();
@@ -102,7 +121,11 @@ Future<void> loadRecentScans() async {
         return dateB.compareTo(dateA);
       });
       
-      recentScans.assignAll(products);
+      recentScans.clear(); // Clear existing data
+      recentScans.addAll(products); // Add new data
+
+            update();
+
     } catch (e) {
       print("Error load recent scans: $e");
       error.value = e.toString();
@@ -110,6 +133,13 @@ Future<void> loadRecentScans() async {
       isLoadingScans(false);
     }
   }
+
+   Future<void> addNewScan(Products scan) async {
+    recentScans.insert(0, scan); // Add to beginning of list
+    calculateHealthyPercentage();
+    update();
+  }
+
 
   Future<void> loadRecommendation() async{
     try{

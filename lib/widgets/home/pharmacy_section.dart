@@ -102,7 +102,7 @@ class PharmacySection extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '${pharmacy.distance.toStringAsFixed(1)} Meters Away',
+                              '${pharmacy.distance.toStringAsFixed(1)} KM Away',
                               style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,

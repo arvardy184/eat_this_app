@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/chat_user_model.dart';
 import 'package:eat_this_app/app/data/models/consultant2_model.dart';
 import 'package:eat_this_app/app/data/models/message_model.dart';
@@ -144,10 +145,13 @@ Future<void> sendMessage(String text) async {
   }
 
   Future<void> _loadInitialData() async {
-    if (isConsultant.value) {
+    if (typeUser.value == 'Consultant') {
       await fetchAcquaintances();
       await fetchRequests();
-    } else {
+    } else if(typeUser.value == 'Pharmacy') {
+      print("INIT PHARMACY");
+    }
+    else {
       await fetchAddedConsultants();
       await fetchConsultants();
     }
@@ -163,6 +167,18 @@ Future<void> sendMessage(String text) async {
       handleError(e);
     }
   }
+
+  Future<void> checkTypeUser() async{
+    try{
+      final type = await _chatService.getType();
+      typeUser.value = type ?? 'General User';
+      print(" User Type: $type, Is Consultant: ${isConsultant.value}");
+    } on DioException catch (e) {
+      handleError(e);
+    }
+  }
+  
+  
 
  Future<void> fetchConsultants({String? query}) async {
     try {

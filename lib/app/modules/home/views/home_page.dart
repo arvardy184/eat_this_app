@@ -4,11 +4,7 @@ import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 import 'package:eat_this_app/app/modules/pharmacy/controllers/pharmacy_controller.dart';
 import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/services/package_service.dart';
-import 'package:eat_this_app/widgets/home/custom_app_bar.dart';
 import 'package:eat_this_app/widgets/home/pharmacy_section.dart';
-import 'package:eat_this_app/widgets/home/product_history_card.dart';
-import 'package:eat_this_app/widgets/product/recommendation_widget.dart';
-import 'package:eat_this_app/widgets/subscription/subscription_status_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -208,6 +204,7 @@ class HomePage extends GetView<HomeController> {
   }
 
   Widget _buildSubscriptionStatus() {
+    print("is premium: ${subscriptionController.isPremium.value} ${subscriptionController.remainingScans.value} ${subscriptionController.recentScans.length}" );
     return GetBuilder<SubscriptionController>(
       init: subscriptionController,
       builder: (controller) => Container(
@@ -239,6 +236,7 @@ class HomePage extends GetView<HomeController> {
                     ),
                   )),
               if (!controller.isPremium.value) ...[
+                
                 ElevatedButton(
                   onPressed: controller.showUpgradeDialog,
                   style: ElevatedButton.styleFrom(
@@ -256,8 +254,8 @@ class HomePage extends GetView<HomeController> {
             _buildQuotaIndicator(
               'Daily Scans',
               controller.remainingScans.value,
-              controller.recentScans.length,
-              controller.isPremium.value,
+              subscriptionController.recentScans.length,
+              subscriptionController.isPremium.value,
             ),
           ],
         ),
@@ -265,37 +263,67 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-  Widget _buildQuotaIndicator(
-    String label,
-    int max,
-    int current,
-    bool isPremium,
-  ) {
-    // Get total scans from controller
-    final totalScans = controller.recentScans.length;
-    print("is premiu m: $isPremium");
-    // Calculate progress
-    int progress;
-    if (isPremium) {
-      progress = 1;
-      print("is premium progress: $progress");
-    } else if (max <= 0) {
-      print("max: $max");
-      progress = 0;
-    } else {
-      progress = (totalScans / max).toInt();
-      print("progress: $progress");
-    }
+Widget _buildQuotaIndicator(
+  String label,
+  int max,
+  int current,
+  bool isPremium,
+) {
+  // Get scans count
+  final scansCount = controller.recentScans.length;
+  
+  // Calculate progress (0.0 to 1.0)
+  double progress;
+  if (isPremium) {
 
-    return Column(
+    progress = scansCount > 0 ? scansCount / (scansCount + 5) : 0.0;
+    print("berapa progress premium $progress");
+  } else {
+    
+    progress = max > 0 ? (scansCount / max).clamp(0.0, 1.0) : 0.0;
+    print("Berapa progress free $progress");
+  }
+
+  // Determine color based on usage
+  Color getProgressColor() {
+    if (isPremium) return Colors.blue[900]!;
+    if (scansCount >= max) return Colors.red;
+    if (scansCount >= (max * 0.8)) return Colors.orange; // Warning when near limit
+    return CIETTheme.primary_color;
+  }
+
+  // Format display text
+  String getQuotaText() {
+    if (isPremium) {
+      return '$scansCount scans today';
+    } else {
+      return '$scansCount/$max scans';
+    }
+  }
+
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.1),
+          spreadRadius: 1,
+          blurRadius: 4,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Icon(
-              isPremium ? Icons.all_inclusive : Icons.timer,
+              isPremium ? Icons.all_inclusive : Icons.timer_outlined,
               size: 20,
-              color: Colors.grey[600],
+              color: getProgressColor(),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -307,43 +335,81 @@ class HomePage extends GetView<HomeController> {
                 ),
               ),
             ),
-            Text(
-              label == 'Daily Scans'
-                  ? isPremium
-                      ? '${controller.recentScans.length}/$max'
-                      : '${controller.recentScans.length}/$max'
-                  : isPremium
-                      ? '$max remaining'
-                      : '$max remaining',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: (controller.recentScans.length < max || isPremium)
-                    ? Colors.blue[900]
-                    : Colors.red,
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                color: getProgressColor().withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                getQuotaText(),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: getProgressColor(),
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: progress.toDouble(),
-            backgroundColor: Colors.grey[200],
-            valueColor: AlwaysStoppedAnimation<Color>(
-              isPremium
-                  ? Colors.blue[900]!
-                  : controller.recentScans.length >= max
-                      ? Colors.red
-                      : CIETTheme.primary_color,
+        const SizedBox(height: 12),
+        Stack(
+          children: [
+            // Background track
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: 1,
+                backgroundColor: Colors.grey[200],
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  getProgressColor().withOpacity(0.2),
+                ),
+                minHeight: 12,
+              ),
             ),
-            minHeight: 8,
-          ),
+            // Progress bar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: progress,
+                backgroundColor: Colors.transparent,
+                valueColor: AlwaysStoppedAnimation<Color>(getProgressColor()),
+                minHeight: 12,
+              ),
+            ),
+          ],
         ),
+        if (!isPremium && scansCount >= (max * 0.8)) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                size: 16,
+                color: scansCount >= max ? Colors.red : Colors.orange,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  scansCount >= max
+                      ? 'Scan limit reached. Upgrade to Premium for unlimited scans!'
+                      : 'Approaching scan limit. Consider upgrading to Premium!',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: scansCount >= max ? Colors.red : Colors.orange,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildRecentScans() {
     return Column(

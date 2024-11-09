@@ -21,8 +21,10 @@ class ChatPage extends GetView<ChatController> {
         );
       }
 
-      if (controller.isConsultant.value) {
+      if (controller.isConsultant.value && controller.typeUser.value == 'Consultant') {
         return _buildConsultantView(context);
+      } else if(controller.typeUser.value == 'Pharmacy') {
+        return _buildApotekView(context);
       }
 
       
@@ -248,6 +250,21 @@ class ChatPage extends GetView<ChatController> {
             }),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildApotekView(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Consultation'),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.person_add_rounded),
+        //   onPressed: () => Get.toNamed('/add-consultant'),
+        // ),
+      ),
+      body: Center(
+        child: Text('Chat Tidak Tersedia Untuk Apotek'),
       ),
     );
   }

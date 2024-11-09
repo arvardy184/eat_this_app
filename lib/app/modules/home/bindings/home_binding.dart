@@ -12,9 +12,9 @@ class HomeBinding  implements Bindings{
   @override
   void dependencies() {
   Get.lazyPut(() => ApiService());
-    Get.lazyPut(() => HomeService(Get.find<ApiService>()));
-     Get.lazyPut(() => HomeController());
-    Get.lazyPut(() => PackageService(ApiProvider()));
-    Get.lazyPut(() => SubscriptionController(Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
+  Get.lazyPut(() => HomeService(Get.find<ApiService>()));
+  Get.lazyPut(() => HomeController());
+  Get.lazyPut(() => PackageService(ApiProvider()));
+  Get.lazyPut(() => SubscriptionController(Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
   }
 }
