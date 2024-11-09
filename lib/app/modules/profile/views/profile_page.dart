@@ -140,8 +140,8 @@ class ProfilePage extends GetView<ProfileController> {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    "Premium Member",
+                  Text(
+                    "${user.package?.name} Package",
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

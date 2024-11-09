@@ -166,7 +166,17 @@ class TermsOfServicePage extends StatelessWidget {
         if (contactInfo) ...[
           const SizedBox(height: 16),
           _buildContactInfo(context),
+          Container(
+            margin: const EdgeInsets.only(top: 16),
+            child: Center(
+              child: Text(
+                "Made with 🫶🏿 by Arvan, Zidan, and Riady",
+                textAlign: TextAlign.center,
+              )
+            )
+          ),
         ],
+         
         const SizedBox(height: 24),
       ],
     );
@@ -212,13 +222,13 @@ class TermsOfServicePage extends StatelessWidget {
           _buildContactItem(
             icon: Icons.email,
             title: 'Email',
-            content: 'support@canieatthis.com',
+            content: 'arvanardana1@gmail.com',
           ),
           const SizedBox(height: 8),
           _buildContactItem(
             icon: Icons.phone,
             title: 'Phone',
-            content: '+62 812-3456-7890',
+            content: '+62 851-5653-6353',
           ),
           const SizedBox(height: 8),
           _buildContactItem(
@@ -226,6 +236,8 @@ class TermsOfServicePage extends StatelessWidget {
             title: 'Address',
             content: 'Jl. Veteran, Ketawanggede, Kec. Lowokwaru, Kota Malang, Jawa Timur 65145',
           ),
+
+         
         ],
       ),
     );

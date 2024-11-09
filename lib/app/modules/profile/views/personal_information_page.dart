@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 import '../controllers/profile_controller.dart';
 
 // ignore: must_be_immutable
@@ -12,15 +14,223 @@ class PersonalInformationPage extends GetView<ProfileController> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
+  final TextEditingController almaMaterController = TextEditingController();
+  final TextEditingController specializationController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController latitudeController = TextEditingController();
+  final TextEditingController longitudeController = TextEditingController();
   final RxBool isEditing = false.obs;
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    bool enabled = true,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    Widget? suffix,
+    String? hint,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          enabled: enabled && isEditing.value,
+          readOnly: readOnly,
+          maxLines: maxLines,
+          onTap: onTap,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.blue, width: 2),
+            ),
+            filled: !isEditing.value || !enabled,
+            fillColor: Colors.grey.shade100,
+            hintText: hint,
+            suffixIcon: suffix,
+            contentPadding: const EdgeInsets.all(16),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildLocationPicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Location',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 200,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Stack(
+              children: [
+                // GoogleMap(
+                  // initialCameraPosition: CameraPosition(
+                  //   target: LatLng(
+                  //     double.parse(latitudeController.text),
+                  //     double.parse(longitudeController.text),
+                  //   ),
+                  //   zoom: 15,
+                  // ),
+                  // markers: {
+                  //   Marker(
+                  //     markerId: const MarkerId('pharmacy'),
+                  //     position: LatLng(
+                  //       double.parse(latitudeController.text),
+                  //       double.parse(longitudeController.text),
+                  //     ),
+                  //   ),
+                  // },
+                  // onTap: isEditing.value ? _handleMapTap : null,
+                // ),
+                if (isEditing.value)
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: FloatingActionButton(
+                      mini: true,
+                      child: const Icon(Icons.my_location),
+                      onPressed: _getCurrentLocation,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildAllergySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Allergies',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: isEditing.value ? () => _showAllergensDialog(Get.context!) : null,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(12),
+              color: !isEditing.value ? Colors.grey.shade100 : Colors.white,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Selected Allergies'),
+                    if (isEditing.value) const Icon(Icons.arrow_drop_down),
+                  ],
+                ),
+                if (controller.allergens.any((a) => a.isSelected)) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: controller.allergens
+                        .where((a) => a.isSelected)
+                        .map((allergen) => Chip(
+                              label: Text(allergen.name),
+                              backgroundColor: Colors.blue,
+                              labelStyle: const TextStyle(color: Colors.white),
+                            ))
+                        .toList(),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleMapTap(LatLng position) {
+    latitudeController.text = position.latitude.toString();
+    longitudeController.text = position.longitude.toString();
+    // You might want to reverse geocode the position to get the address
+    // and update addressController
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      latitudeController.text = position.latitude.toString();
+      longitudeController.text = position.longitude.toString();
+      // You might want to reverse geocode the position to get the address
+      // and update addressController
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to get current location',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     nameController.text = controller.user.value?.name ?? '';
     emailController.text = controller.user.value?.email ?? '';
+    final packageName = controller.user.value?.type ?? '';
+    print("apa package name $packageName");
+    
+    if (packageName == 'Consultant') {
+      almaMaterController.text = controller.user.value?.almamater ?? '';
+      specializationController.text = controller.user.value?.specialization ?? '';
+    } else if (packageName == 'Pharmacy') {
+      addressController.text = controller.user.value?.address ?? '';
+      latitudeController.text = controller.user.value?.latitude?.toString() ?? '0';
+      longitudeController.text = controller.user.value?.longitude?.toString() ?? '0';
+    }
 
-    if (controller.user.value?.birthDate != null &&
-        dateController.text.isEmpty) {
+    if (controller.user.value?.birthDate != null && dateController.text.isEmpty) {
       try {
         final date = DateTime.parse(controller.user.value!.birthDate!);
         selectedDate.value = date;
@@ -30,137 +240,86 @@ class PersonalInformationPage extends GetView<ProfileController> {
       }
     }
 
-    return Obx(() => Scaffold(
-          appBar: AppBar(
-            title: Text('Personal Information'),
-            centerTitle: true,
-            leading: isEditing.value
-                ? IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: _handleCancel,
-                  )
-                : IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () => Get.back(),
-                  ),
-            actions: [
-              Obx(() => TextButton(
-                    onPressed: () => _handleEditSave(context),
-                    child: Text(
-                      isEditing.value ? 'Save' : 'Edit',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  )),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Personal Information'),
+        centerTitle: true,
+        leading: isEditing.value
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: _handleCancel,
+              )
+            : IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Get.back(),
+              ),
+        actions: [
+          TextButton(
+            onPressed: () => _handleEditSave(context),
+            child: Text(
+              isEditing.value ? 'Save' : 'Edit',
+              style: const TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField(
+                label: 'Name',
+                controller: nameController,
+                hint: 'Enter your name',
+              ),
+              _buildTextField(
+                label: 'Email',
+                controller: emailController,
+                enabled: false,
+              ),
+              _buildTextField(
+                label: 'Date of Birth',
+                controller: dateController,
+                readOnly: true,
+                onTap: isEditing.value ? () => _selectDate(context) : null,
+                suffix: const Icon(Icons.calendar_today),
+                hint: 'Select date of birth',
+              ),
+              if (packageName == 'Consultant') ...[
+                _buildTextField(
+                  label: 'Almamater',
+                  controller: almaMaterController,
+                  hint: 'Enter your alma mater',
+                ),
+                _buildTextField(
+                  label: 'Specialization',
+                  controller: specializationController,
+                  hint: 'Enter your specialization',
+                ),
+              ] else if (packageName == 'Pharmacy') ...[
+                _buildTextField(
+                  label: 'Address',
+                  controller: addressController,
+                  maxLines: 3,
+                  hint: 'Enter pharmacy address',
+                ),
+                if (isEditing.value) _buildLocationPicker(),
+              ],
+              _buildAllergySection(),
             ],
           ),
-          body: Obx(() {
-            if (controller.isLoading.value) {
-              return Center(child: CircularProgressIndicator());
-            }
-
-            return SingleChildScrollView(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Name',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: nameController,
-                    enabled: isEditing.value,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Enter your name',
-                      filled: !isEditing.value,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: emailController,
-                    enabled: false,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Date of Birth',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: dateController,
-                    readOnly: true,
-                    enabled: isEditing.value,
-                    onTap: isEditing.value ? () => _selectDate(context) : null,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Select date of birth',
-                      suffixIcon: Icon(Icons.calendar_today),
-                      filled: !isEditing.value,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Allergies',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  InkWell(
-                    onTap: isEditing.value
-                        ? () => _showAllergensDialog(context)
-                        : null,
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(4),
-                        color: !isEditing.value ? Colors.grey[200] : null,
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: controller.allergens
-                                  .where((a) => a.isSelected)
-                                  .map((allergen) => Chip(
-                                        label: Text(allergen.name),
-                                        backgroundColor: Colors.orange,
-                                        labelStyle:
-                                            TextStyle(color: Colors.white),
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                          if (isEditing.value) Icon(Icons.arrow_drop_down),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ));
+        );
+      }),
+    );
   }
 
   Future<void> _selectDate(BuildContext context) async {

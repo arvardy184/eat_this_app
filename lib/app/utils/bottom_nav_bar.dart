@@ -78,7 +78,7 @@ class PersistentBottomNavBar extends StatelessWidget {
         ),
         PersistentBottomNavBarItem(
           icon: const Icon(Icons.chat_rounded),
-          title: "Chat",
+          title: "Consult",
           activeColorPrimary: CIETTheme.primary_color,
           inactiveColorPrimary: Colors.grey,
         ),
