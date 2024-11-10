@@ -12,6 +12,7 @@ import 'package:eat_this_app/app/data/models/user2_model.dart';
 import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:eat_this_app/app/utils/error_handler.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
@@ -138,6 +139,7 @@ class ChatService {
         throw Exception("Token expired");
         
        }
+       print("Error get consultant: ${e.response?.data}");
       print("Error get  consultant: $e");
       throw Exception(e);
     }
@@ -164,74 +166,114 @@ class ChatService {
         throw Exception("Token expired");
         
        }
+       print("Error get added: ${e.response?.data}");
       throw Exception(e);
     }
   }
 
-  Future<ConsultantData> addConsultant(String consultantId) async {
-    final token = await getToken(); 
-    if (token == null) throw Exception("Token not found");
+ Future<ConsultantData> addConsultant(String consultantId) async {
+  final token = await getToken(); 
+  if (token == null) throw Exception("Token not found");
 
-    try {
-      final response = await dio.post(
-        "${ApiConstants.baseUrl}user/consultants/add",
-        data: {"consultant_id": consultantId},
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
+  try {
+    final response = await dio.post(
+      "${ApiConstants.baseUrl}user/consultants/add",
+      data: {"consultant_id": consultantId},
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
 
-  
-      print("Request user id: $consultantId");
-      print("Response add consultant: ${response.data}");
+    print("Request user id: $consultantId");
+    print("Response add consultant: ${response.data}");
 
-   
-      if (response.statusCode == 200 && response.data != null) {
-        //TODO handle response add success
-        return ConsultantData.fromJson(response.data);
-      } else {
-        throw Exception("Failed to add consultant, invalid response data");
+    if (response.statusCode == 200 && response.data != null) {
+      return ConsultantData.fromJson(response.data);
+    } else {
+      throw Exception("Failed to add consultant, invalid response data");
+    }
+  } on DioException catch (dioError) {
+    if (dioError.response != null) {
+      print("Server error: ${dioError.response?.statusCode}");
+      print("Error data: ${dioError.response?.data}");
+      
+      // Handle specific 400 error for already added consultant
+      if (dioError.response?.statusCode == 400) {
+        final errorData = dioError.response?.data;
+        if (errorData is Map && errorData['errors'] == "Consultant already added.") {
+          Get.snackbar(
+            'Information',
+            'This consultant has already been added to your list.',
+            backgroundColor: Colors.orange.shade100,
+            colorText: Colors.orange.shade900,
+            duration: const Duration(seconds: 2),
+          );
+          throw Exception("Consultant already added");
+        }
       }
-    } on DioException catch (dioError) {
-
-      if (dioError.response != null) {
-        print("Server error: ${dioError.response?.statusCode}");
-        print("Error data: ${dioError.response?.data}");
-        Get.snackbar(
-          'Error',
-          'Failed to add consultant: ${dioError.response?.statusMessage} (Code: ${dioError.response?.statusCode})',
-        );
-      } else if (dioError.type == DioExceptionType.connectionTimeout) {
-        print("Connection timeout occurred");
-        Get.snackbar('Error', 'Connection timeout. Please try again.');
-      } else if (dioError.type == DioExceptionType.receiveTimeout) {
-        print("Receive timeout occurred");
-        Get.snackbar('Error', 'Receive timeout. Please try again.');
-      } else if (dioError.type == DioExceptionType.unknown) {
-        print("Network issue: ${dioError.message}");
-        Get.snackbar('Error', 'Network issue. Please check your connection.');
-      } else if(dioError.response?.statusCode == 401){
-       
+      
+      // Handle other status codes
+      else if (dioError.response?.statusCode == 401) {
         await ErrorHandler.handleUnauthorized();
         throw Exception("Token expired");
-        
-       
+      } else {
+        Get.snackbar(
+          'Error',
+          'Failed to add consultant: ${dioError.response?.statusMessage}',
+          backgroundColor: Colors.red.shade100,
+          colorText: Colors.red.shade900,
+        );
       }
-      else {
-        print("Unexpected error occurred: ${dioError.message}");
-        Get.snackbar('Error', 'An unexpected error occurred.');
-      }
-      throw Exception(dioError);
-    } catch (e) {
-      print("Unexpected error in addConsultant: $e");
+    } 
+    // Handle connection errors
+    else if (dioError.type == DioExceptionType.connectionTimeout) {
+      print("Connection timeout occurred");
       Get.snackbar(
-          'Error', 'Failed to add consultant due to an unexpected error.');
-      throw Exception(e);
+        'Error',
+        'Connection timeout. Please try again.',
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade900,
+      );
+    } else if (dioError.type == DioExceptionType.receiveTimeout) {
+      print("Receive timeout occurred");
+      Get.snackbar(
+        'Error',
+        'Receive timeout. Please try again.',
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade900,
+      );
+    } else if (dioError.type == DioExceptionType.unknown) {
+      print("Network issue: ${dioError.message}");
+      Get.snackbar(
+        'Error',
+        'Network issue. Please check your connection.',
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade900,
+      );
+    } else {
+      print("Unexpected error occurred: ${dioError.message}");
+      Get.snackbar(
+        'Error',
+        'An unexpected error occurred.',
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade900,
+      );
     }
+    throw dioError;
+  } catch (e) {
+    print("Unexpected error in addConsultant: $e");
+    Get.snackbar(
+      'Error',
+      'Failed to add consultant due to an unexpected error.',
+      backgroundColor: Colors.red.shade100,
+      colorText: Colors.red.shade900,
+    );
+    throw e;
   }
+}
 
   Future<User2Model> reqAsConsultant() async {
     final token = await getToken();
@@ -277,7 +319,7 @@ class ChatService {
         throw Exception("Token expired");
         
        }
-      print("Error di getAquaintances: $e");
+      print("Error di getAquaintances: ${e.response?.data}");
       throw Exception(e);
     }
   }

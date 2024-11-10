@@ -5,8 +5,10 @@ import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
 import 'package:eat_this_app/app/modules/chat/controllers/subscription_controller.dart';
 import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
+import 'package:eat_this_app/app/utils/error_handler.dart';
 import 'package:eat_this_app/services/package_service.dart';
 import 'package:eat_this_app/services/product_service.dart';
+import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 class ScanController extends BaseController {
@@ -15,8 +17,11 @@ class ScanController extends BaseController {
   final Rx<ProductModel?> productData = Rx<ProductModel?>(null);
   final alternativeProducts = <Products>[].obs;
   final isLoadingAlternatives = false.obs;
-  final isMax  = false.obs;
-  final subscriptionController = Get.put(SubscriptionController( Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
+  final isMax = false.obs;
+  final subscriptionController = Get.put(SubscriptionController(
+    Get.find<PackageService>(),
+    packageService: PackageService(ApiProvider()),
+  ));
   final HomeController homeController = Get.find<HomeController>();
 
   @override
@@ -37,42 +42,99 @@ class ScanController extends BaseController {
     try {
       isScanning.value = false;
       isLoading.value = true;
-      
-      productData.value = await _productService.fetchProductData(barcode);
-      
-      if (productData.value?.product != null) {
-        print("Product found: ${productData.value?.product?.name}");
-         if (subscriptionController.dailyScanCount.value >= subscriptionController.remainingScans.value 
-      || !subscriptionController.isPremium.value) {
-           print("apakah ${subscriptionController.dailyScanCount.value} >= ${subscriptionController.remainingScans.value}");
-        print("Is premium: ${subscriptionController.isPremium.value} Remaining scans: ${subscriptionController.remainingScans.value} Daily scan count: ${subscriptionController.dailyScanCount.value}");
-   
-    return subscriptionController.showUpgradeDialog();
-  }
-        showSuccess('Product found successfully');
-        loadInitialAlternatives();
 
+      // Cek subscription sebelum scan
+      if (subscriptionController.dailyScanCount.value >= 
+          subscriptionController.remainingScans.value || 
+          !subscriptionController.isPremium.value) {
+        print("Scan limit check: ${subscriptionController.dailyScanCount.value} >= ${subscriptionController.remainingScans.value}");
+        print("Premium status: ${subscriptionController.isPremium.value}");
+        isLoading.value = false;
+        return subscriptionController.showUpgradeDialog();
+      }
+
+      final result = await _productService.fetchProductData(barcode);
+      if (result.product != null) {
+        productData.value = result;
+        print("Product found: ${result.product?.name}");
+        showSuccess('Product found successfully');
+        
+        // Increment scan count after successful scan
         await subscriptionController.incrementDailyScanCount();
         await homeController.loadRecentScans();
-         homeController.update();
+        homeController.update();
       } else {
         showError('No product found for this barcode');
       }
     } on DioException catch (e) {
-       if(e.response?.statusCode == 500){
-         print("Error status code: ${e.response?.statusCode}");
-          subscriptionController.showUpgradeDialog();
-       }
-      handleError(e);
+      print("DioException caught: ${e.type}, Status: ${e.response?.statusCode}");
+      isLoading.value = false;
+      
+      // Handle different status codes
+      switch (e.response?.statusCode) {
+        case 400:
+          if (e.response?.data?['message']!) {
+            subscriptionController.showUpgradeDialog();
+          } else {
+            showError('Invalid request. Please try again.');
+          }
+          break;
+          
+        case 401:
+          showError('Session expired. Please login again.');
+          await ErrorHandler.handleUnauthorized();
+          break;
+          
+        case 404:
+          showError('Product not found');
+          break;
+          
+        case 423:
+          showError('Service temporarily locked. Please try again later.');
+          break;
+          
+        case 429:
+          showError('Too many requests. Please wait a moment and try again.');
+          break;
+          
+        case 500:
+          showError('Server error. Please try again later.');
+          break;
+          
+        default:
+          if (e.type == DioExceptionType.connectionTimeout) {
+            showError('Connection timeout. Please check your internet connection.');
+          } else if (e.type == DioExceptionType.connectionError) {
+            showError('Connection error. Please check your internet connection.');
+          } else {
+            showError('An error occurred. Please try again.');
+          }
+      }
+      
+      // Reset state on error
+      isScanning.value = true;
+      productData.value = null;
+      alternativeProducts.clear();
+      
+    } catch (e) {
+      print("General error caught: $e");
+      isLoading.value = false;
+      showError('An unexpected error occurred');
+      
+      // Reset state on error
+      isScanning.value = true;
+      productData.value = null;
+      alternativeProducts.clear();
+      
     } finally {
       isLoading.value = false;
     }
   }
 
-  void loadInitialAlternatives() {
+  Future<void> loadInitialAlternatives() async {
     if (productData.value?.product?.keywords != null) {
       final keywords = productData.value!.product!.keywords!.split(',');
-      refreshAlternatives(keywords);
+      await refreshAlternatives(keywords);
     }
   }
 
@@ -84,18 +146,43 @@ class ScanController extends BaseController {
       final results = await _productService.getAlternative(keywords);
       print("Alternative products found: ${results.length}");
       
-      // Remove current product from alternatives if present
       final currentProductId = productData.value?.product?.id;
-      print("Current product ID: $currentProductId");
       final filtered = results.where((p) => p.id != currentProductId).toList();
       
-      print("Alternative products found: ${filtered.length} after filtering");
+      print("Filtered alternative products: ${filtered.length}");
       alternativeProducts.assignAll(filtered);
-    } on DioException catch (e) {
+      
+    } catch (e) {
       print("Error loading alternatives: $e");
+      // Don't show error for alternatives, just leave the list empty
+      alternativeProducts.clear();
     } finally {
       isLoadingAlternatives(false);
     }
+  }
+
+  void showError(String message) {
+    Get.snackbar(
+      'Error',
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red.shade100,
+      colorText: Colors.red.shade900,
+      duration: const Duration(seconds: 3),
+      margin: const EdgeInsets.all(8),
+    );
+  }
+
+  void showSuccess(String message) {
+    Get.snackbar(
+      'Success',
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.green.shade100,
+      colorText: Colors.green.shade900,
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(8),
+    );
   }
 
   @override

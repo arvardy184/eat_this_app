@@ -3,6 +3,7 @@ import 'package:eat_this_app/app/modules/profile/views/personal_information_page
 import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfilePage extends GetView<ProfileController> {
@@ -335,15 +336,15 @@ class ProfilePage extends GetView<ProfileController> {
               },
             ),
             MenuItem(
-              icon: Icons.privacy_tip,
-              title: "Privacy Policy",
+              icon: Icons.info,
+              title: "Terms of Service",
               onTap: () => Get.toNamed('/terms'),
             ),
-            MenuItem(
-              icon: Icons.settings,
-              title: "Settings",
-              onTap: () {},
-            ),
+            // MenuItem(
+            //   icon: Icons.settings,
+            //   title: "Settings",
+            //   onTap: () {},
+            // ),
           ],
         ),
         const SizedBox(height: 16),
@@ -353,7 +354,9 @@ class ProfilePage extends GetView<ProfileController> {
             MenuItem(
               icon: Icons.help,
               title: "Help Center",
-              onTap: () {},
+              onTap: () {
+                launchUrlString( "wa.me/6285156536353");
+              },
             ),
             MenuItem(
               icon: Icons.logout,

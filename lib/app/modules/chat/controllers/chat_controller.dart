@@ -241,8 +241,12 @@ Future<void> addConsultant(String consultantId) async {
    
     showSuccess('Consultant added successfully');
   } catch (e) {
-  
-    handleError(e);
+  if (e.toString().contains("Consultant already added")) {
+    // Optional: Handle specifically for already added case
+    print("Consultant was already added");
+  } else {
+    print("Error adding consultant: $e");
+  }
   } finally {
    
     isLoading.value = false;
