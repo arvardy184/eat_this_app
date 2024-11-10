@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -74,66 +75,200 @@ class PersonalInformationPage extends GetView<ProfileController> {
     );
   }
 
-  Widget _buildLocationPicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Location',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+Widget _buildLocationPicker() {
+  final currentLat = double.tryParse(latitudeController.text) ?? -7.983908;
+  final currentLng = double.tryParse(longitudeController.text) ?? 112.621391;
+  
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Location',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Container(
+        height: 200,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Stack(
+            children: [
+              FlutterMap(
+                options: MapOptions(
+                  initialCenter: LatLng(currentLat, currentLng),
+                  initialZoom: 15,
+                  onTap: isEditing.value 
+                    ? (tapPosition, latLng) {
+                        latitudeController.text = latLng.latitude.toString();
+                        longitudeController.text = latLng.longitude.toString();
+                      }
+                    : null,
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    subdomains: const ['a', 'b', 'c'],
+                  ),
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        width: 40,
+                        height: 40,
+                        point: LatLng(currentLat, currentLng),
+                        child: const Icon(
+                          Icons.location_pin,
+                          color: Colors.red,
+                          size: 40,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if (isEditing.value)
+                Positioned(
+                  right: 8,
+                  bottom: 8,
+                  child: FloatingActionButton(
+                    mini: true,
+                    onPressed: _getCurrentLocation,
+                    child: const Icon(Icons.my_location),
+                  ),
+                ),
+            ],
           ),
         ),
-        const SizedBox(height: 8),
-        Container(
-          height: 200,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Stack(
+      ),
+      const SizedBox(height: 12),
+      Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // GoogleMap(
-                  // initialCameraPosition: CameraPosition(
-                  //   target: LatLng(
-                  //     double.parse(latitudeController.text),
-                  //     double.parse(longitudeController.text),
-                  //   ),
-                  //   zoom: 15,
-                  // ),
-                  // markers: {
-                  //   Marker(
-                  //     markerId: const MarkerId('pharmacy'),
-                  //     position: LatLng(
-                  //       double.parse(latitudeController.text),
-                  //       double.parse(longitudeController.text),
-                  //     ),
-                  //   ),
-                  // },
-                  // onTap: isEditing.value ? _handleMapTap : null,
-                // ),
-                if (isEditing.value)
-                  Positioned(
-                    right: 8,
-                    bottom: 8,
-                    child: FloatingActionButton(
-                      mini: true,
-                      child: const Icon(Icons.my_location),
-                      onPressed: _getCurrentLocation,
-                    ),
+                const Text(
+                  'Latitude',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
+                ),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: latitudeController,
+                  enabled: isEditing.value,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    filled: !isEditing.value,
+                    fillColor: Colors.grey.shade100,
+                  ),
+                ),
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-      ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Longitude',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: longitudeController,
+                  enabled: isEditing.value,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    filled: !isEditing.value,
+                    fillColor: Colors.grey.shade100,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+    ],
+  );
+}
+
+Future<void> _getCurrentLocation() async {
+  try {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Get.snackbar(
+        'Error',
+        'Location services are disabled. Please enable the services',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Get.snackbar(
+          'Error',
+          'Location permissions are denied',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      Get.snackbar(
+        'Error',
+        'Location permissions are permanently denied, we cannot request permissions.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    final position = await Geolocator.getCurrentPosition();
+    latitudeController.text = position.latitude.toString();
+    longitudeController.text = position.longitude.toString();
+    
+    Get.snackbar(
+      'Success',
+      'Location updated successfully',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  } catch (e) {
+    Get.snackbar(
+      'Error',
+      'Failed to get current location: $e',
+      snackPosition: SnackPosition.BOTTOM,
     );
   }
+}
 
   Widget _buildAllergySection() {
     return Column(
@@ -198,21 +333,21 @@ class PersonalInformationPage extends GetView<ProfileController> {
     // and update addressController
   }
 
-  Future<void> _getCurrentLocation() async {
-    try {
-      final position = await Geolocator.getCurrentPosition();
-      latitudeController.text = position.latitude.toString();
-      longitudeController.text = position.longitude.toString();
-      // You might want to reverse geocode the position to get the address
-      // and update addressController
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to get current location',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     final position = await Geolocator.getCurrentPosition();
+  //     latitudeController.text = position.latitude.toString();
+  //     longitudeController.text = position.longitude.toString();
+  //     // You might want to reverse geocode the position to get the address
+  //     // and update addressController
+  //   } catch (e) {
+  //     Get.snackbar(
+  //       'Error',
+  //       'Failed to get current location',
+  //       snackPosition: SnackPosition.BOTTOM,
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

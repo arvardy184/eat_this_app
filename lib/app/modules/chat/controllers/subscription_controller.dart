@@ -75,6 +75,7 @@ class SubscriptionController extends BaseController {
       remainingScans.value = await packageService.getRemainingScans();
       remainingConsultations.value =
           await packageService.getRemainingConsultations();
+          print("cek subscription: ${remainingScans.value}");
     } catch (e) {
       print("error checking subscription: $e");
     } finally {

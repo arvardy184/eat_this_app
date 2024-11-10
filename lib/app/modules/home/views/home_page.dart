@@ -204,7 +204,7 @@ class HomePage extends GetView<HomeController> {
   }
 
   Widget _buildSubscriptionStatus() {
-    print("is premium: ${subscriptionController.isPremium.value} ${subscriptionController.remainingScans.value} ${subscriptionController.recentScans.length}" );
+    print("is premium?: ${subscriptionController.isPremium.value} ${subscriptionController.remainingScans.value} ${subscriptionController.recentScans.length}" );
     return GetBuilder<SubscriptionController>(
       init: subscriptionController,
       builder: (controller) => Container(
@@ -269,35 +269,42 @@ Widget _buildQuotaIndicator(
   int current,
   bool isPremium,
 ) {
-  // Get scans count
-  final scansCount = controller.recentScans.length;
+  
   
   // Calculate progress (0.0 to 1.0)
   double progress;
   if (isPremium) {
-
-    progress = scansCount > 0 ? scansCount / (scansCount + 5) : 0.0;
+      print("progress premium ${current}");
+progress = current > 0 ? 1.0 : 0.0;
     print("berapa progress premium $progress");
   } else {
     
-    progress = max > 0 ? (scansCount / max).clamp(0.0, 1.0) : 0.0;
+       progress = max > 0 ? (current / max) : 0.0;
     print("Berapa progress free $progress");
   }
 
   // Determine color based on usage
-  Color getProgressColor() {
-    if (isPremium) return Colors.blue[900]!;
-    if (scansCount >= max) return Colors.red;
-    if (scansCount >= (max * 0.8)) return Colors.orange; // Warning when near limit
+Color getProgressColor() {
+    if (isPremium) {
+      return Colors.blue[900]!;
+    }
+    
+    // For free users
+    if (current >= max) {
+      return Colors.red;
+    }
+    if (current >= (max * 0.8)) {
+      return Colors.orange;
+    }
     return CIETTheme.primary_color;
   }
 
   // Format display text
   String getQuotaText() {
     if (isPremium) {
-      return '$scansCount scans today';
+      return '$current scans today';
     } else {
-      return '$scansCount/$max scans';
+      return '$current/$max scans';
     }
   }
 
@@ -362,7 +369,7 @@ Widget _buildQuotaIndicator(
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
-                value: 1,
+                value: 1.0,
                 backgroundColor: Colors.grey[200],
                 valueColor: AlwaysStoppedAnimation<Color>(
                   getProgressColor().withOpacity(0.2),
@@ -374,7 +381,7 @@ Widget _buildQuotaIndicator(
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
-                value: progress,
+                value:  progress.clamp(0.0, 1.0),
                 backgroundColor: Colors.transparent,
                 valueColor: AlwaysStoppedAnimation<Color>(getProgressColor()),
                 minHeight: 12,
@@ -382,24 +389,43 @@ Widget _buildQuotaIndicator(
             ),
           ],
         ),
-        if (!isPremium && scansCount >= (max * 0.8)) ...[
+   if (!isPremium && current >= max) ...[
           const SizedBox(height: 8),
           Row(
             children: [
               Icon(
                 Icons.warning_amber_rounded,
                 size: 16,
-                color: scansCount >= max ? Colors.red : Colors.orange,
+                color: Colors.red,
               ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  scansCount >= max
-                      ? 'Scan limit reached. Upgrade to Premium for unlimited scans!'
-                      : 'Approaching scan limit. Consider upgrading to Premium!',
+                  'Scan limit reached. Upgrade to Premium for unlimited scans!',
                   style: TextStyle(
                     fontSize: 12,
-                    color: scansCount >= max ? Colors.red : Colors.orange,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ] else if (!isPremium && current >= (max * 0.8)) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                size: 16,
+                color: Colors.orange,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  'Approaching scan limit. Consider upgrading to Premium!',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.orange,
                   ),
                 ),
               ),

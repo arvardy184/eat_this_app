@@ -1,41 +1,324 @@
-import 'package:eat_this_app/app/data/providers/api_provider.dart';
-import 'package:eat_this_app/services/package_service.dart';
+import 'package:eat_this_app/app/data/models/consultant2_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/chat_controller.dart';
 import '../controllers/subscription_controller.dart';
-
 class ChatPage extends GetView<ChatController> {
   const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final subscriptionController = Get.put(SubscriptionController( Get.find<PackageService>(), packageService: PackageService(ApiProvider())));
     return Obx(() {
-      // Show loading while initializing
       if (!controller.isInitialized.value || controller.isLoading.value) {
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
+        return _buildLoadingView();
       }
 
       if (controller.isConsultant.value && controller.typeUser.value == 'Consultant') {
         return _buildConsultantView(context);
-      } else if(controller.typeUser.value == 'Pharmacy') {
+      } else if (controller.typeUser.value == 'Pharmacy') {
         return _buildApotekView(context);
       }
 
-      
-
       if (!controller.canAccessChat()) {
-        return _buildSubscriptionView(context, subscriptionController);
+        return _buildSubscriptionView(context, Get.find());
       }
 
-      // Show appropriate view based on consultant status
       return _buildUserView(context);
     });
+  }
+
+  Widget _buildLoadingView() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              'Initializing Chat...',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserView(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Expert Consultation',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_add_rounded),
+            onPressed: () => Get.toNamed('/add-consultant'),
+            tooltip: 'Add New Consultant',
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          _buildSearchBar(),
+          _buildConsultantsList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Search consultants...',
+          prefixIcon: const Icon(Icons.search, color: Colors.grey),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+                
+      
+            },
+          ),
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+        ),
+        onChanged: controller.onSearchChanged,
+      ),
+    );
+  }
+
+  Widget _buildConsultantsList() {
+    return Expanded(
+      child: Obx(() {
+        if (controller.isLoading.value) {
+          return _buildLoadingConsultants();
+        }
+
+        if (controller.addedConsultants.isEmpty) {
+          return _buildEmptyConsultants();
+        }
+
+        return RefreshIndicator(
+          onRefresh: controller.fetchAddedConsultants,
+          child: ListView.builder(
+            itemCount: controller.addedConsultants.length,
+            itemBuilder: (context, index) {
+              final consultant = controller.addedConsultants[index];
+              return _buildConsultantCard(consultant);
+            },
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildLoadingConsultants() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 16),
+          Text(
+            'Loading consultants...',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyConsultants() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            'No Consultants Yet',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Add a consultant to start chatting',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => Get.toNamed('/add-consultant'),
+            icon: const Icon(Icons.add),
+            label: const Text('Add Consultant'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 12,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConsultantCard(ConsultantData consultant) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      elevation: 2,
+      child: InkWell(
+        onTap: () => Get.toNamed('/chat/room', arguments: consultant),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              _buildConsultantAvatar(consultant),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          consultant.name ?? 'Unknown',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          '2m ago', // Add timestamp logic
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      consultant.specialization ?? 'Nutrition Expert',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          size: 12,
+                          color: Colors.green,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Online',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (consultant.lastMessage != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              '1',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConsultantAvatar(ConsultantData consultant) {
+    return Stack(
+      children: [
+        CircleAvatar(
+          radius: 30,
+          backgroundImage: consultant.profilePicture != null
+              ? NetworkImage(consultant.profilePicture!)
+              : null,
+          child: consultant.profilePicture == null
+              ? Text(
+                  consultant.name?[0] ?? '',
+                  style: const TextStyle(fontSize: 20),
+                )
+              : null,
+        ),
+        Positioned(
+          right: 0,
+          bottom: 0,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+            ),
+            child: Icon(
+              Icons.verified,
+              size: 16,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   // View for Consultant
@@ -184,75 +467,75 @@ class ChatPage extends GetView<ChatController> {
     });
   }
 
-  // View for regular User
-  Widget _buildUserView(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Consultants'),
-        leading: IconButton(
-          icon: const Icon(Icons.person_add_rounded),
-          onPressed: () => Get.toNamed('/add-consultant'),
-        ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search consultants...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onChanged: controller.onSearchChanged,
-            ),
-          ),
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
+  // // View for regular User
+  // Widget _buildUserView(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: const Text('My Consultants'),
+  //       leading: IconButton(
+  //         icon: const Icon(Icons.person_add_rounded),
+  //         onPressed: () => Get.toNamed('/add-consultant'),
+  //       ),
+  //     ),
+  //     body: Column(
+  //       children: [
+  //         Padding(
+  //           padding: const EdgeInsets.all(16.0),
+  //           child: TextField(
+  //             decoration: InputDecoration(
+  //               hintText: 'Search consultants...',
+  //               prefixIcon: const Icon(Icons.search),
+  //               border: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(12),
+  //               ),
+  //             ),
+  //             onChanged: controller.onSearchChanged,
+  //           ),
+  //         ),
+  //         Expanded(
+  //           child: Obx(() {
+  //             if (controller.isLoading.value) {
+  //               return const Center(child: CircularProgressIndicator());
+  //             }
 
-              if (controller.consultants.isEmpty) {
-                return const Center(child: Text('No consultants found'));
-              }
+  //             if (controller.consultants.isEmpty) {
+  //               return const Center(child: Text('No consultants found'));
+  //             }
 
-              return RefreshIndicator(
-                onRefresh: controller.fetchAddedConsultants,
-                child: ListView.builder(
-                  itemCount: controller.addedConsultants.length,
-                  itemBuilder: (context, index) {
-                    final consultant = controller.addedConsultants[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: consultant.profilePicture != null
-                            ? NetworkImage(consultant.profilePicture!)
-                            : null,
-                        child: consultant.profilePicture == null
-                            ? Text(consultant.name?[0] ?? '')
-                            : null,
-                      ),
-                      title: Text(consultant.name ?? 'Unknown'),
-                      subtitle: Text(
-                          consultant.lastMessage ?? 'No messages yet',style: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 14
-                          ),),
-                      trailing: const Icon(Icons.chat_bubble_outline),
-                      onTap: () =>
-                          Get.toNamed('/chat/room', arguments: consultant),
-                    );
-                  },
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
-    );
-  }
+  //             return RefreshIndicator(
+  //               onRefresh: controller.fetchAddedConsultants,
+  //               child: ListView.builder(
+  //                 itemCount: controller.addedConsultants.length,
+  //                 itemBuilder: (context, index) {
+  //                   final consultant = controller.addedConsultants[index];
+  //                   return ListTile(
+  //                     leading: CircleAvatar(
+  //                       backgroundImage: consultant.profilePicture != null
+  //                           ? NetworkImage(consultant.profilePicture!)
+  //                           : null,
+  //                       child: consultant.profilePicture == null
+  //                           ? Text(consultant.name?[0] ?? '')
+  //                           : null,
+  //                     ),
+  //                     title: Text(consultant.name ?? 'Unknown'),
+  //                     subtitle: Text(
+  //                         consultant.lastMessage ?? 'No messages yet',style: TextStyle(
+  //                           color: Colors.grey[500],
+  //                           fontSize: 14
+  //                         ),),
+  //                     trailing: const Icon(Icons.chat_bubble_outline),
+  //                     onTap: () =>
+  //                         Get.toNamed('/chat/room', arguments: consultant),
+  //                   );
+  //                 },
+  //               ),
+  //             );
+  //           }),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildApotekView(BuildContext context) {
     return Scaffold(

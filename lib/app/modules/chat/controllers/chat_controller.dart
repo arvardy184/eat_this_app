@@ -9,6 +9,7 @@ import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
 import 'package:eat_this_app/app/modules/chat/controllers/subscription_controller.dart';
 import 'package:eat_this_app/services/chat_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -27,7 +28,10 @@ class ChatController extends BaseController {
   final isConsultant = false.obs;
   final typeUser = ''.obs;
   final isInitialized = false.obs;
-   final currentUserKey = ''.obs;
+  final currentUserKey = ''.obs;
+  final isSearching = false.obs;
+  final RxList<ConsultantData> filteredConsultants = <ConsultantData>[].obs;
+  final searchController = TextEditingController();
 
   final isConnected = false.obs;
   final isConnecting = false.obs;
@@ -39,6 +43,7 @@ class ChatController extends BaseController {
 
   late final String recipientKey;
   
+    
 
   Future<void> init(String currentUserKey, String recipientKey) async {
     this.currentUserKey.value = currentUserKey;
@@ -334,6 +339,7 @@ Future<void> listPackage() async{
     // acquaintances.clear();
     // requests.clear();
     // addedConsultants.clear();
+    searchController.dispose();
     messages.clear();
     searchQuery.value = '';
     isLoading.value = false;

@@ -43,9 +43,11 @@ class ScanController extends BaseController {
       if (productData.value?.product != null) {
         print("Product found: ${productData.value?.product?.name}");
          if (subscriptionController.dailyScanCount.value >= subscriptionController.remainingScans.value 
-      && !subscriptionController.isPremium.value) {
-    subscriptionController.showUpgradeDialog();
-    return;
+      || !subscriptionController.isPremium.value) {
+           print("apakah ${subscriptionController.dailyScanCount.value} >= ${subscriptionController.remainingScans.value}");
+        print("Is premium: ${subscriptionController.isPremium.value} Remaining scans: ${subscriptionController.remainingScans.value} Daily scan count: ${subscriptionController.dailyScanCount.value}");
+   
+    return subscriptionController.showUpgradeDialog();
   }
         showSuccess('Product found successfully');
         loadInitialAlternatives();
@@ -56,7 +58,11 @@ class ScanController extends BaseController {
       } else {
         showError('No product found for this barcode');
       }
-    } catch (e) {
+    } on DioException catch (e) {
+       if(e.response?.statusCode == 500){
+         print("Error status code: ${e.response?.statusCode}");
+          subscriptionController.showUpgradeDialog();
+       }
       handleError(e);
     } finally {
       isLoading.value = false;
