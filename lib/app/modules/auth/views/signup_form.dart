@@ -82,41 +82,11 @@ class _SignupFormState extends State<SignupForm> {
               SizedBox(height: 28),
               Row(
                 children: [
-                  Expanded(
-                    child: Divider(
-                      thickness: 1,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Text('Or'),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Divider(
-                      thickness: 1,
-                      color: Colors.grey[400],
-                    ),
-                  ),
+         
                 ],
               ),
               SizedBox(height: 28),
-              SocialLoginButton(
-                text: 'Continue with Google',
-                icon: 'assets/images/google_icon.png',
-                onPressed: () {
-                  // Handle Google login
-                  print("Logging in with Google...");
-                },
-              ),
-              SizedBox(height: 20),
-              SocialLoginButton(
-                text: 'Continue with Facebook',
-                icon: 'assets/images/facebook_icon.png',
-                onPressed: () {
-                  // Handle Facebook login
-                  print("Logging in with Facebook...");
-                },
-              ),
+             
             ],
           ),
         ),

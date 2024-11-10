@@ -86,44 +86,8 @@ class _LoginFormState extends State<LoginForm> {
                 onPressed: _handleLogin,
               ),
               const SizedBox(height: 28),
-              Row(
-                children: [
-                  Expanded(
-                    child: Divider(
-                      thickness: 1,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text('Or'),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Divider(
-                      thickness: 1,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 50),
-              SocialLoginButton(
-                text: 'Continue with Google',
-                icon: 'assets/images/google_icon.png',
-                onPressed: () {
-                  // Handle Google login
-                  print("Logging in with Google...");
-                },
-              ),
-              SizedBox(height: 20),
-              SocialLoginButton(
-                text: 'Continue with Facebook',
-                icon: 'assets/images/facebook_icon.png',
-                onPressed: () {
-                  // Handle Facebook login
-                  print("Logging in with Facebook...");
-                },
-              ),
-              SizedBox(height: 38),
+           
+      
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

@@ -326,12 +326,12 @@ Future<void> _getCurrentLocation() async {
     );
   }
 
-  void _handleMapTap(LatLng position) {
-    latitudeController.text = position.latitude.toString();
-    longitudeController.text = position.longitude.toString();
-    // You might want to reverse geocode the position to get the address
-    // and update addressController
-  }
+  // void _handleMapTap(LatLng position) {
+  //   latitudeController.text = position.latitude.toString();
+  //   longitudeController.text = position.longitude.toString();
+  //   // You might want to reverse geocode the position to get the address
+  //   // and update addressController
+  // }
 
   // Future<void> _getCurrentLocation() async {
   //   try {

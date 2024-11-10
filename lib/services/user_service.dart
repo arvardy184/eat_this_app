@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:eat_this_app/app/data/models/allergen_model.dart';
+import 'package:eat_this_app/app/data/models/password_model.dart';
 import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
@@ -130,7 +131,48 @@ class UserService {
       throw Exception('Network error occurred');
     }
   }
+Future<PasswordModel> changePassword(
+    String oldPassword,
+    String newPassword,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
 
+      if (token == null || token.isEmpty) {
+        throw Exception('No authentication token found');
+      }
+
+      final response = await _dio.post(
+        '${ApiConstants.baseUrl}user/change-password',
+        data: {
+          'old_password': oldPassword,
+          'new_password': newPassword,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        if (response.data['token'] != null) {
+          // Save new token
+          await prefs.setString('auth_token', response.data['token']);
+        }
+        return PasswordModel.fromJson(response.data);
+      } else {
+        throw Exception(response.data['message'] ?? 'Failed to change password');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('Current password is incorrect');
+      }
+      throw Exception(e.response?.data['message'] ?? 'Failed to change password');
+    }
+  }
   Future<void> updateUserAllergens(List<String> allergens) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');

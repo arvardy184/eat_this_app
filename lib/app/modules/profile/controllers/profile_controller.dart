@@ -3,6 +3,7 @@ import 'package:eat_this_app/app/data/models/allergen_model.dart';
 import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
 import 'package:eat_this_app/services/user_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
@@ -10,6 +11,12 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileController extends BaseController {
+  final oldPasswordController = TextEditingController();
+  final newPasswordController = TextEditingController();
+  final confirmPasswordController = TextEditingController(); 
+  final RxBool isPasswordVisible = false.obs;
+  final RxBool isNewPasswordVisible = false.obs;
+  final RxBool isConfirmPasswordVisible = false.obs;
   final UserService _userService = UserService();
   final Rx<User?> user = Rx<User?>(null);
   final ImagePicker _picker = ImagePicker();
@@ -21,6 +28,53 @@ class ProfileController extends BaseController {
     loadUserProfile();
     loadAllergens();
   }
+
+  Future<void> changePassword() async {
+    try {
+      if (!validatePasswords()) return;
+
+      isLoading.value = true;
+      final response = await _userService.changePassword(
+        oldPasswordController.text,
+        newPasswordController.text,
+      );
+
+      if (response.token != null) {
+        showSuccess('Password changed successfully');
+        Get.back(); // Close the change password page
+        // Clear controllers
+        oldPasswordController.clear();
+        newPasswordController.clear();
+        confirmPasswordController.clear();
+      }
+    } catch (e) {
+      handleError(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  bool validatePasswords() {
+    if (oldPasswordController.text.isEmpty ||
+        newPasswordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
+      showError('All fields are required');
+      return false;
+    }
+
+    if (newPasswordController.text.length < 6) {
+      showError('New password must be at least 6 characters long');
+      return false;
+    }
+
+    if (newPasswordController.text != confirmPasswordController.text) {
+      showError('New passwords do not match');
+      return false;
+    }
+
+    return true;
+  }
+
+
 
   Future<void> loadUserProfile() async {
     try {
@@ -130,6 +184,8 @@ class ProfileController extends BaseController {
     }
   }
 
+  
+
   void toggleAllergen(int index) {
     final allergen = allergens[index];
     allergen.isSelected = !allergen.isSelected;
@@ -142,6 +198,9 @@ class ProfileController extends BaseController {
   @override
   void onClose() {
     user.value = null;
+    oldPasswordController.dispose();
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
     super.onClose();
   }
 }

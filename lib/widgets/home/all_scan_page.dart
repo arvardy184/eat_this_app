@@ -38,7 +38,10 @@ class AllScanPage extends GetView<HomeController> {
         return const Center(child: CircularProgressIndicator());
       }
 
+
+
       final todayScans = controller.recentScans.where((scan) {
+         print("data tanggal ${scan.pivot?.createdAt} skrg ${DateTime.now().toString()}");
         if (scan.pivot?.createdAt == null) return false;
         final scanDate = DateTime.parse(scan.pivot!.createdAt!);
         final today = DateTime.now();

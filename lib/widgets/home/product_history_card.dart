@@ -14,6 +14,7 @@ class ProductHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("data tanggal ${product.pivot?.createdAt} skrg ${DateTime.now().toString()}");
     final String formattedDate = DateFormat('MMM d, y').format(
       DateTime.parse(product.pivot?.createdAt ?? DateTime.now().toString()),
     );

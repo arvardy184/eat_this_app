@@ -325,10 +325,12 @@ class ProfilePage extends GetView<ProfileController> {
               onTap: () => Get.to(() => PersonalInformationPage()),
             ),
             MenuItem(
-              icon: Icons.language,
-              title: "Language",
-              trailing: "English (US)",
-              onTap: () {},
+              icon: Icons.password_outlined,
+              title: "Change Password",
+              // trailing: "English (US)",
+              onTap: () {
+                Get.toNamed('/change-password');
+              },
             ),
             MenuItem(
               icon: Icons.privacy_tip,

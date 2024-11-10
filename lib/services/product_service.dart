@@ -120,7 +120,10 @@ class ProductService {
       } else if(response.statusCode == 404){  
         throw Exception('Product not found');
        
-      } else{
+      }else if(response.statusCode == 500){
+        throw Exception('Failed to fetch product data with status code: ${response.statusCode}');
+      }
+       else{
         throw Exception('Failed to fetch product data with status code: ${response.statusCode}');
       }
     } on DioException catch (e) {

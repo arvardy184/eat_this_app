@@ -17,6 +17,7 @@ import 'package:eat_this_app/app/modules/pharmacy/bindings/pharmacy_binding.dart
 import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_detail_page.dart';
 import 'package:eat_this_app/app/modules/pharmacy/views/pharmacy_page.dart';
 import 'package:eat_this_app/app/modules/profile/bindings/profile_binding.dart';
+import 'package:eat_this_app/app/modules/profile/views/change_password_page.dart';
 import 'package:eat_this_app/app/modules/profile/views/profile_page.dart';
 import 'package:eat_this_app/app/modules/scan/bindings/alternative_bindings.dart';
 import 'package:eat_this_app/app/modules/scan/controllers/alternative_controller.dart';
@@ -115,6 +116,7 @@ class AppPages {
       page: () => AlternativeProductPage(),
       binding: AlternativeProductBinding(),
     ),
+    GetPage(name: '/change-password', page: () => const ChangePasswordPage(), binding: ProfileBinding()),
   ];
 }
 
