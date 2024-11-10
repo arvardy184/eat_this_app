@@ -69,13 +69,13 @@ class _LoginFormState extends State<LoginForm> {
                     style: TextStyle(fontSize: 12),
                   ),
                   const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      Get.off(() => const ForgotPasswordForm());
-                    },
-                    child: const Text("Forgot Password?",
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  ),
+                  // TextButton(
+                  //   onPressed: () {
+                  //     Get.off(() => const ForgotPasswordForm());
+                  //   },
+                  //   child: const Text("Forgot Password?",
+                  //       style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  // ),
                 ],
               ),
               const SizedBox(height: 20),

@@ -1,7 +1,8 @@
 
 import 'package:eat_this_app/app/data/models/history_model.dart';
 import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
-import 'package:flutter/material.dart';
+import 'package:eat_this_app/app/utils/date_utils.dart';
+import 'package:flutter/material.dart' hide DateUtils;
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -32,56 +33,92 @@ class AllScanPage extends GetView<HomeController> {
     );
   }
 
-  Widget _buildTodayScans() {
-    return Obx(() {
-      if (controller.isLoadingScans.value) {
-        return const Center(child: CircularProgressIndicator());
+Widget _buildTodayScans() {
+  return Obx(() {
+    if (controller.isLoadingScans.value) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Filter untuk scan hari ini
+    final todayScans = controller.recentScans.where((scan) {
+      if (scan.pivot?.createdAt == null) return false;
+      
+      try {
+        return DateUtils.isToday(scan.pivot?.createdAt);
+      } catch (e) {
+        print('Error filtering today scans: $e');
+        return false;
       }
+    }).toList();
 
+    // Sort by time (newest first)
+    todayScans.sort((a, b) {
+      if (a.pivot?.createdAt == null || b.pivot?.createdAt == null) return 0;
+      
+      final dateA = DateTime.parse(a.pivot!.createdAt!).toLocal();
+      final dateB = DateTime.parse(b.pivot!.createdAt!).toLocal();
+      return dateB.compareTo(dateA);
+    });
 
-
-      final todayScans = controller.recentScans.where((scan) {
-         print("data tanggal ${scan.pivot?.createdAt} skrg ${DateTime.now().toString()}");
-        if (scan.pivot?.createdAt == null) return false;
-        final scanDate = DateTime.parse(scan.pivot!.createdAt!);
-        final today = DateTime.now();
-        return scanDate.year == today.year &&
-            scanDate.month == today.month &&
-            scanDate.day == today.day;
-      }).toList();
-
-      if (todayScans.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.history, size: 64, color: Colors.grey[400]),
-              const SizedBox(height: 16),
-              Text(
-                'No scans today',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 16,
-                ),
+    if (todayScans.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.history, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'No scans today',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 16,
               ),
-            ],
-          ),
-        );
-      }
-
-      return RefreshIndicator(
-        onRefresh: () => controller.loadRecentScans(),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: todayScans.length,
-          itemBuilder: (context, index) {
-            final scan = todayScans[index];
-            return _buildScanCard(scan);
-          },
+            ),
+          ],
         ),
       );
-    });
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => controller.loadRecentScans(),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: todayScans.length,
+        itemBuilder: (context, index) {
+          final scan = todayScans[index];
+          return Column(
+            children: [
+              if (index == 0 || _shouldShowTimeHeader(scan, todayScans[index - 1]))
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                  child: Text(
+                    DateUtils.formatTimeOnly(scan.pivot?.createdAt),
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              _buildScanCard(scan),
+            ],
+          );
+        },
+      ),
+    );
+  });
+}
+
+bool _shouldShowTimeHeader(Products currentScan, Products previousScan) {
+  if (currentScan.pivot?.createdAt == null || previousScan.pivot?.createdAt == null) {
+    return false;
   }
+
+  final currentTime = DateTime.parse(currentScan.pivot!.createdAt!).toLocal();
+  final previousTime = DateTime.parse(previousScan.pivot!.createdAt!).toLocal();
+
+  return currentTime.hour != previousTime.hour || 
+         currentTime.minute != previousTime.minute;
+}
 
   Widget _buildAllScans() {
     return Obx(() {
@@ -110,14 +147,13 @@ class AllScanPage extends GetView<HomeController> {
 
       // Group scans by date
       final groupedScans = <String, List<Products>>{};
-      for (var scan in controller.recentScans) {
-        if (scan.pivot?.createdAt != null) {
-          final date = DateFormat('yyyy-MM-dd')
-              .format(DateTime.parse(scan.pivot!.createdAt!));
-          groupedScans.putIfAbsent(date, () => []);
-          groupedScans[date]!.add(scan);
-        }
+   for (var scan in controller.recentScans) {
+      if (scan.pivot?.createdAt != null) {
+        final date = DateUtils.formatDateOnly(scan.pivot?.createdAt);
+        groupedScans.putIfAbsent(date, () => []);
+        groupedScans[date]!.add(scan);
       }
+   }
 
       return RefreshIndicator(
         onRefresh: () => controller.loadRecentScans(),
@@ -133,7 +169,7 @@ class AllScanPage extends GetView<HomeController> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    DateFormat('MMMM d, y').format(DateTime.parse(date)),
+                    date,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -151,9 +187,7 @@ class AllScanPage extends GetView<HomeController> {
   }
 
   Widget _buildScanCard(Products scan) {
-    final scanTime = scan.pivot?.createdAt != null
-        ? DateFormat('HH:mm').format(DateTime.parse(scan.pivot!.createdAt!))
-        : '';
+ final scanTime = DateUtils.formatTimeOnly(scan.pivot?.createdAt);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
