@@ -2,6 +2,7 @@ import 'package:eat_this_app/app/components/CustomButton.dart';
 import 'package:eat_this_app/app/components/CustomTextField.dart';
 import 'package:eat_this_app/app/hooks/use_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ForgotPasswordForm extends StatefulWidget {
   const ForgotPasswordForm({Key? key}) : super(key: key);
@@ -42,10 +43,30 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
                   controller: _emailController, hint: "Text your email"),
               const SizedBox(height: 35),
               CustomButton(
-                text: 'Confirm',
-                isPrimary: true,
-                onPressed: () {},
-              ),
+  text: 'Confirm',
+  isPrimary: true,
+  onPressed: () async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      Get.snackbar('Error', 'Email cannot be empty');
+    } else {
+      try {
+        await _auth.forgotPassword(email);
+      Get.snackbar(
+      'Success',
+     "Reset Password",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green[100],
+      colorText: Colors.green[900],
+    );
+        // Get.snackbar('Success', 'Reset link has been sent to your email');
+      } catch (e) {
+        Get.snackbar('Error', 'Failed to send reset link');
+      }
+    }
+  },
+),
+
             ],
           ),
         ),

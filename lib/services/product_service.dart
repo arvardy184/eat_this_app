@@ -75,8 +75,7 @@ class ProductService {
       }
     } catch (e) {
       print('General error: $e');
-      
-      throw Exception('Error: $e');
+      throw Exception('Failed to fetch product data: $e');
     }
   }
 

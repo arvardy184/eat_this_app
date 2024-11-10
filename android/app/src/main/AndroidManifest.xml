@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <application
-        android:label="eat_this_app"
+        android:label="Can I Eat This?"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

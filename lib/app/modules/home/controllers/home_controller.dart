@@ -55,6 +55,7 @@ List<Products> get todayScans {
       if (scan.pivot?.createdAt == null) return false;
       try {
         final scanDate = DateTime.parse(scan.pivot!.createdAt!);
+        print("cek tanggal todayscans ${scan.pivot?.createdAt} skrg ${DateTime.now().toString()} dan is utc ${scanDate.isUtc}");
         return scanDate.year == today.year &&
             scanDate.month == today.month &&
             scanDate.day == today.day;

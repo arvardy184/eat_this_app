@@ -51,14 +51,15 @@ class AppPages {
         ]),
     GetPage(
         name: '/search', page: () => SearchPage(), binding: SearchBinding()),
-    GetPage(
-      name: '/product/details',
-      page: () => ProductDetailPage(), // Halaman detail produk
-      binding: BindingsBuilder(() {
-        Get.put(
-            AlternativeProductController()); // Bind controller untuk halaman detail
-      }),
-    ),
+   GetPage(
+  name: '/product/alternative',
+  
+  page: () => AlternativeProductPage(),
+  binding: AlternativeProductBinding(),
+  
+  transition: Transition.rightToLeft,
+  
+),
     GetPage(
         name: '/beranda',
         page: () => HomePage(),
@@ -111,11 +112,11 @@ class AppPages {
         binding: ChatBinding()),
     GetPage(
         name: '/chat/room', page: () => ChatRoomPage(), binding: ChatBinding()),
-    GetPage(
-      name: '/product/alternative',
-      page: () => AlternativeProductPage(),
-      binding: AlternativeProductBinding(),
-    ),
+    // GetPage(
+    //   name: '/product/alternative',
+    //   page: () => AlternativeProductPage(),
+    //   binding: AlternativeProductBinding(),
+    // ),
     GetPage(name: '/change-password', page: () => const ChangePasswordPage(), binding: ProfileBinding()),
   ];
 }

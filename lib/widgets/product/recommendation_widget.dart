@@ -78,6 +78,7 @@ class RecommendationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        print("Product ID: ${product.id}");
         Get.toNamed('/product/alternative', arguments: product.id);
       },
       child: Container(

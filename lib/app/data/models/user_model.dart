@@ -31,7 +31,7 @@ class User {
   String? updatedAt;
   String? birthDate;
   String? specialization;
-  String? almamater;
+  String? almaMater;
   String? latitude;
   String? longitude;
   String? address;
@@ -51,7 +51,7 @@ class User {
     this.allergens,
     this.birthDate,
     this.specialization,
-    this.almamater,
+    this.almaMater,
     this.latitude,
     this.longitude,
     this.address,
@@ -70,7 +70,7 @@ class User {
     updatedAt = json['updated_at'];
     birthDate = json['birth_date'];
     specialization = json['specialization'];
-    almamater = json['alma_mater'];
+    almaMater = json['alma_mater'];
     latitude = json['latitude'];
     longitude = json['longitude'];
     address = json['address'];
@@ -97,7 +97,7 @@ class User {
     data['updated_at'] = updatedAt;
     data['birth_date'] = birthDate;
     data['specialization'] = specialization;
-    data['alma_mater'] = almamater;
+    data['alma_mater'] = almaMater;
     data['latitude'] = latitude;  
     data['longitude'] = longitude;
     data['address'] = address;

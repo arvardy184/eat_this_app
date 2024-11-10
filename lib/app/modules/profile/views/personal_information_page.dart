@@ -115,7 +115,7 @@ Widget _buildLocationPicker() {
                 children: [
                   TileLayer(
                     urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    subdomains: const ['a', 'b', 'c'],
+                   subdomains: const ['a', 'b', 'c'],
                   ),
                   MarkerLayer(
                     markers: [
@@ -326,28 +326,7 @@ Future<void> _getCurrentLocation() async {
     );
   }
 
-  // void _handleMapTap(LatLng position) {
-  //   latitudeController.text = position.latitude.toString();
-  //   longitudeController.text = position.longitude.toString();
-  //   // You might want to reverse geocode the position to get the address
-  //   // and update addressController
-  // }
 
-  // Future<void> _getCurrentLocation() async {
-  //   try {
-  //     final position = await Geolocator.getCurrentPosition();
-  //     latitudeController.text = position.latitude.toString();
-  //     longitudeController.text = position.longitude.toString();
-  //     // You might want to reverse geocode the position to get the address
-  //     // and update addressController
-  //   } catch (e) {
-  //     Get.snackbar(
-  //       'Error',
-  //       'Failed to get current location',
-  //       snackPosition: SnackPosition.BOTTOM,
-  //     );
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -357,7 +336,7 @@ Future<void> _getCurrentLocation() async {
     print("apa package name $packageName");
     
     if (packageName == 'Consultant') {
-      almaMaterController.text = controller.user.value?.almamater ?? '';
+      almaMaterController.text = controller.user.value?.almaMater ?? '';
       specializationController.text = controller.user.value?.specialization ?? '';
     } else if (packageName == 'Pharmacy') {
       addressController.text = controller.user.value?.address ?? '';
@@ -414,7 +393,7 @@ Future<void> _getCurrentLocation() async {
               _buildTextField(
                 label: 'Name',
                 controller: nameController,
-                hint: 'Enter your name',
+                hint: '${nameController.text}',
               ),
               _buildTextField(
                 label: 'Email',
@@ -427,7 +406,7 @@ Future<void> _getCurrentLocation() async {
                 readOnly: true,
                 onTap: isEditing.value ? () => _selectDate(context) : null,
                 suffix: const Icon(Icons.calendar_today),
-                hint: 'Select date of birth',
+                hint: '',
               ),
               if (packageName == 'Consultant') ...[
                 _buildTextField(
@@ -448,8 +427,12 @@ Future<void> _getCurrentLocation() async {
                   hint: 'Enter pharmacy address',
                 ),
                 if (isEditing.value) _buildLocationPicker(),
-              ],
+              ]  else if (packageName != 'Pharmacy  ') ...[
+                 
               _buildAllergySection(),
+              ]
+              
+             
             ],
           ),
         );
@@ -515,11 +498,28 @@ Future<void> _getCurrentLocation() async {
           formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.value!);
         }
 
-        await controller.updateUserInfo(
-          name: nameController.text,
-          dateOfBirth: formattedDate,
-          allergens: controller.selectedAllergens,
-        );
+        final packageName = controller.user.value?.type ?? 'General User';
+
+        Map<String, dynamic> updateData = {
+          'name': nameController.text,
+          'birth_date': formattedDate,
+        };
+        
+
+         // Add type-specific fields
+      if (packageName == 'Consultant') {
+        updateData['alma_mater'] = almaMaterController.text;
+        updateData['specialization'] = specializationController.text;
+      } else if (packageName == 'Pharmacy') {
+        updateData['address'] = addressController.text;
+        updateData['latitude'] = double.tryParse(latitudeController.text);
+        updateData['longitude'] = double.tryParse(longitudeController.text);
+      }
+
+         await controller.updateUserInfo(
+        data: updateData,
+        allergens: controller.selectedAllergens,
+      );
 
         // Sukses update, kembalikan ke mode view
         isEditing.value = false;

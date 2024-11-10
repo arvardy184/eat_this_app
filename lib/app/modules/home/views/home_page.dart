@@ -748,8 +748,10 @@ Color getProgressColor() {
                                 const Spacer(), // Push button to bottom
                                 TextButton(
                                   onPressed: () {
+                                    print("product id ${product.id}");
                                     Get.toNamed('/product/alternative',
-                                        arguments: product.id);
+                                        arguments: product.id,
+                                       );
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,

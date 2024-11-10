@@ -41,6 +41,7 @@ class ProfileController extends BaseController {
 
       if (response.token != null) {
         showSuccess('Password changed successfully');
+        print("Success");
         Get.back(); // Close the change password page
         // Clear controllers
         oldPasswordController.clear();
@@ -135,37 +136,41 @@ class ProfileController extends BaseController {
     }
   }
 
-  Future<void> updateUserInfo({
-    String? name,
-    String? dateOfBirth,
-    List<String>? allergens,
-  }) async {
-    try {
-      isLoading.value = true;
+Future<void> updateUserInfo({
+  Map<String, dynamic>? data,
+  List<String>? allergens,
+}) async {
+  try {
+    isLoading.value = true;
 
-      // Update basic info if provided
-      if (name != null || dateOfBirth != null) {
-        final response = await _userService.updateProfile(
-          null,
-          name,
-          dateOfBirth, // Already in correct format YYYY-MM-DD
-        );
-        user.value = response.user;
-      }
-
-      // Update allergens if provided
-      if (allergens != null && allergens.isNotEmpty) {
-        await _userService.updateUserAllergens(allergens);
-      }
-
-      await loadUserProfile();
-    } catch (e) {
-      print('Error updating user info: $e');
-      handleError(e);
-    } finally {
-      isLoading.value = false;
+    // Update user data if provided
+    if (data != null && data.isNotEmpty) {
+      final response = await _userService.updateProfile(
+        data['image_path'],
+        data['name'],
+        data['birth_date'],
+        almaMater: data['alma_mater'],
+        specialization: data['specialization'],
+        address: data['address'],
+        latitude: data['latitude'],
+        longitude: data['longitude'],
+      );
+      user.value = response.user;
     }
+
+    // Update allergens if provided
+    if (allergens != null && allergens.isNotEmpty) {
+      await _userService.updateUserAllergens(allergens);
+    }
+
+    await loadUserProfile();
+  } catch (e) {
+    print('Error updating user info: $e');
+    handleError(e);
+  } finally {
+    isLoading.value = false;
   }
+}
 
   Future<void> loadAllergens() async {
     try {

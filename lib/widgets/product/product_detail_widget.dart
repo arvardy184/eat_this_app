@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:eat_this_app/app/data/models/alternative_model.dart';
 import 'package:eat_this_app/app/data/models/product_model.dart';
+import 'package:eat_this_app/app/modules/scan/controllers/alternative_controller.dart';
 import 'package:eat_this_app/app/themes/app_theme.dart';
 import 'package:eat_this_app/widgets/product/shimmer_product_detail.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,9 @@ class ProductDetailWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final arguments = Get.arguments;
+    print("arguments $arguments");
     if (isLoading) {
       return const ProductDetailShimmer();
     }
@@ -72,27 +76,27 @@ class ProductDetailWidget extends StatelessWidget {
                   ),
                 ),
                 // Back button with blur effect
-                Positioned(
-                  top: 16,
-                  left: 16,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new),
-                          color: Colors.black87,
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   top: 16,
+                //   left: 16,
+                //   child: ClipRRect(
+                //     borderRadius: BorderRadius.circular(30),
+                //     child: BackdropFilter(
+                //       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                //       child: Container(
+                //         decoration: BoxDecoration(
+                //           color: Colors.white.withOpacity(0.3),
+                //           borderRadius: BorderRadius.circular(30),
+                //         ),
+                //         child: IconButton(
+                //           icon: const Icon(Icons.arrow_back_ios_new),
+                //           color: Colors.black87,
+                //           onPressed: () => Navigator.pop(context),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
 
@@ -750,22 +754,34 @@ class ProductDetailWidget extends StatelessWidget {
                         }).toList(),
                       ),
                     const Spacer(),
-                    ElevatedButton(
-                      onPressed: () {
-                        Get.toNamed('/product/alternative',
-                            arguments: product.id);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: CIETTheme.primary_color,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        minimumSize: const Size(double.infinity, 40),
-                      ),
-                      child: const Text('View Details'),
-                    ),
+                 ElevatedButton(
+onPressed: () {
+  print("Button pressed");
+  if (product.id != null) {
+    print("Product ID exists: ${product.id}");
+    Get.delete<AlternativeProductController>();
+    print("Controller deleted");
+    Get.toNamed(
+      '/product/alternative',
+      arguments: product.id,
+      preventDuplicates: false,
+    );
+    print("Navigation attempted");
+  } else {
+    print("Product ID is null");
+  }
+},
+  style: ElevatedButton.styleFrom(
+    backgroundColor: CIETTheme.primary_color,
+    foregroundColor: Colors.white,
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    minimumSize: const Size(double.infinity, 40),
+  ),
+  child: const Text('View Details'),
+),
                   ],
                 ),
               ),

@@ -43,64 +43,83 @@ class UserService {
       throw Exception('Failed to fetch user profile');
     }
   }
+Future<UserModel> updateProfile(
+  String? imagePath,
+  String? name,
+  String? birthDate, {
+  String? almaMater,
+  String? specialization,
+  String? address,
+  double? latitude,
+  double? longitude,
+}) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('auth_token');
 
-  Future<UserModel> updateProfile(
-      String? imagePath, String? name, String? birthDate) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-
-    if (token == null || token.isEmpty) {
-      throw Exception('No authentication token found');
-    }
-
-    FormData formData = FormData();
-
-    // Add fields conditionally
-    if (name != null) {
-      formData.fields.add(MapEntry('name', name));
-    }
-
-    if (birthDate != null) {
-      formData.fields.add(MapEntry('birth_date', birthDate));
-    }
-
-    if (imagePath != null) {
-      final file = await MultipartFile.fromFile(
-        imagePath,
-        filename: 'profile.jpg',
-      );
-      formData.files.add(MapEntry('profile_picture', file));
-    }
-
-    try {
-      print("Sending data to API:");
-      print("Name: $name");
-      print("Birth Date: $birthDate");
-      print("Image Path: $imagePath");
-
-      final response = await _dio.post(
-        '${ApiConstants.baseUrl}user/update',
-        data: formData,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'multipart/form-data',
-          },
-        ),
-      );
-
-      print("API Response: ${response.data}");
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return UserModel.fromJson(response.data);
-      } else {
-        throw Exception('Failed to update profile');
-      }
-    } catch (e) {
-      print("Error in updateProfile: $e");
-      rethrow;
-    }
+  if (token == null || token.isEmpty) {
+    throw Exception('No authentication token found');
   }
+
+  FormData formData = FormData();
+
+  // Add basic fields
+  if (name != null) {
+    formData.fields.add(MapEntry('name', name));
+  }
+  if (birthDate != null) {
+    formData.fields.add(MapEntry('birth_date', birthDate));
+  }
+
+  // Add consultant fields
+  if (almaMater != null) {
+    formData.fields.add(MapEntry('alma_mater', almaMater));
+  }
+  if (specialization != null) {
+    formData.fields.add(MapEntry('specialization', specialization));
+  }
+
+  // Add pharmacy fields
+  if (address != null) {
+    formData.fields.add(MapEntry('address', address));
+  }
+  if (latitude != null) {
+    formData.fields.add(MapEntry('latitude', latitude.toString()));
+  }
+  if (longitude != null) {
+    formData.fields.add(MapEntry('longitude', longitude.toString()));
+  }
+
+  // Add image if provided
+  if (imagePath != null) {
+    final file = await MultipartFile.fromFile(
+      imagePath,
+      filename: 'profile.jpg',
+    );
+    formData.files.add(MapEntry('profile_picture', file));
+  }
+
+  try {
+    final response = await _dio.post(
+      '${ApiConstants.baseUrl}user/update',
+      data: formData,
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'multipart/form-data',
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return UserModel.fromJson(response.data);
+    } else {
+      throw Exception('Failed to update profile');
+    }
+  } catch (e) {
+    print("Error in updateProfile: $e");
+    rethrow;
+  }
+}
 
   Future<List<Allergen>> getAllergens() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -146,7 +165,7 @@ Future<PasswordModel> changePassword(
       final response = await _dio.post(
         '${ApiConstants.baseUrl}user/change-password',
         data: {
-          'old_password': oldPassword,
+          'last_password': oldPassword,
           'new_password': newPassword,
         },
         options: Options(
@@ -161,15 +180,18 @@ Future<PasswordModel> changePassword(
         if (response.data['token'] != null) {
           // Save new token
           await prefs.setString('auth_token', response.data['token']);
+      
         }
         return PasswordModel.fromJson(response.data);
       } else {
+        print("Response data: ${response.data}");
         throw Exception(response.data['message'] ?? 'Failed to change password');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         throw Exception('Current password is incorrect');
       }
+      print("Dio error: ${e.response?.data}");
       throw Exception(e.response?.data['message'] ?? 'Failed to change password');
     }
   }

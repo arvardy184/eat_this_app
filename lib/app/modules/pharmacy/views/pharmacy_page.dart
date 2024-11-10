@@ -1,6 +1,5 @@
 import 'package:eat_this_app/app/hooks/use_auth.dart';
 import 'package:eat_this_app/app/themes/app_theme.dart';
-import 'package:eat_this_app/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
@@ -8,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import '../controllers/pharmacy_controller.dart';
 import 'pharmacy_detail_page.dart';
 
+// ignore: must_be_immutable
 class PharmacyPage extends StatelessWidget {
   final PharmacyController controller = Get.put(PharmacyController());
   final MapController mapController = MapController();

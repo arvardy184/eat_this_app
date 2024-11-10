@@ -38,6 +38,20 @@ class UseAuth {
     }
   }
 
+  Future<void> forgotPassword(String email) async {
+  try {
+    final response = await _apiService.forgotPassword(email);
+    if (response.statusCode == 200) {
+      Get.snackbar('Success', 'A reset link has been sent to your email');
+    } else {
+      Get.snackbar('Error', 'Failed to send reset link');
+    }
+  } catch (e) {
+    Get.snackbar('Error', 'An error occurred');
+  }
+}
+
+
   Future<void> handleUnauthorized() async {
     try {
       await _apiService.refreshToken();

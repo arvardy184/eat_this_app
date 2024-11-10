@@ -88,16 +88,17 @@ class ApiProvider {
     }
   }
 
-  Future<Response> forgotPassword(String email) async {
-    try {
-      final response = await _dio.post('forgot-password', data: {
-        'email': email,
-      });
-      return response;
-    } catch (e) {
-      rethrow;
-    }
+Future<Response> forgotPassword(String email) async {
+  try {
+    final response = await _dio.post('${ApiConstants.baseUrl}forgot-password', data: {
+      'email': email,
+    });
+    return response;
+  } catch (e) {
+    throw e;
   }
+}
+
 
   Future<Response> signup(String name, String email, String password) async {
     try {

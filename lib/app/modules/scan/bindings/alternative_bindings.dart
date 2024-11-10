@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 class AlternativeProductBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => AlternativeProductController());
+    Get.lazyPut(() => AlternativeProductController(
+      
+    ),fenix: true);
     Get.lazyPut(() => ProductService());
   }
 }

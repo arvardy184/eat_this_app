@@ -14,16 +14,22 @@ class AlternativeProductController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final productId = Get.arguments as String;
-    loadProductData(productId);
+    final args = Get.arguments;
+    
+    print("Product ID di alternative: $args");
+
+      print("Invalid arguments: $args");
+       loadProductData(args.toString());
+    
   }
+  
 
   Future<void> loadProductData(String productId) async {
     try {
       isLoading(true);
       final result = await _productService.fetchProductData(productId);
       productData.value = result;
-
+      print("loaded alternative product data: $result");
       // Load alternatives
       if (result.product?.keywords != null) {
         final keywords = result.product!.keywords!.split(',');
@@ -51,5 +57,12 @@ class AlternativeProductController extends GetxController {
     } finally {
       isLoadingAlternatives(false);
     }
+  }
+
+   @override
+  void onClose() {
+    productData.value = null;
+    alternativeProducts.clear();
+    super.onClose();
   }
 }

@@ -12,6 +12,7 @@ class ProfilePage extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
+    final user = controller.user.value;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Account"),
@@ -26,7 +27,9 @@ class ProfilePage extends GetView<ProfileController> {
             children: [
               _buildProfileHeader(),
               const SizedBox(height: 20),
-              _buildAllergenSection(),
+              if (user?.type != "Pharmacy") ...[
+                _buildAllergenSection(),
+              ],
               const SizedBox(height: 20),
               _buildMenuSection(),
             ],
@@ -160,7 +163,8 @@ class ProfilePage extends GetView<ProfileController> {
   Widget _buildAllergenSection() {
     return Obx(() {
       final user = controller.user.value;
-      if (user?.allergens == null || user!.allergens!.isEmpty) {
+      if (user?.allergens == null ||
+          user!.allergens!.isEmpty && user.type != 'Pharmacy') {
         return Container(
           padding: const EdgeInsets.all(16),
           margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -206,53 +210,50 @@ class ProfilePage extends GetView<ProfileController> {
       }
 
       return Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "My Allergens",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "My Allergens",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => Get.to(() => PersonalInformationPage()),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: user.allergens!.map((allergen) {
-                return _buildAllergenChip(allergen.name ?? '');
-              }).toList(),
-            ),
-          ],
-        ),
-      );
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () => Get.to(() => PersonalInformationPage()),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: user.allergens!.map((allergen) {
+                  return _buildAllergenChip(allergen.name ?? '');
+                }).toList(),
+              ),
+            ],
+          ));
     });
-
-    
   }
 
   void _showImagePickerBottomSheet(BuildContext context) {
@@ -284,6 +285,7 @@ class ProfilePage extends GetView<ProfileController> {
       },
     );
   }
+
   Widget _buildAllergenChip(String allergen) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -365,7 +367,6 @@ class ProfilePage extends GetView<ProfileController> {
     );
   }
 
-
   Widget _buildMenuGroup({
     required String title,
     required List<MenuItem> items,
@@ -436,6 +437,4 @@ class MenuItem {
     this.color = Colors.black87,
     required this.onTap,
   });
-
 }
-

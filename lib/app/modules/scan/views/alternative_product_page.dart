@@ -7,26 +7,30 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 
 import '../../../data/models/product_model.dart';
-
 class AlternativeProductPage extends GetView<AlternativeProductController> {
+  const AlternativeProductPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Product Details'),
+        title: const Text('Product Detail'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
       ),
-      body: Obx(() => controller.isLoading.value
-          ? const Center(child: CircularProgressIndicator())
-          : ProductDetailWidget(
-              productData: controller.productData.value ?? ProductModel(),
-              onRefreshAlternatives: controller.refreshAlternatives,
-              isLoadingAlternatives: controller.isLoadingAlternatives.value,
-              alternativeProducts: controller.alternativeProducts,
-            )),
+      body: Obx(() {
+        print("Showing alternative product: ${controller.productData.value?.product?.name}");
+        
+        return ProductDetailWidget(
+          productData: controller.productData.value ?? ProductModel(),
+          onRefreshAlternatives: controller.refreshAlternatives,
+          isLoadingAlternatives: controller.isLoadingAlternatives.value,
+          alternativeProducts: controller.alternativeProducts,
+          isLoading: controller.isLoading.value,
+        );
+      }),
     );
   }
 }

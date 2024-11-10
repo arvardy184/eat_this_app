@@ -38,7 +38,7 @@ class PersistentBottomNavBar extends StatelessWidget {
         GetBuilder(
             init: PharmacyController(),
             builder: (controller) => PharmacyPage()),
-        
+
         GetBuilder<ChatController>(
           init: ChatController(),
           builder: (controller) => ChatPage(),
@@ -92,21 +92,23 @@ class PersistentBottomNavBar extends StatelessWidget {
       padding: EdgeInsets.all(8),
       screens: buildScreens(),
       items: navBarsItems(),
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       handleAndroidBackButtonPress: true,
-      resizeToAvoidBottomInset: true,
+      // resizeToAvoidBottomInset: true,
       navBarHeight: 70,
       stateManagement: true,
       hideNavigationBarWhenKeyboardAppears: true,
+      backgroundColor: Colors.white,
+
       decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
+        colorBehindNavBar: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 8,
-            offset: const Offset(0, -3),
+            color: Colors.blueAccent.withOpacity(0.4),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
         ],
       ),

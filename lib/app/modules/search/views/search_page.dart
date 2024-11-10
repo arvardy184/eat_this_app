@@ -174,8 +174,9 @@ class SearchPage extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
                           onTap: () {
+                            print("Product ID: ${product.id}");
                             Get.toNamed(
-                              '/product/details',
+                              '/product/alternative',
                               arguments: product.id,
                             );
                           },

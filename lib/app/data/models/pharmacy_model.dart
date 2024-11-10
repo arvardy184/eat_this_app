@@ -24,7 +24,7 @@ class Pharmacy {
       id: json['id'],
       name: json['name'],
       email: json['email'],
-      address: json['address'],
+      address: json['address'] ?? 'Jl. Veteran',
       profilePicture: json['profile_picture'],
       latitude: double.parse(json['latitude']),
       longitude: double.parse(json['longitude']),
