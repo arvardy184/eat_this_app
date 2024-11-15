@@ -173,7 +173,7 @@ Future<void> sendMessage(String text) async {
     }
   }
 
-  Future<void> checkTypeUser() async{
+  Future<void> checkTypeUser() async {
     try{
       final type = await _chatService.getType();
       typeUser.value = type ?? 'General User';

@@ -52,17 +52,38 @@ class UseAuth {
     }
   }
 
-  Future<void> forgotPassword(String email) async {
-  try {
-    final response = await _apiService.forgotPassword(email);
-    if (response.statusCode == 200) {
-      Get.snackbar('Success', 'A reset link has been sent to your email');
-    } else {
-      Get.snackbar('Error', 'Failed to send reset link');
+Future<void> forgotPassword(String email) async {
+    try {
+      final response = await _apiService.forgotPassword(email);
+      print("Response: $response");
+      Get.toNamed('/otp', arguments: email);
+    } catch (e) {
+      throw e;
     }
-  } catch (e) {
-    Get.snackbar('Error', 'An error occurred');
   }
+
+  Future<void> verifyOtp(String email, String token) async {
+    try {
+      final response = await _apiService.verifyOTP(email, token);
+      print("Response: $response");
+      Get.toNamed('/reset-password', arguments: {
+        'email': email,
+        'token': token,
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> resetPassword(String email, String token, String password) async {
+    try {
+      final response = await _apiService.resetPasswors(email, token, password);
+      print("Response: $response");
+      Get.offAllNamed('/login');
+    } catch (e) {
+      throw e;
+    }
+  
 }
 
 

@@ -3,6 +3,8 @@ import 'package:eat_this_app/app/middleware/auth_middleware.dart';
 import 'package:eat_this_app/app/modules/auth/views/forgetPassword_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/login_form.dart';
 import 'package:eat_this_app/app/modules/auth/views/login_page.dart';
+import 'package:eat_this_app/app/modules/auth/views/otp_page.dart';
+import 'package:eat_this_app/app/modules/auth/views/reset_password_page.dart';
 import 'package:eat_this_app/app/modules/auth/views/signup_form.dart';
 import 'package:eat_this_app/app/modules/chat/bindings/chat_binding.dart';
 import 'package:eat_this_app/app/modules/chat/bindings/subscription_binding.dart';
@@ -118,6 +120,8 @@ class AppPages {
     //   binding: AlternativeProductBinding(),
     // ),
     GetPage(name: '/change-password', page: () => const ChangePasswordPage(), binding: ProfileBinding()),
+    GetPage(name: '/otp', page: () => const OtpVerificationPage()),
+GetPage(name: '/reset-password', page: () => const ResetPasswordPage()),
   ];
 }
 

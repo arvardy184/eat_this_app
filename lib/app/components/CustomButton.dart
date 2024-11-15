@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final bool isPrimary;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
 
   const CustomButton({
@@ -19,19 +19,21 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      child: isLoading
-          ? Loading(color: isPrimary ? Colors.white : CIETTheme.primary_color)
-          : Text(text),
+      onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
         foregroundColor: isPrimary ? Colors.white : CIETTheme.primary_color,
         backgroundColor: isPrimary ? CIETTheme.primary_color : Colors.white,
         side: BorderSide(color: CIETTheme.primary_color),
-        minimumSize: Size(double.infinity, 50),
+        minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
+        disabledBackgroundColor: isPrimary ? CIETTheme.primary_color.withOpacity(0.7) : Colors.grey[300],
+        disabledForegroundColor: isPrimary ? Colors.white70 : Colors.grey,
       ),
-      onPressed: onPressed,
+      child: isLoading
+          ? Loading(color: isPrimary ? Colors.white : CIETTheme.primary_color)
+          : Text(text),
     );
   }
 }

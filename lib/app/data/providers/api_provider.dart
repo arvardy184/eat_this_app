@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:eat_this_app/app/data/models/status_model.dart';
 import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/utils/constant.dart';
 import 'package:get/get.dart' as getx;
@@ -88,16 +89,16 @@ class ApiProvider {
     }
   }
 
-Future<Response> forgotPassword(String email) async {
-  try {
-    final response = await _dio.post('${ApiConstants.baseUrl}forgot-password', data: {
-      'email': email,
-    });
-    return response;
-  } catch (e) {
-    throw e;
-  }
-}
+// Future<Response> forgotPassword(String email) async {
+//   try {
+//     final response = await _dio.post('${ApiConstants.baseUrl}forgot-password', data: {
+//       'email': email,
+//     });
+//     return response;
+//   } catch (e) {
+//     throw e;
+//   }
+// }
 
 
   Future<Response> signup(String name, String email, String password) async {
@@ -126,6 +127,49 @@ Future<Response> forgotPassword(String email) async {
       rethrow;
     }
   }
+
+  Future<StatusModel> forgotPassword(String email) async {
+    try {
+      final response = await _dio.post('${ApiConstants.baseUrl}password/forgot', data: {
+        'email': email,
+      });
+      if(response.statusCode != 200) throw Exception('Failed to send reset link');
+      return StatusModel.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Failed to send reset link');
+    }
+  }
+
+  Future<StatusModel> verifyOTP(String email, String token) async{
+    try {
+      final response = await _dio.post('${ApiConstants.baseUrl}otp/verify', data: {
+        'email': email,
+        'token': token,
+      });
+      if(response.statusCode != 200) throw Exception('Failed to verify OTP');
+      return StatusModel.fromJson(response.data); 
+    } catch (e) {
+      throw Exception('Failed to verify OTP');
+    }
+    }
+
+    Future<StatusModel> resetPasswors(String email, String token, String password) async{
+      try {
+        final response = await _dio.post('${ApiConstants.baseUrl}otp/change', data: {
+          'email': email,
+          'token': token,
+          'new_password': password,
+        });
+        print("Response: ${response.data} ${response.statusCode}");
+        if(response.statusCode != 200) throw Exception('Failed to reset password');
+        
+        return StatusModel.fromJson(response.data); 
+      } catch (e) {
+        throw Exception('Failed to reset password');
+      }
+    }
+    
+  
 
   Future<dynamic> refreshToken() async {
     try {
