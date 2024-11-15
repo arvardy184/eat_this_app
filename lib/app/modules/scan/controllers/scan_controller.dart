@@ -45,8 +45,7 @@ class ScanController extends BaseController {
 
       // Cek subscription sebelum scan
       if (subscriptionController.dailyScanCount.value >= 
-          subscriptionController.remainingScans.value || 
-          !subscriptionController.isPremium.value) {
+          subscriptionController.remainingScans.value ) {
         print("Scan limit check: ${subscriptionController.dailyScanCount.value} >= ${subscriptionController.remainingScans.value}");
         print("Premium status: ${subscriptionController.isPremium.value}");
         isLoading.value = false;
@@ -143,7 +142,7 @@ class ScanController extends BaseController {
       isLoadingAlternatives(true);
       alternativeProducts.clear();
      if(keywords.isEmpty) return;
-     
+
       final results = await _productService.getAlternative(keywords);
       print("Alternative products found: ${results.length}");
       
