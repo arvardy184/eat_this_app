@@ -1,9 +1,21 @@
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UseAuth {
   final ApiProvider _apiService = ApiProvider();
+
+
+  void showSuccess(String message) {
+    Get.snackbar(
+      'Success',
+      message,
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green[100],
+      colorText: Colors.green[900],
+    );
+  }
 
   Future<void> login(String email, String password) async {
   try {
@@ -12,6 +24,7 @@ class UseAuth {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       print("Login successful");
+    
       Get.offAllNamed('/home');  // Navigate to the home page
     } else {
       print("Login failed with status: ${response.statusCode}");
@@ -29,7 +42,8 @@ class UseAuth {
     try {
       final response = await _apiService.signup(name, email, password);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.offAllNamed('/home');
+         Get.offAllNamed('/home');
+        showSuccess("Signup successful");
       } else {
         Get.snackbar('Signup Failed', 'Please check your credentials');
       }

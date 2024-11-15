@@ -142,7 +142,8 @@ class ScanController extends BaseController {
     try {
       isLoadingAlternatives(true);
       alternativeProducts.clear();
-      
+     if(keywords.isEmpty) return;
+     
       final results = await _productService.getAlternative(keywords);
       print("Alternative products found: ${results.length}");
       

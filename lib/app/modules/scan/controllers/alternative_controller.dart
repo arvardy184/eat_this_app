@@ -45,6 +45,8 @@ class AlternativeProductController extends GetxController {
   Future<void> refreshAlternatives(List<String> keywords) async {
     try {
       isLoadingAlternatives(true);
+      if(keywords.isEmpty) return;
+      
       final results = await _productService.getAlternative(keywords);
 
       // Remove current product from alternatives

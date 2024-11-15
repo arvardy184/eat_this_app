@@ -89,6 +89,9 @@ class ProductService {
     if (token == null || token.isEmpty) { 
       throw Exception('No authentication token found');
     }
+    if(term.isEmpty){
+      throw Exception('No term found');
+    }
    try {
       final response = await _dio.get(
         '${ApiConstants.baseUrl}product/alternative',
@@ -107,7 +110,7 @@ class ProductService {
       // Log response status and data
       print("Response status: ${response.statusCode}");
       print("Response data: ${response.data}");
-
+        
       if (response.statusCode == 200) {
         final data = response.data;
         print("data: ${data}");

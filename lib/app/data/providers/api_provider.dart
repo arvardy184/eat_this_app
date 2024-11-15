@@ -107,7 +107,21 @@ Future<Response> forgotPassword(String email) async {
         'email': email,
         'password': password,
       });
-      return response;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+        await _saveTokens(
+          accessToken: data['token'] ?? '',
+          refreshToken: data['refresh_token'] ?? '',
+        );
+        await _saveTypes(type: data['user']['type'] ?? '');
+        await saveUserData(data['user'] ?? {});
+        return response;
+      } else {
+        print("Login failed with status code: ${response.statusCode}");
+        return response;
+      }
+
     } catch (e) {
       rethrow;
     }

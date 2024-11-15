@@ -102,6 +102,7 @@ class _SignupFormState extends State<SignupForm> {
 
     setState(() => _isLoading = true);
     try {
+  
       await _auth.signup(_nameController.text, _emailController.text,
           _passwordController.text);
     } finally {
