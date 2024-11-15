@@ -38,7 +38,7 @@ class ProductService {
       
       // Log response status and data
       print("Response status: ${response.statusCode}");
-      print("Response data: ${response.data}");
+      print("Response data fetch produxt: ${response.data}");
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -109,7 +109,7 @@ class ProductService {
       
       // Log response status and data
       print("Response status: ${response.statusCode}");
-      print("Response data: ${response.data}");
+      print("Response data get alternative: ${response.data}");
         
       if (response.statusCode == 200) {
         final data = response.data;
@@ -117,7 +117,12 @@ class ProductService {
         final getAlternative = GetAlternativeModel.fromJson(response.data);
        return getAlternative.products ?? [];
       } else if (response.statusCode == 401) {
+        if(response.data['errors']['term']){
+         print("Error message di get alternative: ${response.data['errors']['term']}");
+
+        } else{
         await ErrorHandler.handleUnauthorized();
+        }
         throw Exception('Session expired. Please login again.');
       } else if(response.statusCode == 404){  
         throw Exception('Product not found');

@@ -36,7 +36,7 @@ class ScanPage extends StatelessWidget {
                 : ProductDetailWidget(
                     productData: controller.productData.value ?? ProductModel(),
                     onRefreshAlternatives: (keywords) =>
-                        controller.refreshAlternatives(keywords),
+                      keywords.isNotEmpty ?  controller.refreshAlternatives(keywords) : null,
                     isLoadingAlternatives:
                         controller.isLoadingAlternatives.value,
                     alternativeProducts: controller.alternativeProducts,
