@@ -204,7 +204,8 @@ class HomePage extends GetView<HomeController> {
   }
 
   Widget _buildSubscriptionStatus() {
-    print("is premium?: ${subscriptionController.isPremium.value} ${subscriptionController.remainingScans.value} ${subscriptionController.recentScans.length}" );
+    print(
+        "is premium?: ${subscriptionController.isPremium.value} ${subscriptionController.remainingScans.value} ${subscriptionController.recentScans.length}");
     return GetBuilder<SubscriptionController>(
       init: subscriptionController,
       builder: (controller) => Container(
@@ -236,7 +237,6 @@ class HomePage extends GetView<HomeController> {
                     ),
                   )),
               if (!controller.isPremium.value) ...[
-                
                 ElevatedButton(
                   onPressed: controller.showUpgradeDialog,
                   style: ElevatedButton.styleFrom(
@@ -269,31 +269,30 @@ Widget _buildQuotaIndicator(
   int current,
   bool isPremium,
 ) {
+  // Gunakan todayScansCount untuk menghitung scan hari ini
+  final todayScans = controller.todayScansCount;
   
-  
-  // Calculate progress (0.0 to 1.0)
   double progress;
   if (isPremium) {
-      print("progress premium ${current}");
-progress = current > 0 ? 1.0 : 0.0;
+    print("progress premium ${todayScans}");
+    progress = todayScans > 0 ? 1.0 : 0.0;
     print("berapa progress premium $progress");
   } else {
-    
-       progress = max > 0 ? (current / max) : 0.0;
+    progress = max > 0 ? (todayScans / max) : 0.0;
     print("Berapa progress free $progress");
   }
 
   // Determine color based on usage
-Color getProgressColor() {
+  Color getProgressColor() {
     if (isPremium) {
       return Colors.blue[900]!;
     }
-    
+
     // For free users
-    if (current >= max) {
+    if (todayScans >= max) {
       return Colors.red;
     }
-    if (current >= (max * 0.8)) {
+    if (todayScans >= (max * 0.8)) {
       return Colors.orange;
     }
     return CIETTheme.primary_color;
@@ -302,9 +301,9 @@ Color getProgressColor() {
   // Format display text
   String getQuotaText() {
     if (isPremium) {
-      return '$current scans today';
+      return '$todayScans scans today';
     } else {
-      return '$current/$max scans';
+      return '$todayScans/$max scans';
     }
   }
 
@@ -365,7 +364,6 @@ Color getProgressColor() {
         const SizedBox(height: 12),
         Stack(
           children: [
-            // Background track
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
@@ -377,11 +375,10 @@ Color getProgressColor() {
                 minHeight: 12,
               ),
             ),
-            // Progress bar
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
-                value:  progress.clamp(0.0, 1.0),
+                value: progress.clamp(0.0, 1.0),
                 backgroundColor: Colors.transparent,
                 valueColor: AlwaysStoppedAnimation<Color>(getProgressColor()),
                 minHeight: 12,
@@ -389,7 +386,7 @@ Color getProgressColor() {
             ),
           ],
         ),
-   if (!isPremium && current >= max) ...[
+        if (!isPremium && todayScans >= max) ...[
           const SizedBox(height: 8),
           Row(
             children: [
@@ -410,7 +407,7 @@ Color getProgressColor() {
               ),
             ],
           ),
-        ] else if (!isPremium && current >= (max * 0.8)) ...[
+        ] else if (!isPremium && todayScans >= (max * 0.8)) ...[
           const SizedBox(height: 8),
           Row(
             children: [
@@ -749,9 +746,10 @@ Color getProgressColor() {
                                 TextButton(
                                   onPressed: () {
                                     print("product id ${product.id}");
-                                    Get.toNamed('/product/alternative',
-                                        arguments: product.id,
-                                       );
+                                    Get.toNamed(
+                                      '/product/alternative',
+                                      arguments: product.id,
+                                    );
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,

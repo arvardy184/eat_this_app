@@ -36,10 +36,10 @@ class SearchService {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['products']; // Updated here
+        final List<dynamic> data = response.data['products']; 
         return data.map((json) => Products.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load recommended products');
+       throw Exception('Failed to fetch recommended products');
       }
     } catch (e) {
       throw Exception('Error fetching recommended products: $e');

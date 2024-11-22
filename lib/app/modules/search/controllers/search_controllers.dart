@@ -22,7 +22,7 @@ class SearchControllers extends BaseController {
       final recommendedProducts = await _searchService.getRecommendedProducts();
       products.value = recommendedProducts;
     } catch (e) {
-      handleError(e);
+      print("Error loading recommended products: $e");
     } finally {
       isLoading.value = false;
     }

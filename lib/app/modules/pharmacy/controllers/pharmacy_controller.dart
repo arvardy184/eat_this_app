@@ -109,14 +109,14 @@ class PharmacyController extends BaseController {
       );
     } catch (e) {
       errorMessage.value = e.toString();
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        duration: const Duration(seconds: 5),
-      );
+      // Get.snackbar(
+      //   'Error',
+      //   e.toString(),
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: Colors.red,
+      //   colorText: Colors.white,
+      //   duration: const Duration(seconds: 5),
+      // );
     } finally {
       isLoading.value = false;
     }

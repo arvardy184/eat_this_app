@@ -3,6 +3,7 @@ import 'package:eat_this_app/app/data/models/recommendation_model.dart';
 import 'package:eat_this_app/app/data/models/user_model.dart';
 import 'package:eat_this_app/app/data/providers/api_provider.dart';
 import 'package:eat_this_app/app/modules/auth/controllers/base_controller.dart';
+import 'package:eat_this_app/app/utils/date_utils.dart';
 import 'package:eat_this_app/services/api_service.dart';
 import 'package:eat_this_app/services/home_service.dart';
 import 'package:get/get.dart';
@@ -42,11 +43,25 @@ class HomeController extends BaseController {
         loadRecentScans(),
         loadRecommendation(),
         loadUserData(),
+        
       ]);
     } catch (e) {
       print("Error refreshing data: $e");
       error.value = e.toString();
     }
+  }
+
+
+  int get todayScansCount {
+    return recentScans.where((scan) {
+      if (scan.pivot?.createdAt == null) return false;
+      try {
+        return DateUtils.isToday(scan.pivot?.createdAt);
+      } catch (e) {
+        print('Error counting today scans: $e');
+        return false;
+      }
+    }).length;
   }
 
 List<Products> get todayScans {

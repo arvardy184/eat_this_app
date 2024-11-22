@@ -4,10 +4,9 @@ import 'package:eat_this_app/app/modules/home/controllers/home_controller.dart';
 import 'package:eat_this_app/app/utils/date_utils.dart';
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class AllScanPage extends GetView<HomeController> {
-  const AllScanPage({Key? key}) : super(key: key);
+  const AllScanPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +84,7 @@ Widget _buildTodayScans() {
         padding: const EdgeInsets.all(16),
         itemCount: todayScans.length,
         itemBuilder: (context, index) {
+          print("berapa index di history: $index");
           final scan = todayScans[index];
           return Column(
             children: [
